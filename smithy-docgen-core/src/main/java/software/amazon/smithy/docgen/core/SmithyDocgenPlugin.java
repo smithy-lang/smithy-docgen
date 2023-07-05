@@ -18,6 +18,9 @@ package software.amazon.smithy.docgen.core;
 import software.amazon.smithy.build.PluginContext;
 import software.amazon.smithy.build.SmithyBuildPlugin;
 
+/**
+ * Generates API documentation from a Smithy model.
+ */
 public final class SmithyDocgenPlugin implements SmithyBuildPlugin {
 
     @Override
