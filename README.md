@@ -1,11 +1,6 @@
-## My Project
+## Smithy DocGen
 
-TODO: Fill this README out!
-
-Be sure to:
-
-* Change the title in this README
-* Edit your repository description on GitHub
+Smithy build plugin to generate API documentation from models authored in [Smithy](https://smithy.io) IDL.
 
 ## Security
 
