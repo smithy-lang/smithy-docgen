@@ -16,9 +16,13 @@
 package software.amazon.smithy.docgen.core;
 
 import software.amazon.smithy.codegen.core.SymbolWriter;
+import software.amazon.smithy.model.shapes.Shape;
+import software.amazon.smithy.model.traits.DocumentationTrait;
+import software.amazon.smithy.utils.StringUtils;
 
 public final class MarkdownTextWriter
         extends SymbolWriter<MarkdownTextWriter, MarkdownTextImportContainer> {
+    private int headerLevel = 0;
 
     public MarkdownTextWriter() {
         super(new MarkdownTextImportContainer());
@@ -29,5 +33,39 @@ public final class MarkdownTextWriter
         public MarkdownTextWriter apply(String s, String s1) {
             return new MarkdownTextWriter();
         }
+    }
+
+    public MarkdownTextWriter writeShapeDocs(Shape shape) {
+        shape.getTrait(DocumentationTrait.class)
+                .map(DocumentationTrait::getValue)
+                .ifPresent(this::writeWithNewline);
+        return this;
+    }
+
+    private MarkdownTextWriter writeWithNewline(Object content, Object... args) {
+        write(content, args);
+        write("");
+        return this;
+    }
+
+    public MarkdownTextWriter openHeader(String content) {
+        headerLevel++;
+        if (headerLevel > 5) {
+            throw new RuntimeException("Tried opening a header nested too deeply.");
+        }
+
+        writeWithNewline(StringUtils.repeat("#", headerLevel) + " " + content);
+
+        return this;
+    }
+
+    public MarkdownTextWriter closeHeader() {
+        if (headerLevel <= 0) {
+            throw new RuntimeException("Closed a header that was never opened.");
+        }
+        write("");
+
+        headerLevel--;
+        return this;
     }
 }

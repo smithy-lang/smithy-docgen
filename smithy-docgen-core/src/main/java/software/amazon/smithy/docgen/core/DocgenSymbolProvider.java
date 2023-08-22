@@ -38,6 +38,36 @@ public class DocgenSymbolProvider extends ShapeVisitor.Default<Symbol> implement
         return shape.accept(this);
     }
 
+    @Override
+    public Symbol serviceShape(ServiceShape shape) {
+        return getSymbolBuilder(shape)
+                .definitionFile(getDefinitionFile(serviceShape, shape))
+                .build();
+    }
+
+    private Symbol.Builder getSymbolBuilder(Shape shape) {
+        return Symbol.builder()
+                .name(getShapeName(serviceShape, shape))
+                .putProperty("shape", shape)
+                .putProperty("shapeType", shape.getType());
+    }
+
+    private static String getDefinitionFile(ServiceShape serviceShape, Shape shape) {
+        return getDefinitionFile(getShapeName(serviceShape, shape) + ".md");
+    }
+
+    public static String getDefinitionFile(String filename) {
+        return "sources/" + filename;
+    }
+
+    private static String getShapeName(ServiceShape serviceShape, Shape shape) {
+        String name = shape.getId().getName(serviceShape);
+        if (shape.getId().getMember().isPresent()) {
+            name += "-" + shape.getId().getMember().get();
+        }
+        return name;
+    }
+
     // All other shapes don't get generation, so we'll do null checks where this might
     // have impact.
     @Override
