@@ -26,6 +26,10 @@ import software.amazon.smithy.model.Model;
 import software.amazon.smithy.model.node.Node;
 import software.amazon.smithy.utils.IoUtils;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Paths;
+
 public class SmithyDocgenPluginTest {
 
     @Test
@@ -54,7 +58,18 @@ public class SmithyDocgenPluginTest {
     private void assertServicePageContents(MockManifest manifest) {
         String servicePage = manifest.expectFileString("/sources/SampleService.md");
 
-        assertEquals(servicePage,
-                IoUtils.readUtf8File(getClass().getResource("expected-outputs/SampleService.md").getPath()));
+        assertEquals(servicePage, readExpectedPageContent("expected-outputs/SampleService.md"));
+    }
+
+    private String readExpectedPageContent(String filename) {
+        URI uri;
+
+        try {
+            uri = getClass().getResource(filename).toURI();
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+
+        return IoUtils.readUtf8File(Paths.get(uri));
     }
 }
