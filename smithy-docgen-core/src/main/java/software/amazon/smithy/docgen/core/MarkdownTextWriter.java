@@ -13,16 +13,21 @@
  * permissions and limitations under the License.
  */
 
-description = "This module contains support for generating API documentation " +
-        "based on Smithy models."
+package software.amazon.smithy.docgen.core;
 
-ext {
-    displayName = "Smithy :: DocGen :: Core"
-    moduleName = "software.amazon.smithy.docgen.core"
-}
+import software.amazon.smithy.codegen.core.SymbolWriter;
 
-dependencies {
-    api("software.amazon.smithy:smithy-build:$smithyVersion")
-    api("software.amazon.smithy:smithy-model:$smithyVersion")
-    api("software.amazon.smithy:smithy-codegen-core:$smithyVersion")
+public final class MarkdownTextWriter
+        extends SymbolWriter<MarkdownTextWriter, MarkdownTextImportContainer> {
+
+    public MarkdownTextWriter() {
+        super(new MarkdownTextImportContainer());
+    }
+
+    public static final class Factory implements SymbolWriter.Factory<MarkdownTextWriter> {
+        @Override
+        public MarkdownTextWriter apply(String s, String s1) {
+            return new MarkdownTextWriter();
+        }
+    }
 }

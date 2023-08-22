@@ -13,16 +13,14 @@
  * permissions and limitations under the License.
  */
 
-description = "This module contains support for generating API documentation " +
-        "based on Smithy models."
+package software.amazon.smithy.docgen.core;
 
-ext {
-    displayName = "Smithy :: DocGen :: Core"
-    moduleName = "software.amazon.smithy.docgen.core"
-}
+import software.amazon.smithy.codegen.core.ImportContainer;
+import software.amazon.smithy.codegen.core.Symbol;
 
-dependencies {
-    api("software.amazon.smithy:smithy-build:$smithyVersion")
-    api("software.amazon.smithy:smithy-model:$smithyVersion")
-    api("software.amazon.smithy:smithy-codegen-core:$smithyVersion")
+public class MarkdownTextImportContainer implements ImportContainer {
+    @Override
+    public void importSymbol(Symbol symbol, String s) {
+        // no-op
+    }
 }
