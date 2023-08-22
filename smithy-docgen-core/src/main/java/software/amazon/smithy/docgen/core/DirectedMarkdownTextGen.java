@@ -28,6 +28,7 @@ import software.amazon.smithy.codegen.core.directed.GenerateResourceDirective;
 import software.amazon.smithy.codegen.core.directed.GenerateServiceDirective;
 import software.amazon.smithy.codegen.core.directed.GenerateStructureDirective;
 import software.amazon.smithy.codegen.core.directed.GenerateUnionDirective;
+import software.amazon.smithy.docgen.core.generators.ServiceGenerator;
 import software.amazon.smithy.model.Model;
 
 public class DirectedMarkdownTextGen
@@ -54,7 +55,7 @@ public class DirectedMarkdownTextGen
 
     @Override
     public void generateService(GenerateServiceDirective<DocgenGenerationContext, DocgenSettings> directive) {
-        // no-op for now
+        new ServiceGenerator().accept(directive);
     }
 
     @Override
