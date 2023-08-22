@@ -17,6 +17,7 @@ package software.amazon.smithy.docgen.core;
 
 import software.amazon.smithy.build.PluginContext;
 import software.amazon.smithy.build.SmithyBuildPlugin;
+import software.amazon.smithy.codegen.core.directed.CodegenDirector;
 
 /**
  * Generates API documentation from a Smithy model.
@@ -30,6 +31,18 @@ public final class SmithyDocgenPlugin implements SmithyBuildPlugin {
 
     @Override
     public void execute(PluginContext pluginContext) {
-        // Do nothing for now
+        DocgenSettings docgenSettings = DocgenSettings.from(pluginContext.getSettings());
+
+        CodegenDirector<MarkdownTextWriter, DocgenIntegration, DocgenGenerationContext, DocgenSettings> runner
+                = new CodegenDirector<>();
+
+        runner.directedCodegen(new DirectedMarkdownTextGen());
+        runner.integrationClass(DocgenIntegration.class);
+        runner.fileManifest(pluginContext.getFileManifest());
+        runner.model(pluginContext.getModel());
+        runner.settings(docgenSettings);
+        runner.service(docgenSettings.service());
+        runner.performDefaultCodegenTransforms();
+        runner.run();
     }
 }

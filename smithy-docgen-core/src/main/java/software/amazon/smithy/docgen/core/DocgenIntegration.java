@@ -13,17 +13,10 @@
  * permissions and limitations under the License.
  */
 
-description = "This module contains support for generating API documentation " +
-        "based on Smithy models."
+package software.amazon.smithy.docgen.core;
 
-ext {
-    displayName = "Smithy :: DocGen :: Core"
-    moduleName = "software.amazon.smithy.docgen.core"
-}
+import software.amazon.smithy.codegen.core.SmithyIntegration;
 
-dependencies {
-    api("software.amazon.smithy:smithy-build:$smithyVersion")
-    api("software.amazon.smithy:smithy-model:$smithyVersion")
-    api("software.amazon.smithy:smithy-utils:$smithyVersion")
-    api("software.amazon.smithy:smithy-codegen-core:$smithyVersion")
+public interface DocgenIntegration
+        extends SmithyIntegration<DocgenSettings, MarkdownTextWriter, DocgenGenerationContext> {
 }
