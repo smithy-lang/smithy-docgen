@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -18,6 +18,5 @@ package software.amazon.smithy.docgen.core;
 import software.amazon.smithy.codegen.core.SmithyIntegration;
 import software.amazon.smithy.docgen.core.writers.DocWriter;
 
-public interface DocIntegration
-        extends SmithyIntegration<DocSettings, DocWriter, DocGenerationContext> {
+public interface DocIntegration extends SmithyIntegration<DocSettings, DocWriter, DocGenerationContext> {
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@
 
 package software.amazon.smithy.docgen.core;
 
+
+import java.util.logging.Logger;
 import software.amazon.smithy.build.PluginContext;
 import software.amazon.smithy.build.SmithyBuildPlugin;
 import software.amazon.smithy.codegen.core.directed.CodegenDirector;
@@ -25,6 +27,8 @@ import software.amazon.smithy.docgen.core.writers.DocWriter;
  */
 public final class SmithyDocPlugin implements SmithyBuildPlugin {
 
+    private static final Logger LOGGER = Logger.getLogger(SmithyDocPlugin.class.getName());
+
     @Override
     public String getName() {
         return "docgen";
@@ -32,6 +36,7 @@ public final class SmithyDocPlugin implements SmithyBuildPlugin {
 
     @Override
     public void execute(PluginContext pluginContext) {
+        LOGGER.fine("Beginning documentation generation.");
         DocSettings docSettings = DocSettings.from(pluginContext.getSettings());
 
         CodegenDirector<DocWriter, DocIntegration, DocGenerationContext, DocSettings> runner
@@ -45,5 +50,6 @@ public final class SmithyDocPlugin implements SmithyBuildPlugin {
         runner.service(docSettings.service());
         runner.performDefaultCodegenTransforms();
         runner.run();
+        LOGGER.fine("Finished documentation generation.");
     }
 }

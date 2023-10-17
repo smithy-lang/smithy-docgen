@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -15,6 +15,9 @@
 
 package software.amazon.smithy.docgen.core;
 
+import static java.lang.String.format;
+
+import java.util.logging.Logger;
 import software.amazon.smithy.codegen.core.Symbol;
 import software.amazon.smithy.codegen.core.SymbolProvider;
 import software.amazon.smithy.model.Model;
@@ -23,6 +26,9 @@ import software.amazon.smithy.model.shapes.Shape;
 import software.amazon.smithy.model.shapes.ShapeVisitor;
 
 public class DocSymbolProvider extends ShapeVisitor.Default<Symbol> implements SymbolProvider {
+
+    private static final Logger LOGGER = Logger.getLogger(DocSymbolProvider.class.getName());
+
     private final Model model;
     private final DocSettings docSettings;
     private final ServiceShape serviceShape;
@@ -35,7 +41,9 @@ public class DocSymbolProvider extends ShapeVisitor.Default<Symbol> implements S
 
     @Override
     public Symbol toSymbol(Shape shape) {
-        return shape.accept(this);
+        var symbol = shape.accept(this);
+        LOGGER.fine(() -> format("Creating symbol from %s: %s", shape, symbol));
+        return symbol;
     }
 
     @Override
@@ -48,8 +56,7 @@ public class DocSymbolProvider extends ShapeVisitor.Default<Symbol> implements S
     private Symbol.Builder getSymbolBuilder(Shape shape) {
         return Symbol.builder()
                 .name(getShapeName(serviceShape, shape))
-                .putProperty("shape", shape)
-                .putProperty("shapeType", shape.getType());
+                .putProperty("shape", shape);
     }
 
     private static String getDefinitionFile(ServiceShape serviceShape, Shape shape) {
@@ -61,11 +68,7 @@ public class DocSymbolProvider extends ShapeVisitor.Default<Symbol> implements S
     }
 
     private static String getShapeName(ServiceShape serviceShape, Shape shape) {
-        String name = shape.getId().getName(serviceShape);
-        if (shape.getId().getMember().isPresent()) {
-            name += "-" + shape.getId().getMember().get();
-        }
-        return name;
+        return shape.getId().getName(serviceShape);
     }
 
     // All other shapes don't get generation, so we'll do null checks where this might

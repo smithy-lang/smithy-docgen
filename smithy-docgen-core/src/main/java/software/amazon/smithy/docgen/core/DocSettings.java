@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -15,12 +15,17 @@
 
 package software.amazon.smithy.docgen.core;
 
+import java.util.Objects;
 import software.amazon.smithy.model.node.ObjectNode;
 import software.amazon.smithy.model.shapes.ShapeId;
 
 public record DocSettings(ShapeId service) {
+
+    public DocSettings {
+        Objects.requireNonNull(service);
+    }
+
     public static DocSettings from(ObjectNode pluginSettings) {
-        return new DocSettings(
-                pluginSettings.expectStringMember("service").expectShapeId());
+        return new DocSettings(pluginSettings.expectStringMember("service").expectShapeId());
     }
 }

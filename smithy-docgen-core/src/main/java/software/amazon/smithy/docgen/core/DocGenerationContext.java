@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -24,8 +24,7 @@ import software.amazon.smithy.docgen.core.writers.DocWriter;
 import software.amazon.smithy.docgen.core.writers.MarkdownWriter;
 import software.amazon.smithy.model.Model;
 
-public final class DocGenerationContext
-        implements CodegenContext<DocSettings, DocWriter, DocIntegration> {
+public final class DocGenerationContext implements CodegenContext<DocSettings, DocWriter, DocIntegration> {
     private final Model model;
     private final DocSettings docSettings;
     private final SymbolProvider symbolProvider;
@@ -44,8 +43,8 @@ public final class DocGenerationContext
         this.docSettings = docSettings;
         this.symbolProvider = symbolProvider;
         this.fileManifest = fileManifest;
-        this.writerDelegator = new WriterDelegator<>(fileManifest, symbolProvider,
-                new MarkdownWriter.Factory());
+        // TODO: pull the factory from the integrations
+        this.writerDelegator = new WriterDelegator<>(fileManifest, symbolProvider, new MarkdownWriter.Factory());
         this.docIntegrations = docIntegrations;
     }
 
