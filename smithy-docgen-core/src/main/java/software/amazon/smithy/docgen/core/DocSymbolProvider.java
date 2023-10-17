@@ -22,15 +22,15 @@ import software.amazon.smithy.model.shapes.ServiceShape;
 import software.amazon.smithy.model.shapes.Shape;
 import software.amazon.smithy.model.shapes.ShapeVisitor;
 
-public class DocgenSymbolProvider extends ShapeVisitor.Default<Symbol> implements SymbolProvider {
+public class DocSymbolProvider extends ShapeVisitor.Default<Symbol> implements SymbolProvider {
     private final Model model;
-    private final DocgenSettings docgenSettings;
+    private final DocSettings docSettings;
     private final ServiceShape serviceShape;
 
-    public DocgenSymbolProvider(Model model, DocgenSettings docgenSettings) {
+    public DocSymbolProvider(Model model, DocSettings docSettings) {
         this.model = model;
-        this.docgenSettings = docgenSettings;
-        this.serviceShape = model.expectShape(docgenSettings.service(), ServiceShape.class);
+        this.docSettings = docSettings;
+        this.serviceShape = model.expectShape(docSettings.service(), ServiceShape.class);
     }
 
     @Override

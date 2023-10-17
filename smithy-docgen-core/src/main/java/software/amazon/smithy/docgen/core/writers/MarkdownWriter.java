@@ -13,42 +13,44 @@
  * permissions and limitations under the License.
  */
 
-package software.amazon.smithy.docgen.core;
+package software.amazon.smithy.docgen.core.writers;
 
 import software.amazon.smithy.codegen.core.SymbolWriter;
 import software.amazon.smithy.model.shapes.Shape;
 import software.amazon.smithy.model.traits.DocumentationTrait;
 import software.amazon.smithy.utils.StringUtils;
 
-public final class MarkdownTextWriter
-        extends SymbolWriter<MarkdownTextWriter, MarkdownTextImportContainer> {
+public final class MarkdownWriter
+    extends DocWriter {
     private int headerLevel = 0;
 
-    public MarkdownTextWriter() {
-        super(new MarkdownTextImportContainer());
+    public MarkdownWriter() {
+        super(new DocImportContainer());
     }
 
-    public static final class Factory implements SymbolWriter.Factory<MarkdownTextWriter> {
+    public static final class Factory implements SymbolWriter.Factory<DocWriter> {
         @Override
-        public MarkdownTextWriter apply(String s, String s1) {
-            return new MarkdownTextWriter();
+        public DocWriter apply(String s, String s1) {
+            return new MarkdownWriter();
         }
     }
 
-    public MarkdownTextWriter writeShapeDocs(Shape shape) {
+    @Override
+    public DocWriter writeShapeDocs(Shape shape) {
         shape.getTrait(DocumentationTrait.class)
                 .map(DocumentationTrait::getValue)
                 .ifPresent(this::writeWithNewline);
         return this;
     }
 
-    private MarkdownTextWriter writeWithNewline(Object content, Object... args) {
+    private DocWriter writeWithNewline(Object content, Object... args) {
         write(content, args);
         write("");
         return this;
     }
 
-    public MarkdownTextWriter openHeader(String content) {
+    @Override
+    public DocWriter openHeader(String content) {
         headerLevel++;
         if (headerLevel > 5) {
             throw new RuntimeException("Tried opening a header nested too deeply.");
@@ -59,7 +61,8 @@ public final class MarkdownTextWriter
         return this;
     }
 
-    public MarkdownTextWriter closeHeader() {
+    @Override
+    public DocWriter closeHeader() {
         if (headerLevel <= 0) {
             throw new RuntimeException("Closed a header that was never opened.");
         }

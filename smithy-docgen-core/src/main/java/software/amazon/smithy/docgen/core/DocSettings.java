@@ -15,12 +15,12 @@
 
 package software.amazon.smithy.docgen.core;
 
-import software.amazon.smithy.codegen.core.ImportContainer;
-import software.amazon.smithy.codegen.core.Symbol;
+import software.amazon.smithy.model.node.ObjectNode;
+import software.amazon.smithy.model.shapes.ShapeId;
 
-public class MarkdownTextImportContainer implements ImportContainer {
-    @Override
-    public void importSymbol(Symbol symbol, String s) {
-        // no-op
+public record DocSettings(ShapeId service) {
+    public static DocSettings from(ObjectNode pluginSettings) {
+        return new DocSettings(
+                pluginSettings.expectStringMember("service").expectShapeId());
     }
 }

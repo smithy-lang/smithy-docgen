@@ -17,16 +17,16 @@ package software.amazon.smithy.docgen.core.generators;
 
 import java.util.function.Consumer;
 import software.amazon.smithy.codegen.core.directed.GenerateServiceDirective;
-import software.amazon.smithy.docgen.core.DocgenGenerationContext;
-import software.amazon.smithy.docgen.core.DocgenSettings;
+import software.amazon.smithy.docgen.core.DocGenerationContext;
+import software.amazon.smithy.docgen.core.DocSettings;
 import software.amazon.smithy.model.shapes.ServiceShape;
 import software.amazon.smithy.model.traits.TitleTrait;
 
 public final class ServiceGenerator
-        implements Consumer<GenerateServiceDirective<DocgenGenerationContext, DocgenSettings>> {
+        implements Consumer<GenerateServiceDirective<DocGenerationContext, DocSettings>> {
 
     @Override
-    public void accept(GenerateServiceDirective<DocgenGenerationContext, DocgenSettings> directive) {
+    public void accept(GenerateServiceDirective<DocGenerationContext, DocSettings> directive) {
         ServiceShape serviceShape = directive.service();
 
         directive.context().writerDelegator().useShapeWriter(serviceShape, writer -> {

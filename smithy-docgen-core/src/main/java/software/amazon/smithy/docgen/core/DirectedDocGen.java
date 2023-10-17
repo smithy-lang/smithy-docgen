@@ -31,60 +31,60 @@ import software.amazon.smithy.codegen.core.directed.GenerateUnionDirective;
 import software.amazon.smithy.docgen.core.generators.ServiceGenerator;
 import software.amazon.smithy.model.Model;
 
-public class DirectedMarkdownTextGen
-        implements DirectedCodegen<DocgenGenerationContext, DocgenSettings, DocgenIntegration> {
+public class DirectedDocGen
+        implements DirectedCodegen<DocGenerationContext, DocSettings, DocIntegration> {
 
     @Override
-    public SymbolProvider createSymbolProvider(CreateSymbolProviderDirective<DocgenSettings> directive) {
-        return new DocgenSymbolProvider(directive.model(), directive.settings());
+    public SymbolProvider createSymbolProvider(CreateSymbolProviderDirective<DocSettings> directive) {
+        return new DocSymbolProvider(directive.model(), directive.settings());
     }
 
     @Override
-    public DocgenGenerationContext createContext(CreateContextDirective<DocgenSettings, DocgenIntegration> directive) {
+    public DocGenerationContext createContext(CreateContextDirective<DocSettings, DocIntegration> directive) {
         Model model = directive.model();
-        DocgenSettings docgenSettings = directive.settings();
-        List<DocgenIntegration> docgenIntegrations = new ArrayList<>(directive.integrations());
+        DocSettings docSettings = directive.settings();
+        List<DocIntegration> docIntegrations = new ArrayList<>(directive.integrations());
 
-        return new DocgenGenerationContext(
+        return new DocGenerationContext(
                 model,
-                docgenSettings,
+            docSettings,
                 directive.symbolProvider(),
                 directive.fileManifest(),
-                docgenIntegrations);
+            docIntegrations);
     }
 
     @Override
-    public void generateService(GenerateServiceDirective<DocgenGenerationContext, DocgenSettings> directive) {
+    public void generateService(GenerateServiceDirective<DocGenerationContext, DocSettings> directive) {
         new ServiceGenerator().accept(directive);
     }
 
     @Override
-    public void generateStructure(GenerateStructureDirective<DocgenGenerationContext, DocgenSettings> directive) {
+    public void generateStructure(GenerateStructureDirective<DocGenerationContext, DocSettings> directive) {
         // no-op for now
     }
 
     @Override
-    public void generateError(GenerateErrorDirective<DocgenGenerationContext, DocgenSettings> directive) {
+    public void generateError(GenerateErrorDirective<DocGenerationContext, DocSettings> directive) {
         // no-op for now
     }
 
     @Override
-    public void generateUnion(GenerateUnionDirective<DocgenGenerationContext, DocgenSettings> directive) {
+    public void generateUnion(GenerateUnionDirective<DocGenerationContext, DocSettings> directive) {
         // no-op for now
     }
 
     @Override
-    public void generateEnumShape(GenerateEnumDirective<DocgenGenerationContext, DocgenSettings> directive) {
+    public void generateEnumShape(GenerateEnumDirective<DocGenerationContext, DocSettings> directive) {
         // no-op for now
     }
 
     @Override
-    public void generateIntEnumShape(GenerateIntEnumDirective<DocgenGenerationContext, DocgenSettings> directive) {
+    public void generateIntEnumShape(GenerateIntEnumDirective<DocGenerationContext, DocSettings> directive) {
         // no-op for now
     }
 
     @Override
-    public void generateResource(GenerateResourceDirective<DocgenGenerationContext, DocgenSettings> directive) {
+    public void generateResource(GenerateResourceDirective<DocGenerationContext, DocSettings> directive) {
         // no-op for now
     }
 }

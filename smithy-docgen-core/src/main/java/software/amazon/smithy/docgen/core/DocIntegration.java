@@ -16,7 +16,8 @@
 package software.amazon.smithy.docgen.core;
 
 import software.amazon.smithy.codegen.core.SmithyIntegration;
+import software.amazon.smithy.docgen.core.writers.DocWriter;
 
-public interface DocgenIntegration
-        extends SmithyIntegration<DocgenSettings, MarkdownTextWriter, DocgenGenerationContext> {
+public interface DocIntegration
+        extends SmithyIntegration<DocSettings, DocWriter, DocGenerationContext> {
 }

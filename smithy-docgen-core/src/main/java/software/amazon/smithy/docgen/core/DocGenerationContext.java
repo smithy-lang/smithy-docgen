@@ -20,31 +20,33 @@ import software.amazon.smithy.build.FileManifest;
 import software.amazon.smithy.codegen.core.CodegenContext;
 import software.amazon.smithy.codegen.core.SymbolProvider;
 import software.amazon.smithy.codegen.core.WriterDelegator;
+import software.amazon.smithy.docgen.core.writers.DocWriter;
+import software.amazon.smithy.docgen.core.writers.MarkdownWriter;
 import software.amazon.smithy.model.Model;
 
-public final class DocgenGenerationContext
-        implements CodegenContext<DocgenSettings, MarkdownTextWriter, DocgenIntegration> {
+public final class DocGenerationContext
+        implements CodegenContext<DocSettings, DocWriter, DocIntegration> {
     private final Model model;
-    private final DocgenSettings docgenSettings;
+    private final DocSettings docSettings;
     private final SymbolProvider symbolProvider;
     private final FileManifest fileManifest;
-    private final WriterDelegator<MarkdownTextWriter> writerDelegator;
-    private final List<DocgenIntegration> docgenIntegrations;
+    private final WriterDelegator<DocWriter> writerDelegator;
+    private final List<DocIntegration> docIntegrations;
 
-    public DocgenGenerationContext(
+    public DocGenerationContext(
             Model model,
-            DocgenSettings docgenSettings,
+            DocSettings docSettings,
             SymbolProvider symbolProvider,
             FileManifest fileManifest,
-            List<DocgenIntegration> docgenIntegrations
+            List<DocIntegration> docIntegrations
     ) {
         this.model = model;
-        this.docgenSettings = docgenSettings;
+        this.docSettings = docSettings;
         this.symbolProvider = symbolProvider;
         this.fileManifest = fileManifest;
         this.writerDelegator = new WriterDelegator<>(fileManifest, symbolProvider,
-                new MarkdownTextWriter.Factory());
-        this.docgenIntegrations = docgenIntegrations;
+                new MarkdownWriter.Factory());
+        this.docIntegrations = docIntegrations;
     }
 
     @Override
@@ -53,8 +55,8 @@ public final class DocgenGenerationContext
     }
 
     @Override
-    public DocgenSettings settings() {
-        return docgenSettings;
+    public DocSettings settings() {
+        return docSettings;
     }
 
     @Override
@@ -68,12 +70,12 @@ public final class DocgenGenerationContext
     }
 
     @Override
-    public WriterDelegator<MarkdownTextWriter> writerDelegator() {
+    public WriterDelegator<DocWriter> writerDelegator() {
         return writerDelegator;
     }
 
     @Override
-    public List<DocgenIntegration> integrations() {
-        return docgenIntegrations;
+    public List<DocIntegration> integrations() {
+        return docIntegrations;
     }
 }

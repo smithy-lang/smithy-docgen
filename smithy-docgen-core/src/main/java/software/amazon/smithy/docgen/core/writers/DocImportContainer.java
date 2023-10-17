@@ -13,14 +13,14 @@
  * permissions and limitations under the License.
  */
 
-package software.amazon.smithy.docgen.core;
+package software.amazon.smithy.docgen.core.writers;
 
-import software.amazon.smithy.model.node.ObjectNode;
-import software.amazon.smithy.model.shapes.ShapeId;
+import software.amazon.smithy.codegen.core.ImportContainer;
+import software.amazon.smithy.codegen.core.Symbol;
 
-public record DocgenSettings(ShapeId service) {
-    public static DocgenSettings from(ObjectNode pluginSettings) {
-        return new DocgenSettings(
-                pluginSettings.expectStringMember("service").expectShapeId());
+public class DocImportContainer implements ImportContainer {
+    @Override
+    public void importSymbol(Symbol symbol, String s) {
+        // no-op
     }
 }

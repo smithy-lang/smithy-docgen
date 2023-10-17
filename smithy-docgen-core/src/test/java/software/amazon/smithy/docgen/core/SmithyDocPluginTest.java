@@ -30,7 +30,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
 
-public class SmithyDocgenPluginTest {
+public class SmithyDocPluginTest {
 
     @Test
     public void assertDocumentationFiles() {
@@ -48,7 +48,7 @@ public class SmithyDocgenPluginTest {
                         .build())
                 .build();
 
-        SmithyBuildPlugin plugin = new SmithyDocgenPlugin();
+        SmithyBuildPlugin plugin = new SmithyDocPlugin();
         plugin.execute(context);
 
         assertFalse(manifest.getFiles().isEmpty());

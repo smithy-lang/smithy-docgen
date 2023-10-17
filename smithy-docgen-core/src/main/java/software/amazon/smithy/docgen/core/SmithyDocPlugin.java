@@ -18,11 +18,12 @@ package software.amazon.smithy.docgen.core;
 import software.amazon.smithy.build.PluginContext;
 import software.amazon.smithy.build.SmithyBuildPlugin;
 import software.amazon.smithy.codegen.core.directed.CodegenDirector;
+import software.amazon.smithy.docgen.core.writers.DocWriter;
 
 /**
  * Generates API documentation from a Smithy model.
  */
-public final class SmithyDocgenPlugin implements SmithyBuildPlugin {
+public final class SmithyDocPlugin implements SmithyBuildPlugin {
 
     @Override
     public String getName() {
@@ -31,17 +32,17 @@ public final class SmithyDocgenPlugin implements SmithyBuildPlugin {
 
     @Override
     public void execute(PluginContext pluginContext) {
-        DocgenSettings docgenSettings = DocgenSettings.from(pluginContext.getSettings());
+        DocSettings docSettings = DocSettings.from(pluginContext.getSettings());
 
-        CodegenDirector<MarkdownTextWriter, DocgenIntegration, DocgenGenerationContext, DocgenSettings> runner
+        CodegenDirector<DocWriter, DocIntegration, DocGenerationContext, DocSettings> runner
                 = new CodegenDirector<>();
 
-        runner.directedCodegen(new DirectedMarkdownTextGen());
-        runner.integrationClass(DocgenIntegration.class);
+        runner.directedCodegen(new DirectedDocGen());
+        runner.integrationClass(DocIntegration.class);
         runner.fileManifest(pluginContext.getFileManifest());
         runner.model(pluginContext.getModel());
-        runner.settings(docgenSettings);
-        runner.service(docgenSettings.service());
+        runner.settings(docSettings);
+        runner.service(docSettings.service());
         runner.performDefaultCodegenTransforms();
         runner.run();
     }
