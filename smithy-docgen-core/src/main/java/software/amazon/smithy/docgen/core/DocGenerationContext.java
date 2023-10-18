@@ -13,7 +13,13 @@ import software.amazon.smithy.codegen.core.WriterDelegator;
 import software.amazon.smithy.docgen.core.writers.DocWriter;
 import software.amazon.smithy.docgen.core.writers.MarkdownWriter;
 import software.amazon.smithy.model.Model;
+import software.amazon.smithy.utils.SmithyUnstableApi;
 
+/**
+ * Contextual information that is made available during most parts of documentation
+ * generation.
+ */
+@SmithyUnstableApi
 public final class DocGenerationContext implements CodegenContext<DocSettings, DocWriter, DocIntegration> {
     private final Model model;
     private final DocSettings docSettings;

@@ -12,7 +12,7 @@ import software.amazon.smithy.model.traits.DocumentationTrait;
 import software.amazon.smithy.utils.StringUtils;
 
 public final class MarkdownWriter extends DocWriter {
-    private static int MAX_HEADING_DEPTH = 6;
+    private static int MAX_HEADING_DEPTH = 5;
 
     private int headerLevel = 0;
 

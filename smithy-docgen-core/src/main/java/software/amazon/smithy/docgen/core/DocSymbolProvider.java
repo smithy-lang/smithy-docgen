@@ -51,7 +51,7 @@ import software.amazon.smithy.utils.SmithyUnstableApi;
  *
  */
 @SmithyUnstableApi
-public class DocSymbolProvider extends ShapeVisitor.Default<Symbol> implements SymbolProvider {
+public final class DocSymbolProvider extends ShapeVisitor.Default<Symbol> implements SymbolProvider {
 
     /**
      * The name for a shape symbol's named property containing the shape the symbol

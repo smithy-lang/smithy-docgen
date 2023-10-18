@@ -11,10 +11,12 @@ import software.amazon.smithy.build.PluginContext;
 import software.amazon.smithy.build.SmithyBuildPlugin;
 import software.amazon.smithy.codegen.core.directed.CodegenDirector;
 import software.amazon.smithy.docgen.core.writers.DocWriter;
+import software.amazon.smithy.utils.SmithyInternalApi;
 
 /**
  * Generates API documentation from a Smithy model.
  */
+@SmithyInternalApi
 public final class SmithyDocPlugin implements SmithyBuildPlugin {
 
     private static final Logger LOGGER = Logger.getLogger(SmithyDocPlugin.class.getName());

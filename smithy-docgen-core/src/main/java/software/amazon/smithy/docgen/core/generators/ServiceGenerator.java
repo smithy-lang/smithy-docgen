@@ -10,10 +10,13 @@ import software.amazon.smithy.codegen.core.directed.GenerateServiceDirective;
 import software.amazon.smithy.docgen.core.DocGenerationContext;
 import software.amazon.smithy.docgen.core.DocSettings;
 import software.amazon.smithy.model.shapes.ServiceShape;
-import software.amazon.smithy.model.traits.TitleTrait;
+import software.amazon.smithy.utils.SmithyInternalApi;
 
-public final class ServiceGenerator
-        implements Consumer<GenerateServiceDirective<DocGenerationContext, DocSettings>> {
+/**
+ * Generates the top-level documentation for a service.
+ */
+@SmithyInternalApi
+public final class ServiceGenerator implements Consumer<GenerateServiceDirective<DocGenerationContext, DocSettings>> {
 
     @Override
     public void accept(GenerateServiceDirective<DocGenerationContext, DocSettings> directive) {
