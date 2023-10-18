@@ -15,18 +15,21 @@ import software.amazon.smithy.utils.SmithyUnstableApi;
  * {@code smithy-build.json} configuration for this plugin.
  *
  * @param service The shape id of the service to generate documentation for.
+ * @param format The format to generate documentation in. The default is markdown.
  */
 @SmithyUnstableApi
-public record DocSettings(ShapeId service) {
+public record DocSettings(ShapeId service, String format) {
 
     /**
      * Settings for documentation generation. These can be set in the
      * {@code smithy-build.json} configuration for this plugin.
      *
      * @param service The shape id of the service to generate documentation for.
+     * @param format The format to generate documentation in. The default is markdown.
      */
     public DocSettings {
         Objects.requireNonNull(service);
+        Objects.requireNonNull(format);
     }
 
     /**
@@ -36,6 +39,9 @@ public record DocSettings(ShapeId service) {
      * @return loaded settings based on the given node.
      */
     public static DocSettings from(ObjectNode pluginSettings) {
-        return new DocSettings(pluginSettings.expectStringMember("service").expectShapeId());
+        return new DocSettings(
+            pluginSettings.expectStringMember("service").expectShapeId(),
+            pluginSettings.getStringMemberOrDefault("format", "markdown")
+        );
     }
 }
