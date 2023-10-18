@@ -18,9 +18,10 @@ public final class ServiceGenerator
     @Override
     public void accept(GenerateServiceDirective<DocGenerationContext, DocSettings> directive) {
         ServiceShape serviceShape = directive.service();
+        var serviceSymbol = directive.symbolProvider().toSymbol(serviceShape);
 
         directive.context().writerDelegator().useShapeWriter(serviceShape, writer -> {
-            writer.openHeading(serviceShape.expectTrait(TitleTrait.class).getValue());
+            writer.openHeading(serviceSymbol.getName());
             writer.writeShapeDocs(serviceShape);
 
             writer.closeHeading();
