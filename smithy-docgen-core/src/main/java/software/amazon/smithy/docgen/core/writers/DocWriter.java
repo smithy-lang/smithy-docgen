@@ -5,6 +5,7 @@
 
 package software.amazon.smithy.docgen.core.writers;
 
+import software.amazon.smithy.codegen.core.CodegenException;
 import software.amazon.smithy.codegen.core.SymbolWriter;
 import software.amazon.smithy.model.shapes.Shape;
 import software.amazon.smithy.utils.SmithyUnstableApi;
@@ -16,6 +17,10 @@ import software.amazon.smithy.utils.SmithyUnstableApi;
  */
 @SmithyUnstableApi
 public abstract class DocWriter extends SymbolWriter<DocWriter, DocImportContainer> {
+    private static final int MAX_HEADING_DEPTH = 6;
+
+    private int headingDepth = 0;
+
     public DocWriter(DocImportContainer importContainer) {
         super(importContainer);
     }
@@ -47,12 +52,44 @@ public abstract class DocWriter extends SymbolWriter<DocWriter, DocImportContain
      * @param content A string to use as the heading content.
      * @return returns the writer.
      */
-    public abstract DocWriter openHeading(String content);
+    public DocWriter openHeading(String content) {
+        headingDepth++;
+        if (headingDepth > MAX_HEADING_DEPTH) {
+            throw new CodegenException(String.format(
+                "Tried opening a heading nested more deeply than the max depth of %d.",
+                MAX_HEADING_DEPTH
+            ));
+        }
+        return openHeading(content, headingDepth);
+    }
 
     /**
-     * Closes the current heading, cleaning any context created for the current level.
+     * Writes a heading of a given level with the given content.
+     *
+     * <p>{@link #closeHeading} will be called to enable cleaning up any resources or
+     * context this method creates.
+     *
+     * @param content A string to use as the heading content.
+     * @param level The level of the heading to open. This corresponds to HTML heading
+     *              levels, and will only have values between 1 and 6.
+     * @return returns the writer.
+     */
+    abstract DocWriter openHeading(String content, int level);
+
+    /**
+     * Closes the current heading, cleaning any context created for the current level,
+     * then writes a blank line.
      *
      * @return returns the writer.
      */
-    public abstract DocWriter closeHeading();
+    public DocWriter closeHeading() {
+        headingDepth--;
+        if (headingDepth < 0) {
+            throw new CodegenException(
+                "Attempted to close a heading when at the base heading level."
+            );
+        }
+        write("");
+        return this;
+    }
 }
