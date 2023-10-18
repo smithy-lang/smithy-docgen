@@ -28,6 +28,15 @@ public final class DocGenerationContext implements CodegenContext<DocSettings, D
     private final WriterDelegator<DocWriter> writerDelegator;
     private final List<DocIntegration> docIntegrations;
 
+    /**
+     * Constructor.
+     *
+     * @param model The source model to generate for.
+     * @param docSettings Settings to customize generation.
+     * @param symbolProvider The symbol provider to use to turn shapes into symbols.
+     * @param fileManifest The file manifest to write to.
+     * @param docIntegrations A list of integrations to apply during generation.
+     */
     public DocGenerationContext(
             Model model,
             DocSettings docSettings,

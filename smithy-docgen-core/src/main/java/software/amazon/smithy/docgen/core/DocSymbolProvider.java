@@ -25,7 +25,7 @@ import software.amazon.smithy.utils.SmithyUnstableApi;
  * <p>These symbols contain many important pieces of metadata. Particularly
  * important are:
  *
- * <p><ul>
+ * <ul>
  *     <li>{@code name}: The name of the symbol will be used as the title for its
  *     definition section. For services, this defaults to the value of the
  *     {@code title} trait. For other shapes, it defaults to the shape name including
@@ -86,6 +86,12 @@ public final class DocSymbolProvider extends ShapeVisitor.Default<Symbol> implem
     private final DocSettings docSettings;
     private final ServiceShape serviceShape;
 
+    /**
+     * Constructor.
+     *
+     * @param model The model to provide symbols for.
+     * @param docSettings Settings used to customize symbol creation.
+     */
     public DocSymbolProvider(Model model, DocSettings docSettings) {
         this.model = model;
         this.docSettings = docSettings;
@@ -124,7 +130,7 @@ public final class DocSymbolProvider extends ShapeVisitor.Default<Symbol> implem
         );
     }
 
-    public String getDefinitionFile(String filename) {
+    private String getDefinitionFile(String filename) {
         return "content/" + filename;
     }
 

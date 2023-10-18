@@ -21,6 +21,11 @@ public abstract class DocWriter extends SymbolWriter<DocWriter, DocImportContain
 
     private int headingDepth = 0;
 
+    /**
+     * Constructor.
+     *
+     * @param importContainer The container to store any imports in.
+     */
     public DocWriter(DocImportContainer importContainer) {
         super(importContainer);
     }
