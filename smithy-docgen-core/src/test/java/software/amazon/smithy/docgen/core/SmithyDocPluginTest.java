@@ -71,6 +71,7 @@ public class SmithyDocPluginTest {
             throw new RuntimeException(e);
         }
 
-        return IoUtils.readUtf8File(Paths.get(uri));
+        return IoUtils.readUtf8File(Paths.get(uri))
+            .replace("\r\n", "\n");
     }
 }
