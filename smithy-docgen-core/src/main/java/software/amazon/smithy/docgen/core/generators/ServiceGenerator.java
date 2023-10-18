@@ -20,10 +20,10 @@ public final class ServiceGenerator
         ServiceShape serviceShape = directive.service();
 
         directive.context().writerDelegator().useShapeWriter(serviceShape, writer -> {
-            writer.openHeader(serviceShape.expectTrait(TitleTrait.class).getValue());
+            writer.openHeading(serviceShape.expectTrait(TitleTrait.class).getValue());
             writer.writeShapeDocs(serviceShape);
 
-            writer.closeHeader();
+            writer.closeHeading();
         });
     }
 

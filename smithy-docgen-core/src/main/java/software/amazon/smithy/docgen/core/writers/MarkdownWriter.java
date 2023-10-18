@@ -5,13 +5,15 @@
 
 package software.amazon.smithy.docgen.core.writers;
 
+import software.amazon.smithy.codegen.core.CodegenException;
 import software.amazon.smithy.codegen.core.SymbolWriter;
 import software.amazon.smithy.model.shapes.Shape;
 import software.amazon.smithy.model.traits.DocumentationTrait;
 import software.amazon.smithy.utils.StringUtils;
 
-public final class MarkdownWriter
-    extends DocWriter {
+public final class MarkdownWriter extends DocWriter {
+    private static int MAX_HEADING_DEPTH = 6;
+
     private int headerLevel = 0;
 
     public MarkdownWriter() {
@@ -40,10 +42,13 @@ public final class MarkdownWriter
     }
 
     @Override
-    public DocWriter openHeader(String content) {
+    public DocWriter openHeading(String content) {
         headerLevel++;
-        if (headerLevel > 5) {
-            throw new RuntimeException("Tried opening a header nested too deeply.");
+        if (headerLevel > MAX_HEADING_DEPTH) {
+            throw new CodegenException(String.format(
+                "Tried opening a heading nested more deeply than the max depth of %d.",
+                MAX_HEADING_DEPTH
+            ));
         }
 
         writeWithNewline(StringUtils.repeat("#", headerLevel) + " " + content);
@@ -52,9 +57,9 @@ public final class MarkdownWriter
     }
 
     @Override
-    public DocWriter closeHeader() {
+    public DocWriter closeHeading() {
         if (headerLevel <= 0) {
-            throw new RuntimeException("Closed a header that was never opened.");
+            throw new CodegenException("Closed a header that was never opened.");
         }
         write("");
 

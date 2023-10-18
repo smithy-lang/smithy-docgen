@@ -54,7 +54,7 @@ public class DocSymbolProvider extends ShapeVisitor.Default<Symbol> implements S
     }
 
     public static String getDefinitionFile(String filename) {
-        return "sources/" + filename;
+        return "content/" + filename;
     }
 
     private static String getShapeName(ServiceShape serviceShape, Shape shape) {

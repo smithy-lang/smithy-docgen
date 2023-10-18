@@ -15,7 +15,7 @@ public abstract class DocWriter extends SymbolWriter<DocWriter, DocImportContain
 
     public abstract DocWriter writeShapeDocs(Shape shape);
 
-    public abstract DocWriter openHeader(String content);
+    public abstract DocWriter openHeading(String content);
 
-    public abstract DocWriter closeHeader();
+    public abstract DocWriter closeHeading();
 }
