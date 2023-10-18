@@ -42,4 +42,10 @@ public final class MarkdownWriter extends DocWriter {
         writeWithNewline(StringUtils.repeat("#", level) + " " + content);
         return this;
     }
+
+    @Override
+    public String toString() {
+        // Ensure there's exactly one trailing newline
+        return super.toString().stripTrailing() + "\n";
+    }
 }
