@@ -56,7 +56,7 @@ public class SmithyDocPluginTest {
     }
 
     private void assertServicePageContents(MockManifest manifest) {
-        String servicePage = manifest.expectFileString("/sources/SampleService.md");
+        String servicePage = manifest.expectFileString("/content/SampleService.md");
 
         assertEquals(servicePage, readExpectedPageContent("expected-outputs/SampleService.md"));
     }

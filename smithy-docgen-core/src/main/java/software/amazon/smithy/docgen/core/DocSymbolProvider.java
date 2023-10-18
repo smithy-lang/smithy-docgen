@@ -119,7 +119,9 @@ public final class DocSymbolProvider extends ShapeVisitor.Default<Symbol> implem
         if (shape.isMemberShape()) {
             return getDefinitionFile(serviceShape, model.expectShape(shape.getId().withoutMember()));
         }
-        return getDefinitionFile(getShapeName(serviceShape, shape) + ".md");
+        return getDefinitionFile(
+            getShapeName(serviceShape, shape).replaceAll("\\s+", "") + ".md"
+        );
     }
 
     public String getDefinitionFile(String filename) {
@@ -140,7 +142,7 @@ public final class DocSymbolProvider extends ShapeVisitor.Default<Symbol> implem
     }
 
     private String getLinkId(String shapeName) {
-        return shapeName.toLowerCase(Locale.ENGLISH).replaceAll("\\s", "-");
+        return shapeName.toLowerCase(Locale.ENGLISH).replaceAll("\\s+", "-");
     }
 
     // All other shapes don't get generation, so we'll do null checks where this might
