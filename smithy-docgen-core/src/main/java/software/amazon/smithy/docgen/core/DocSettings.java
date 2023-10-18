@@ -19,6 +19,12 @@ import software.amazon.smithy.utils.SmithyUnstableApi;
 @SmithyUnstableApi
 public record DocSettings(ShapeId service) {
 
+    /**
+     * Settings for documentation generation. These can be set in the
+     * {@code smithy-build.json} configuration for this plugin.
+     *
+     * @param service The shape id of the service to generate documentation for.
+     */
     public DocSettings {
         Objects.requireNonNull(service);
     }
