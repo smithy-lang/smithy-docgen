@@ -1,0 +1,21 @@
+{
+    "version": "1.0",
+    "projections": {
+        "plain-markdown": {
+            "plugins": {
+                "docgen": {
+                    "service": "com.example#DocumentedService",
+                    "format": "markdown"
+                }
+            }
+        },
+        "sphinx-markdown": {
+            "plugins": {
+                "docgen": {
+                    "service": "com.example#DocumentedService",
+                    "format": "sphinx-markdown"
+                }
+            }
+        }
+    }
+}

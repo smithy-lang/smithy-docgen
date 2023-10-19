@@ -124,7 +124,7 @@ public final class DocSymbolProvider extends ShapeVisitor.Default<Symbol> implem
     @Override
     public Symbol serviceShape(ServiceShape shape) {
         return getSymbolBuilder(shape)
-            .definitionFile(getDefinitionFile(serviceShape, shape))
+            .definitionFile(getDefinitionFile("index"))
             .build();
     }
 

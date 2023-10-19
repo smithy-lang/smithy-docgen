@@ -41,7 +41,7 @@ public record DocSettings(ShapeId service, String format) {
     public static DocSettings from(ObjectNode pluginSettings) {
         return new DocSettings(
             pluginSettings.expectStringMember("service").expectShapeId(),
-            pluginSettings.getStringMemberOrDefault("format", "markdown")
+            pluginSettings.getStringMemberOrDefault("format", "sphinx-markdown")
         );
     }
 }
