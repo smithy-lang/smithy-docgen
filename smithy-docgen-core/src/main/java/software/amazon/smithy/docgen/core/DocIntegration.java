@@ -5,6 +5,7 @@
 
 package software.amazon.smithy.docgen.core;
 
+import java.util.List;
 import software.amazon.smithy.codegen.core.SmithyIntegration;
 import software.amazon.smithy.docgen.core.writers.DocWriter;
 import software.amazon.smithy.utils.SmithyUnstableApi;
@@ -20,4 +21,18 @@ import software.amazon.smithy.utils.SmithyUnstableApi;
  */
 @SmithyUnstableApi
 public interface DocIntegration extends SmithyIntegration<DocSettings, DocWriter, DocGenerationContext> {
+
+    /**
+     * Adds {@link DocFormat}s to the list of supported formats.
+     *
+     * <p>When resolving the format implementation, the first format found with a
+     * matching name will be used. Use {@link #priority} to adjust which integration
+     * is seen first.
+     *
+     * @param settings The documentation generation settings.
+     * @return A list of formats to add.
+     */
+    default List<DocFormat> docFormats(DocSettings settings) {
+        return List.of();
+    }
 }

@@ -5,13 +5,15 @@
 
 package software.amazon.smithy.docgen.core;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 import software.amazon.smithy.build.FileManifest;
 import software.amazon.smithy.codegen.core.CodegenContext;
+import software.amazon.smithy.codegen.core.CodegenException;
 import software.amazon.smithy.codegen.core.SymbolProvider;
 import software.amazon.smithy.codegen.core.WriterDelegator;
+import software.amazon.smithy.docgen.core.DocSymbolProvider.FileExtensionDecorator;
 import software.amazon.smithy.docgen.core.writers.DocWriter;
-import software.amazon.smithy.docgen.core.writers.MarkdownWriter;
 import software.amazon.smithy.model.Model;
 import software.amazon.smithy.utils.SmithyUnstableApi;
 
@@ -27,6 +29,7 @@ public final class DocGenerationContext implements CodegenContext<DocSettings, D
     private final FileManifest fileManifest;
     private final WriterDelegator<DocWriter> writerDelegator;
     private final List<DocIntegration> docIntegrations;
+    private final DocFormat docFormat;
 
     /**
      * Constructor.
@@ -46,11 +49,31 @@ public final class DocGenerationContext implements CodegenContext<DocSettings, D
     ) {
         this.model = model;
         this.docSettings = docSettings;
-        this.symbolProvider = symbolProvider;
         this.fileManifest = fileManifest;
-        // TODO: pull the factory from the integrations
-        this.writerDelegator = new WriterDelegator<>(fileManifest, symbolProvider, new MarkdownWriter.Factory());
         this.docIntegrations = docIntegrations;
+
+        DocFormat resolvedFormat = null;
+        var availableFormats = new LinkedHashSet<String>();
+        for (var integration : docIntegrations) {
+            for (var format : integration.docFormats(docSettings)) {
+                if (format.name().equals(docSettings.format())) {
+                    resolvedFormat = format;
+                    symbolProvider = new FileExtensionDecorator(symbolProvider, resolvedFormat.extension());
+                    break;
+                }
+                availableFormats.add(format.name());
+            }
+        }
+        if (resolvedFormat == null) {
+            throw new CodegenException(String.format(
+                "Unknown doc format `%s`. You may be missing a dependency. Currently available formats: [%s]",
+                docSettings.format(), String.join(", ", availableFormats)
+            ));
+        }
+
+        this.docFormat = resolvedFormat;
+        this.symbolProvider = symbolProvider;
+        this.writerDelegator = new WriterDelegator<>(fileManifest, symbolProvider, resolvedFormat.writerFactory());
     }
 
     @Override
@@ -81,5 +104,12 @@ public final class DocGenerationContext implements CodegenContext<DocSettings, D
     @Override
     public List<DocIntegration> integrations() {
         return docIntegrations;
+    }
+
+    /**
+     * @return Returns the selected format that documentation should be generated in.
+     */
+    public DocFormat docFormat() {
+        return this.docFormat;
     }
 }
