@@ -15,7 +15,7 @@ import software.amazon.smithy.utils.StringUtils;
  * Writes documentation in <a href="https://spec.commonmark.org">CommonMark</a> format.
  */
 @SmithyUnstableApi
-public final class MarkdownWriter extends DocWriter {
+public class MarkdownWriter extends DocWriter {
 
     /**
      * Constructor.
