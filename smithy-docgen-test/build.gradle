@@ -1,0 +1,33 @@
+/*
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        "classpath"("software.amazon.smithy:smithy-cli:$smithyVersion")
+    }
+}
+
+plugins {
+    id "software.amazon.smithy.gradle.smithy-base" version "$smithyGradleVersion"
+}
+
+tasks["jar"].enabled = false
+
+ext {
+    displayName = "Smithy :: DocGen :: Test"
+    moduleName = "software.amazon.smithy.docgen.test"
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+    implementation(project(":smithy-docgen-core"))
+}
