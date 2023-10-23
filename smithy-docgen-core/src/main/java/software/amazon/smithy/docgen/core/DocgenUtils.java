@@ -44,8 +44,8 @@ public final class DocgenUtils {
         }
 
         ProcessBuilder processBuilder = new ProcessBuilder(finalizedCommand)
-            .redirectErrorStream(true)
-            .directory(directory.toFile());
+                .redirectErrorStream(true)
+                .directory(directory.toFile());
 
         try {
             Process process = processBuilder.start();
@@ -73,5 +73,14 @@ public final class DocgenUtils {
         } catch (InterruptedException | IOException e) {
             throw new CodegenException(e);
         }
+    }
+
+    /**
+     * Replaces all newline characters in a string with the system line separator.
+     * @param input The string to normalize
+     * @return A string with system-appropriate newlines.
+     */
+    public static String normalizeNewlines(String input) {
+        return input.replaceAll("\r?\n", System.lineSeparator());
     }
 }

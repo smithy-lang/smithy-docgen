@@ -6,6 +6,7 @@
 package software.amazon.smithy.docgen.core.integrations;
 
 import static java.lang.String.format;
+import static software.amazon.smithy.docgen.core.DocgenUtils.normalizeNewlines;
 import static software.amazon.smithy.docgen.core.DocgenUtils.runCommand;
 
 import java.util.List;
@@ -234,25 +235,27 @@ public final class SphinxIntegration implements DocIntegration {
             // Finally, run sphinx itself.
             runCommand("./venv/bin/sphinx-build -M dirhtml content build", baseDir);
 
-            System.out.printf("""
-                Successfully built HTML docs. They can be found in "%1$s".\
-                %n%n\
+            System.out.printf(normalizeNewlines("""
+                Successfully built HTML docs. They can be found in "%1$s".
+
                 Other output formats can also be built. A python virtual environment \
                 has been created at "%2$s" containing the build tools needed for \
                 manually building the docs in other formats. See the virtual \
                 environment docs for information on how to activate it: \
-                https://docs.python.org/3/library/venv.html#how-venvs-work\
-                %n%n\
+                https://docs.python.org/3/library/venv.html#how-venvs-work
+
                 Once the environment is activated, run `make dirhtml` from "%3$s" to \
                 to build the docs, substituting dirhtml for whatever format you wish \
-                to build.\
-                %n%n\
+                to build.
+
                 To build the docs without activating the virtual environment, simply \
                 run `./venv/bin/sphinx-build -M dirhtml content build` from "%3$s", \
-                similarly substituting dirhtml for your desired format.\
-                %n%n\
+                similarly substituting dirhtml for your desired format.
+
                 See sphinx docs for other output formats you can choose: \
-                https://www.sphinx-doc.org/en/master/usage/builders/index.html%n%n""",
+                https://www.sphinx-doc.org/en/master/usage/builders/index.html
+
+                """),
                 baseDir.resolve("build/dirhtml"),
                 baseDir.resolve("venv"),
                 baseDir
@@ -265,18 +268,20 @@ public final class SphinxIntegration implements DocIntegration {
 
     private void logManualBuildInstructions(DocGenerationContext context) {
         // TODO: try to get this printed out in the projection section
-        System.out.printf("""
+        System.out.printf(normalizeNewlines("""
             To build the HTML docs manually, you need to first install the python \
             dependencies. These can be found in the `requirements.txt` file in \
             "%1$s". The easiest way to install these is by running `pip install \
             -r requirements.txt`. Depending on your environment, you may need to \
             instead install them from your system package manager, or another \
-            source.\
-            %n%n\
+            source.
+
             Once the dependencies are installed, run `make dirhtml` from \
             "%1$s". Other output formats can also be built. See sphinx docs for \
             other output formats: \
-            https://www.sphinx-doc.org/en/master/usage/builders/index.html%n%n""",
+            https://www.sphinx-doc.org/en/master/usage/builders/index.html
+
+            """),
             context.fileManifest().getBaseDir()
         );
     }
