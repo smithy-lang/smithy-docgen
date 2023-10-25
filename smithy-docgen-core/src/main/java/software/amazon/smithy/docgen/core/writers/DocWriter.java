@@ -5,8 +5,11 @@
 
 package software.amazon.smithy.docgen.core.writers;
 
+import java.util.function.Consumer;
 import software.amazon.smithy.codegen.core.CodegenException;
+import software.amazon.smithy.codegen.core.Symbol;
 import software.amazon.smithy.codegen.core.SymbolWriter;
+import software.amazon.smithy.model.Model;
 import software.amazon.smithy.model.shapes.Shape;
 import software.amazon.smithy.utils.SmithyUnstableApi;
 
@@ -44,9 +47,10 @@ public abstract class DocWriter extends SymbolWriter<DocWriter, DocImportContain
      * default documentation.
      *
      * @param shape The shape whose documentation should be written.
+     * @param model The model whose documentation is being written.
      * @return returns the writer.
      */
-    public abstract DocWriter writeShapeDocs(Shape shape);
+    public abstract DocWriter writeShapeDocs(Shape shape, Model model);
 
     /**
      * Writes a heading with the given content.
@@ -97,4 +101,50 @@ public abstract class DocWriter extends SymbolWriter<DocWriter, DocImportContain
         write("");
         return this;
     }
+
+    /**
+     * Writes any context needed before listing members.
+     *
+     * <p>For example, a direct HTML writer might need to write out a {@code ul} tag.
+     *
+     * @return returns the writer.
+     */
+    public abstract DocWriter openMemberListing();
+
+    /**
+     * Writes any closing context needed before ending a member listing.
+     *
+     * <p>For example, a direct HTML writer might need to write a closing {@code ul}
+     * tag.
+     *
+     * @return returns the writer.
+     */
+    public abstract DocWriter closeMemberListing();
+
+    /**
+     * Writes out the heading information for a member's documentation.
+     *
+     * <p>For example, a direct HTML writer that renders member listings as HTML lists
+     * might write an opening {@code li} tag.
+     *
+     * <p>Implementations MUST create a linkable element where possible if the
+     * {@link software.amazon.smithy.docgen.core.DocSymbolProvider#LINK_ID_PROPERTY}
+     * is set.
+     *
+     * @param memberSymbol A symbol representing the member being documented.
+     * @param writeType A consumer that writes the type, including links to any referenced
+     *                  shapes.
+     * @return returns the writer.
+     */
+    public abstract DocWriter openMemberEntry(Symbol memberSymbol, Consumer<DocWriter> writeType);
+
+    /**
+     * Writes any context needed to close out the documentation for a member.
+     *
+     * <p>For example, a direct HTML writer might need to write a closing {@code li}
+     * tag.
+     *
+     * @return returns the writer.
+     */
+    public abstract DocWriter closeMemberEntry();
 }

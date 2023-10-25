@@ -31,8 +31,7 @@ import software.amazon.smithy.utils.SmithyUnstableApi;
  *     <li>{@code name}: The name of the symbol will be used as the title for its
  *     definition section. For services, this defaults to the value of the
  *     {@code title} trait. For other shapes, it defaults to the shape name including
- *     any renames from the attached service. For members, the member name is appended
- *     to the parent with a separating {@code -}.
+ *     any renames from the attached service.
  *     <li>{@code definitionFile}: The file in which the documentation for this shape
  *     should be written. By default these are all written to a single flat directory.
  *     If this is empty, the shape does not have its own definition section.
@@ -128,6 +127,17 @@ public final class DocSymbolProvider extends ShapeVisitor.Default<Symbol> implem
             .build();
     }
 
+    @Override
+    public Symbol memberShape(MemberShape shape) {
+        var builder = getSymbolBuilder(shape);
+        var containerLinkId = model.expectShape(shape.getContainer())
+                .accept(this)
+                .expectProperty(LINK_ID_PROPERTY, String.class);
+        var linkId = containerLinkId + "-" + getLinkId(getShapeName(serviceShape, shape));
+        builder.putProperty(LINK_ID_PROPERTY, linkId);
+        return builder.build();
+    }
+
     private Symbol.Builder getSymbolBuilder(Shape shape) {
         var name = getShapeName(serviceShape, shape);
         return Symbol.builder()
@@ -157,11 +167,11 @@ public final class DocSymbolProvider extends ShapeVisitor.Default<Symbol> implem
                 .map(StringTrait::getValue)
                 .orElse(shape.getId().getName());
         }
-        var name = shape.getId().getName(serviceShape);
         if (shape.isMemberShape()) {
-            name += "-" + toMemberName(shape.asMemberShape().get());
+            return toMemberName(shape.asMemberShape().get());
+        } else {
+            return shape.getId().getName(serviceShape);
         }
-        return name;
     }
 
     private String getLinkId(String shapeName) {
@@ -172,7 +182,7 @@ public final class DocSymbolProvider extends ShapeVisitor.Default<Symbol> implem
     // have impact.
     @Override
     protected Symbol getDefault(Shape shape) {
-        return null;
+        return getSymbolBuilder(shape).build();
     }
 
     /**

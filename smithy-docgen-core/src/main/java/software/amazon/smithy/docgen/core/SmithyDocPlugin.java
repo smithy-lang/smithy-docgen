@@ -41,6 +41,7 @@ public final class SmithyDocPlugin implements SmithyBuildPlugin {
         runner.settings(docSettings);
         runner.service(docSettings.service());
         runner.performDefaultCodegenTransforms();
+        runner.createDedicatedInputsAndOutputs();
         runner.run();
         LOGGER.fine("Finished documentation generation.");
     }

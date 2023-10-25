@@ -128,6 +128,9 @@ public final class SphinxIntegration implements DocIntegration {
 
                     # Used to write directives that can be parsed by normal parsers
                     "colon_fence",
+
+                    # Used to create formatted member lists
+                    "deflist",
                 ]
                 """);
 

@@ -5,7 +5,10 @@
 
 package software.amazon.smithy.docgen.core.writers;
 
+import java.util.function.Consumer;
+import software.amazon.smithy.codegen.core.Symbol;
 import software.amazon.smithy.codegen.core.SymbolWriter;
+import software.amazon.smithy.docgen.core.DocSymbolProvider;
 import software.amazon.smithy.utils.SmithyUnstableApi;
 
 /**
@@ -27,5 +30,17 @@ public final class SphinxMarkdownWriter extends MarkdownWriter {
         public DocWriter apply(String s, String s1) {
             return new SphinxMarkdownWriter();
         }
+    }
+
+    @Override
+    public DocWriter openMemberEntry(Symbol memberSymbol, Consumer<DocWriter> writeType) {
+        memberSymbol.getProperty(DocSymbolProvider.LINK_ID_PROPERTY, String.class).ifPresent(linkId -> {
+            write("($L)=", linkId);
+        });
+        writeInline("""
+                $L: $C
+                :\s""", memberSymbol.getName(), writeType);
+        indent();
+        return this;
     }
 }
