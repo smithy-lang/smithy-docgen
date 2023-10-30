@@ -22,16 +22,48 @@ import software.amazon.smithy.utils.SmithyUnstableApi;
 public abstract class DocWriter extends SymbolWriter<DocWriter, DocImportContainer> {
     private static final int MAX_HEADING_DEPTH = 6;
 
+    /**
+     * The full path to the file being written to by the writer.
+     */
+    protected final String filename;
+
     private int headingDepth = 0;
 
     /**
      * Constructor.
      *
      * @param importContainer The container to store any imports in.
+     * @param filename The name of the file being written.
      */
-    public DocWriter(DocImportContainer importContainer) {
+    public DocWriter(DocImportContainer importContainer, String filename) {
         super(importContainer);
+        this.filename = filename;
+        putFormatter('R', (s, i) -> referenceFormatter(s));
     }
+
+    /**
+     * Formats the given reference object as a link if possible.
+     *
+     * <p>This given value can be expected to be one of the following types:
+     *
+     * <ul>
+     *     <li>{@code Symbol}: The symbol's name is the link text and a combination of
+     *     the definition file and {@link software.amazon.smithy.docgen.core.DocSymbolProvider#LINK_ID_PROPERTY}
+     *     forms the actual link. If either the link id or definition file are not set,
+     *     the formatter must return the symbol's name.
+     *     <li>{@code SymbolReference}: The reference's alias is the link text and a
+     *     combination of the referenced symbol's definition file and
+     *     {@link software.amazon.smithy.docgen.core.DocSymbolProvider#LINK_ID_PROPERTY}
+     *     forms the actual link. If either the link id or definition file are not set,
+     *     the formatter should return the reference's alias.
+     *     <li>{@code Pair<String, String>}: The key is the link text and the value is
+     *     the link. Both key and value MUST be present.
+     * </ul>
+     *
+     * @param value The value to format.
+     * @return returns a string formatted to reference the given value.
+     */
+    abstract String referenceFormatter(Object value);
 
     /**
      * Writes out the content of the shape's
@@ -70,6 +102,20 @@ public abstract class DocWriter extends SymbolWriter<DocWriter, DocImportContain
             ));
         }
         return openHeading(content, headingDepth);
+    }
+
+    /**
+     * Writes a heading with the given content and linkId.
+     *
+     * <p>{@link #closeHeading} will be called to enable cleaning up any resources or
+     * context this method creates.
+     *
+     * @param content A string to use as the heading content.
+     * @param linkId The identifier used to link to the heading.
+     * @return returns the writer.
+     */
+    public DocWriter openHeading(String content, String linkId) {
+        return writeAnchor(linkId).openHeading(content);
     }
 
     /**
@@ -147,4 +193,18 @@ public abstract class DocWriter extends SymbolWriter<DocWriter, DocImportContain
      * @return returns the writer.
      */
     public abstract DocWriter closeMemberEntry();
+
+    /**
+     * Writes a linkable element to the documentation with the given identifier.
+     *
+     * <p>The resulting HTML should be able to link to this anchor with {@code #linkId}.
+     *
+     * <p>For example, a direct HTML writer might create a {@code span} tag with
+     * the given string as the tag's {@code id}, or modify the next emitted tag
+     * to have the given id.
+     *
+     * @param linkId The anchor's link identifier.
+     * @return returns the writer.
+     */
+    public abstract DocWriter writeAnchor(String linkId);
 }

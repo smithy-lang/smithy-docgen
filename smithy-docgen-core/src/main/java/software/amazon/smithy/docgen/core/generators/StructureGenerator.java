@@ -9,6 +9,7 @@ import java.util.function.Consumer;
 import software.amazon.smithy.codegen.core.directed.GenerateStructureDirective;
 import software.amazon.smithy.docgen.core.DocGenerationContext;
 import software.amazon.smithy.docgen.core.DocSettings;
+import software.amazon.smithy.docgen.core.DocSymbolProvider;
 import software.amazon.smithy.docgen.core.generators.MemberGenerator.MemberListingType;
 import software.amazon.smithy.docgen.core.sections.ShapeDetailsSection;
 import software.amazon.smithy.docgen.core.sections.ShapeSection;
@@ -63,6 +64,8 @@ public final class StructureGenerator
         var symbol = directive.symbolProvider().toSymbol(shape);
         directive.context().writerDelegator().useShapeWriter(shape, writer -> {
             writer.pushState(new ShapeSection(directive.context(), shape));
+
+            symbol.getProperty(DocSymbolProvider.LINK_ID_PROPERTY, String.class).ifPresent(writer::writeAnchor);
             writer.openHeading(symbol.getName());
 
             writer.writeShapeDocs(shape, directive.model());

@@ -262,7 +262,7 @@ public final class MemberGenerator implements Runnable {
 
         private void writeShapeName(Shape shape) {
             var symbol = context.symbolProvider().toSymbol(shape);
-            writer.writeInline(symbol.getName());
+            writer.writeInline("$R", symbol);
         }
     }
 }

@@ -22,13 +22,23 @@ import software.amazon.smithy.utils.SmithyUnstableApi;
  */
 @SmithyUnstableApi
 public final class SphinxMarkdownWriter extends MarkdownWriter {
+
+    /**
+     * Constructs a SphinxMarkdownWriter.
+     *
+     * @param filename The full path to the file being written to.
+     */
+    public SphinxMarkdownWriter(String filename) {
+        super(filename);
+    }
+
     /**
      * Factory to construct {@code SphinxMarkdownWriter}s.
      */
     public static final class Factory implements SymbolWriter.Factory<DocWriter> {
         @Override
-        public DocWriter apply(String s, String s1) {
-            return new SphinxMarkdownWriter();
+        public DocWriter apply(String filename, String namespace) {
+            return new SphinxMarkdownWriter(filename);
         }
     }
 
@@ -37,10 +47,17 @@ public final class SphinxMarkdownWriter extends MarkdownWriter {
         memberSymbol.getProperty(DocSymbolProvider.LINK_ID_PROPERTY, String.class).ifPresent(linkId -> {
             write("($L)=", linkId);
         });
+        // Writes the members as a definition list
         writeInline("""
                 $L: $C
                 :\s""", memberSymbol.getName(), writeType);
         indent();
+        return this;
+    }
+
+    @Override
+    public DocWriter writeAnchor(String linkId) {
+        write("($L)=", linkId);
         return this;
     }
 }

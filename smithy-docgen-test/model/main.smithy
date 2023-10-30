@@ -38,6 +38,11 @@ structure DocumentedStructure {
     // This doesn't have a doc string (this is just a normal comment), so it should
     // pull the docs from the target shape.
     enum: DocumentedStringEnum
+
+    undocumented: UndocumentedStructure
+
+    /// This is a self-referential member. This is a thing that should be possible.
+    self: DocumentedStructure
 }
 
 /// This in an enum that can have one of the following values:
@@ -52,4 +57,10 @@ enum DocumentedStringEnum {
 
     /// Another very common placeholder, often seen with `foo`.
     BAR
+}
+
+// This structure has no docs anywhere
+structure UndocumentedStructure {
+    blob: Blob
+    boolean: Boolean
 }
