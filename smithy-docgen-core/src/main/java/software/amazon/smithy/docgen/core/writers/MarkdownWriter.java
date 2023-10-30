@@ -17,6 +17,7 @@ import software.amazon.smithy.codegen.core.SymbolWriter;
 import software.amazon.smithy.model.Model;
 import software.amazon.smithy.model.shapes.Shape;
 import software.amazon.smithy.model.traits.DocumentationTrait;
+import software.amazon.smithy.model.traits.StringTrait;
 import software.amazon.smithy.utils.Pair;
 import software.amazon.smithy.utils.SmithyUnstableApi;
 import software.amazon.smithy.utils.StringUtils;
@@ -36,7 +37,6 @@ public class MarkdownWriter extends DocWriter {
     public MarkdownWriter(DocImportContainer importContainer, String filename) {
         super(importContainer, filename);
     }
-
 
     /**
      * Constructs a MarkdownWriter.
@@ -104,8 +104,9 @@ public class MarkdownWriter extends DocWriter {
         } else {
             docTrait = shape.getTrait(DocumentationTrait.class);
         }
-        docTrait.map(DocumentationTrait::getValue)
-                .ifPresent(this::writeWithNewline);
+        var documentation = docTrait.map(StringTrait::getValue)
+                .orElse("Placeholder documentation for `" + shape.getId() + "`");
+        writeWithNewline(documentation.replace("$", "$$"));
         return this;
     }
 
