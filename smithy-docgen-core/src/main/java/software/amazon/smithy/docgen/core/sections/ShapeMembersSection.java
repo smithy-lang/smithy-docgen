@@ -25,7 +25,6 @@ import software.amazon.smithy.utils.SmithyUnstableApi;
  */
 @SmithyUnstableApi
 public record ShapeMembersSection(
-
         DocGenerationContext context,
         Shape shape,
         Collection<MemberShape> members,

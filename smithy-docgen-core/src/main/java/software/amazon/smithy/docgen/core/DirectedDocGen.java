@@ -5,7 +5,6 @@
 
 package software.amazon.smithy.docgen.core;
 
-import java.util.logging.Logger;
 import software.amazon.smithy.codegen.core.SymbolProvider;
 import software.amazon.smithy.codegen.core.directed.CreateContextDirective;
 import software.amazon.smithy.codegen.core.directed.CreateSymbolProviderDirective;
@@ -26,8 +25,6 @@ import software.amazon.smithy.utils.SmithyUnstableApi;
  */
 @SmithyUnstableApi
 final class DirectedDocGen implements DirectedCodegen<DocGenerationContext, DocSettings, DocIntegration> {
-
-    private static final Logger LOGGER = Logger.getLogger(DirectedDocGen.class.getName());
 
     @Override
     public SymbolProvider createSymbolProvider(CreateSymbolProviderDirective<DocSettings> directive) {
