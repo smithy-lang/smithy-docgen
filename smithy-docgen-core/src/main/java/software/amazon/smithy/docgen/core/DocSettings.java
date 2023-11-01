@@ -38,7 +38,7 @@ public record DocSettings(ShapeId service, String format) {
      * @param pluginSettings the {@code ObjectNode} to load settings from.
      * @return loaded settings based on the given node.
      */
-    public static DocSettings from(ObjectNode pluginSettings) {
+    public static DocSettings fromNode(ObjectNode pluginSettings) {
         return new DocSettings(
             pluginSettings.expectStringMember("service").expectShapeId(),
             pluginSettings.getStringMemberOrDefault("format", "sphinx-markdown")
