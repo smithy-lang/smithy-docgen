@@ -16,7 +16,7 @@ jobs:
         os: [macos-latest, ubuntu-latest, windows-latest]
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: gradle/wrapper-validation-action@v1
 
       - name: Set up JDK ${{ matrix.java }}
@@ -27,3 +27,37 @@ jobs:
 
       - name: clean and build
         run: ./gradlew clean build -Plog-tests
+
+  build-docs:
+    runs-on: ubuntu-latest
+    name: Test Documentation Build
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: 17
+          distribution: 'corretto'
+
+      - name: Set up Python 3.x
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: clean and build
+        run: ./gradlew clean build -Plog-tests
+
+      - name: Upload built plain markdown test docs
+        uses: actions/upload-artifact@v3
+        with:
+          name: plain-markdown-docs
+          path: smithy-docgen-test/build/smithyprojections/smithy-docgen-test/plain-markdown/docgen
+
+      - name: Upload built sphinx markdown test docs
+        uses: actions/upload-artifact@v3
+        with:
+          name: sphinx-markdown-docs
+          path: |
+            smithy-docgen-test/build/smithyprojections/smithy-docgen-test/sphinx-markdown/docgen
+            !smithy-docgen-test/build/smithyprojections/smithy-docgen-test/sphinx-markdown/docgen/venv
