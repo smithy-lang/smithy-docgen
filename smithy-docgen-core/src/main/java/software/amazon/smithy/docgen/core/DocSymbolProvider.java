@@ -7,18 +7,25 @@ package software.amazon.smithy.docgen.core;
 
 import static java.lang.String.format;
 
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.logging.Logger;
 import software.amazon.smithy.codegen.core.Symbol;
 import software.amazon.smithy.codegen.core.SymbolProvider;
 import software.amazon.smithy.model.Model;
+import software.amazon.smithy.model.knowledge.OperationIndex;
 import software.amazon.smithy.model.shapes.MemberShape;
+import software.amazon.smithy.model.shapes.OperationShape;
 import software.amazon.smithy.model.shapes.ServiceShape;
 import software.amazon.smithy.model.shapes.Shape;
+import software.amazon.smithy.model.shapes.ShapeId;
 import software.amazon.smithy.model.shapes.ShapeVisitor;
 import software.amazon.smithy.model.shapes.StructureShape;
+import software.amazon.smithy.model.traits.InputTrait;
+import software.amazon.smithy.model.traits.OutputTrait;
 import software.amazon.smithy.model.traits.StringTrait;
 import software.amazon.smithy.model.traits.TitleTrait;
 import software.amazon.smithy.utils.SmithyUnstableApi;
@@ -35,20 +42,28 @@ import software.amazon.smithy.utils.StringUtils;
  *     definition section. For services, this defaults to the value of the
  *     {@code title} trait. For other shapes, it defaults to the shape name including
  *     any renames from the attached service.
+ *
  *     <li>{@code definitionFile}: The file in which the documentation for this shape
  *     should be written. By default these are all written to a single flat directory.
  *     If this is empty, the shape does not have its own definition section and cannot
  *     be linked to.
+ *
  *     <li>{@link #SHAPE_PROPERTY}: A named Shape property containing the shape that
  *     the symbol represents. Decorators provided by
  *     {@link DocIntegration#decorateSymbolProvider} MUST set or preserve this
  *     property.
+ *
+ *     <li>{@link #OPERATION_PROPERTY}: A named OperationShape property containing the
+ *     operation shape that the shape is bound to. This will only be present on
+ *     structure shapes that have the {@code input} or {@code output} traits.
+ *
  *     <li>{@link #LINK_ID_PROPERTY}: A named String property containing the string to
  *     use for the id for links to the shape. In HTML, this would be the {@code id} for
  *     the tag containing the shape's definition. Given a link id {@code foo}, a link
  *     to the shape's definition might look like {@code https://example.com/shapes#foo}
  *     for example. If this or {@code definitionFile} is empty, it is not possible to
  *     link to the shape.
+ *
  *     <li>{@link #ENABLE_DEFAULT_FILE_EXTENSION}: A named boolean property indicating
  *     whether the symbol's definition file should have the default file extension
  *     applied. If not present or set to {@code false}, the file extension will not be
@@ -73,6 +88,17 @@ public final class DocSymbolProvider extends ShapeVisitor.Default<Symbol> implem
      * property.
      */
     public static final String SHAPE_PROPERTY = "shape";
+
+    /**
+     * The operation that the symbol's shape is bound to.
+     *
+     * <p>This property will only be present on structures that have either the
+     * {@code input} or {@code output} trait.
+     *
+     * <p>Use {@code symbol.getProperty(OPERATION_PROPERTY, OperationShape.class)} to
+     * access this property.
+     */
+    public static final String OPERATION_PROPERTY = "operation";
 
     /**
      * The name for a shape symbol's named property containing the string to use for
@@ -104,6 +130,7 @@ public final class DocSymbolProvider extends ShapeVisitor.Default<Symbol> implem
     private final Model model;
     private final DocSettings docSettings;
     private final ServiceShape serviceShape;
+    private final Map<ShapeId, OperationShape> ioToOperation;
 
     /**
      * Constructor.
@@ -115,6 +142,26 @@ public final class DocSymbolProvider extends ShapeVisitor.Default<Symbol> implem
         this.model = model;
         this.docSettings = docSettings;
         this.serviceShape = model.expectShape(docSettings.service(), ServiceShape.class);
+        this.ioToOperation = mapIoShapesToOperations(model);
+    }
+
+    private Map<ShapeId, OperationShape> mapIoShapesToOperations(Model model) {
+        // Map input and output structures to their containing shapes. These will be
+        // documented alongside their associated operations, so we need said operations
+        // when generating symbols for them. Pre-computing this mapping is a bit faster
+        // than just running a selector every time we hit an IO
+        // shape.
+        var operationIoMap = new HashMap<ShapeId, OperationShape>();
+        var operationIndex = OperationIndex.of(model);
+        for (var operation : model.getOperationShapes()) {
+            operationIndex.getInputShape(operation)
+                    .filter(i -> i.hasTrait(InputTrait.class))
+                    .ifPresent(i -> operationIoMap.put(i.getId(), operation));
+            operationIndex.getOutputShape(operation)
+                    .filter(i -> i.hasTrait(OutputTrait.class))
+                    .ifPresent(i -> operationIoMap.put(i.getId(), operation));
+        }
+        return Map.copyOf(operationIoMap);
     }
 
     @Override
@@ -132,10 +179,24 @@ public final class DocSymbolProvider extends ShapeVisitor.Default<Symbol> implem
     }
 
     @Override
-    public Symbol structureShape(StructureShape shape) {
+    public Symbol operationShape(OperationShape shape) {
         return getSymbolBuilder(shape)
                 .definitionFile(getDefinitionFile(serviceShape, shape))
                 .build();
+    }
+
+    @Override
+    public Symbol structureShape(StructureShape shape) {
+        var builder = getSymbolBuilder(shape);
+        if (ioToOperation.containsKey(shape.getId())) {
+            // Input and output structures are documented on the operation's definition page.
+            var operation = ioToOperation.get(shape.getId());
+            builder.definitionFile(getDefinitionFile(serviceShape, operation));
+            builder.putProperty(OPERATION_PROPERTY, operation);
+        } else {
+            builder.definitionFile(getDefinitionFile(serviceShape, shape));
+        }
+        return builder.build();
     }
 
     @Override

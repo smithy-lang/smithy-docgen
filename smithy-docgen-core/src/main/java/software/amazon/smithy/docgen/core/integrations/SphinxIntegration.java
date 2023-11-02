@@ -88,7 +88,8 @@ public final class SphinxIntegration implements DocIntegration {
     private static final List<String> BASE_REQUIREMENTS = List.of(
         "Sphinx==7.2.6",
         "myst-parser==2.0.0",
-        "linkify-it-py==2.0.2"
+        "linkify-it-py==2.0.2",
+        "sphinx-inline-tabs==2023.4.21"
     );
 
     private SphinxSettings settings = SphinxSettings.fromNode(Node.objectNode());
@@ -163,7 +164,10 @@ public final class SphinxIntegration implements DocIntegration {
 
             if (context.docFormat().name().equals(MARKDOWN_FORMAT)) {
                 writer.write("""
-                extensions = ["myst_parser"]
+                extensions = [
+                    "myst_parser",
+                    "sphinx_inline_tabs"
+                ]
                 myst_enable_extensions = [
                     # Makes bare links into actual links
                     "linkify",

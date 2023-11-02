@@ -12,10 +12,12 @@ import software.amazon.smithy.codegen.core.directed.DirectedCodegen;
 import software.amazon.smithy.codegen.core.directed.GenerateEnumDirective;
 import software.amazon.smithy.codegen.core.directed.GenerateErrorDirective;
 import software.amazon.smithy.codegen.core.directed.GenerateIntEnumDirective;
+import software.amazon.smithy.codegen.core.directed.GenerateOperationDirective;
 import software.amazon.smithy.codegen.core.directed.GenerateResourceDirective;
 import software.amazon.smithy.codegen.core.directed.GenerateServiceDirective;
 import software.amazon.smithy.codegen.core.directed.GenerateStructureDirective;
 import software.amazon.smithy.codegen.core.directed.GenerateUnionDirective;
+import software.amazon.smithy.docgen.core.generators.OperationGenerator;
 import software.amazon.smithy.docgen.core.generators.ServiceGenerator;
 import software.amazon.smithy.docgen.core.generators.StructureGenerator;
 import software.amazon.smithy.utils.SmithyUnstableApi;
@@ -50,6 +52,11 @@ final class DirectedDocGen implements DirectedCodegen<DocGenerationContext, DocS
     @Override
     public void generateStructure(GenerateStructureDirective<DocGenerationContext, DocSettings> directive) {
         new StructureGenerator().accept(directive);
+    }
+
+    @Override
+    public void generateOperation(GenerateOperationDirective<DocGenerationContext, DocSettings> directive) {
+        new OperationGenerator().accept(directive);
     }
 
     @Override

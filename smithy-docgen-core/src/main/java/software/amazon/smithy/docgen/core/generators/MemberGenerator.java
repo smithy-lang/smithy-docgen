@@ -5,8 +5,11 @@
 
 package software.amazon.smithy.docgen.core.generators;
 
+import java.util.Collection;
+import java.util.Locale;
 import software.amazon.smithy.codegen.core.CodegenException;
 import software.amazon.smithy.docgen.core.DocGenerationContext;
+import software.amazon.smithy.docgen.core.DocSymbolProvider;
 import software.amazon.smithy.docgen.core.sections.MemberSection;
 import software.amazon.smithy.docgen.core.sections.ShapeMembersSection;
 import software.amazon.smithy.docgen.core.writers.DocWriter;
@@ -82,23 +85,42 @@ public final class MemberGenerator implements Runnable {
 
     @Override
     public void run() {
-        writer.pushState(new ShapeMembersSection(context, shape, shape.members(), listingType));
-        writer.openHeading(listingType.getTitle());
-        writer.openMemberListing();
-        for (MemberShape member: shape.getAllMembers().values()) {
-            writer.pushState(new MemberSection(context, member));
+        var members = getMembers();
+        writer.pushState(new ShapeMembersSection(context, shape, members, listingType));
+        var parentSymbol = context.symbolProvider().toSymbol(shape);
+        if (!members.isEmpty()) {
+            parentSymbol.getProperty(DocSymbolProvider.LINK_ID_PROPERTY, String.class).ifPresent(linkId -> {
+                writer.writeAnchor(linkId + "-" + listingType.getLinkIdSuffix());
+            });
+            writer.openHeading(listingType.getTitle());
+            writer.openMemberListing();
+            for (MemberShape member : members) {
+                writer.pushState(new MemberSection(context, member));
 
-            var symbol = context.symbolProvider().toSymbol(member);
-            var target = context.model().expectShape(member.getTarget());
-            writer.openMemberEntry(symbol, w -> target.accept(new MemberTypeVisitor(w, context)));
-            writer.writeShapeDocs(member, context.model());
+                var symbol = context.symbolProvider().toSymbol(member);
+                var target = context.model().expectShape(member.getTarget());
+                writer.openMemberEntry(symbol, w -> target.accept(new MemberTypeVisitor(w, context)));
+                writer.writeShapeDocs(member, context.model());
 
-            writer.closeMemberEntry();
-            writer.popState();
+                writer.closeMemberEntry();
+                writer.popState();
+            }
+            writer.closeMemberListing();
+            writer.closeHeading();
         }
-        writer.closeMemberListing();
-        writer.closeHeading();
         writer.popState();
+    }
+
+    private Collection<MemberShape> getMembers() {
+        return switch (listingType) {
+            case INPUT -> context.model()
+                    .expectShape(shape.asOperationShape().get().getInputShape())
+                    .getAllMembers().values();
+            case OUTPUT -> context.model()
+                    .expectShape(shape.asOperationShape().get().getOutputShape())
+                    .getAllMembers().values();
+            default -> shape.getAllMembers().values();
+        };
     }
 
     /**
@@ -108,12 +130,24 @@ public final class MemberGenerator implements Runnable {
         /**
          * Indicates the listing is for normal shape members.
          */
-        MEMBERS("Members");
+        MEMBERS("Members"),
+
+        /**
+         * Indicates the listing is for an operation's input members.
+         */
+        INPUT("Request Members"),
+
+        /**
+         * Indicates the listing is for an operation's output members.
+         */
+        OUTPUT("Response Members");
 
         private final String title;
+        private final String linkIdSuffix;
 
         MemberListingType(String title) {
             this.title = title;
+            this.linkIdSuffix = title.toLowerCase(Locale.ENGLISH).strip().replaceAll("\\s+", "-");
         }
 
         /**
@@ -121,6 +155,14 @@ public final class MemberGenerator implements Runnable {
          */
         public String getTitle() {
             return title;
+        }
+
+        /**
+         * @return returns the suffix that will be applied to the parent shape's link
+         *         id to form this member listing's link id.
+         */
+        public String getLinkIdSuffix() {
+            return linkIdSuffix;
         }
     }
 
