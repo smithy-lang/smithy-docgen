@@ -128,6 +128,9 @@ public final class SphinxIntegration implements DocIntegration {
 
                     # Used to write directives that can be parsed by normal parsers
                     "colon_fence",
+
+                    # Used to create formatted member lists
+                    "deflist",
                 ]
                 """);
 
@@ -233,7 +236,7 @@ public final class SphinxIntegration implements DocIntegration {
             runCommand("./venv/bin/pip install -r requirements.txt", baseDir);
 
             // Finally, run sphinx itself.
-            runCommand("./venv/bin/sphinx-build -M dirhtml content build", baseDir);
+            runCommand("./venv/bin/sphinx-build -M html content build", baseDir);
 
             System.out.printf(normalizeNewlines("""
                 Successfully built HTML docs. They can be found in "%1$s".
@@ -244,19 +247,19 @@ public final class SphinxIntegration implements DocIntegration {
                 environment docs for information on how to activate it: \
                 https://docs.python.org/3/library/venv.html#how-venvs-work
 
-                Once the environment is activated, run `make dirhtml` from "%3$s" to \
-                to build the docs, substituting dirhtml for whatever format you wish \
+                Once the environment is activated, run `make html` from "%3$s" to \
+                to build the docs, substituting html for whatever format you wish \
                 to build.
 
                 To build the docs without activating the virtual environment, simply \
-                run `./venv/bin/sphinx-build -M dirhtml content build` from "%3$s", \
-                similarly substituting dirhtml for your desired format.
+                run `./venv/bin/sphinx-build -M html content build` from "%3$s", \
+                similarly substituting html for your desired format.
 
                 See sphinx docs for other output formats you can choose: \
                 https://www.sphinx-doc.org/en/master/usage/builders/index.html
 
                 """),
-                baseDir.resolve("build/dirhtml"),
+                baseDir.resolve("build/html"),
                 baseDir.resolve("venv"),
                 baseDir
             );
@@ -276,7 +279,7 @@ public final class SphinxIntegration implements DocIntegration {
             instead install them from your system package manager, or another \
             source.
 
-            Once the dependencies are installed, run `make dirhtml` from \
+            Once the dependencies are installed, run `make html` from \
             "%1$s". Other output formats can also be built. See sphinx docs for \
             other output formats: \
             https://www.sphinx-doc.org/en/master/usage/builders/index.html

@@ -9,6 +9,7 @@ import static java.lang.String.format;
 
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.logging.Logger;
 import software.amazon.smithy.codegen.core.Symbol;
 import software.amazon.smithy.codegen.core.SymbolProvider;
@@ -17,9 +18,11 @@ import software.amazon.smithy.model.shapes.MemberShape;
 import software.amazon.smithy.model.shapes.ServiceShape;
 import software.amazon.smithy.model.shapes.Shape;
 import software.amazon.smithy.model.shapes.ShapeVisitor;
+import software.amazon.smithy.model.shapes.StructureShape;
 import software.amazon.smithy.model.traits.StringTrait;
 import software.amazon.smithy.model.traits.TitleTrait;
 import software.amazon.smithy.utils.SmithyUnstableApi;
+import software.amazon.smithy.utils.StringUtils;
 
 /**
  * Creates documentation Symbols for each shape in the model.
@@ -31,11 +34,11 @@ import software.amazon.smithy.utils.SmithyUnstableApi;
  *     <li>{@code name}: The name of the symbol will be used as the title for its
  *     definition section. For services, this defaults to the value of the
  *     {@code title} trait. For other shapes, it defaults to the shape name including
- *     any renames from the attached service. For members, the member name is appended
- *     to the parent with a separating {@code -}.
+ *     any renames from the attached service.
  *     <li>{@code definitionFile}: The file in which the documentation for this shape
  *     should be written. By default these are all written to a single flat directory.
- *     If this is empty, the shape does not have its own definition section.
+ *     If this is empty, the shape does not have its own definition section and cannot
+ *     be linked to.
  *     <li>{@link #SHAPE_PROPERTY}: A named Shape property containing the shape that
  *     the symbol represents. Decorators provided by
  *     {@link DocIntegration#decorateSymbolProvider} MUST set or preserve this
@@ -128,23 +131,39 @@ public final class DocSymbolProvider extends ShapeVisitor.Default<Symbol> implem
             .build();
     }
 
+    @Override
+    public Symbol structureShape(StructureShape shape) {
+        return getSymbolBuilder(shape)
+                .definitionFile(getDefinitionFile(serviceShape, shape))
+                .build();
+    }
+
+    @Override
+    public Symbol memberShape(MemberShape shape) {
+        var builder = getSymbolBuilder(shape)
+                .definitionFile(getDefinitionFile(serviceShape, model.expectShape(shape.getId().withoutMember())));
+
+        Optional<String> containerLinkId = model.expectShape(shape.getContainer())
+                .accept(this)
+                .getProperty(LINK_ID_PROPERTY, String.class);
+        if (containerLinkId.isPresent()) {
+            var linkId = containerLinkId.get() + "-" + getLinkId(getShapeName(serviceShape, shape));
+            builder.putProperty(LINK_ID_PROPERTY, linkId);
+        }
+        return builder.build();
+    }
+
     private Symbol.Builder getSymbolBuilder(Shape shape) {
         var name = getShapeName(serviceShape, shape);
         return Symbol.builder()
-            .name(name)
-            .putProperty(SHAPE_PROPERTY, shape)
-            .definitionFile(getDefinitionFile(serviceShape, shape))
-            .putProperty(LINK_ID_PROPERTY, getLinkId(name))
-            .putProperty(ENABLE_DEFAULT_FILE_EXTENSION, true);
+                .name(name)
+                .putProperty(SHAPE_PROPERTY, shape)
+                .putProperty(LINK_ID_PROPERTY, getLinkId(name))
+                .putProperty(ENABLE_DEFAULT_FILE_EXTENSION, true);
     }
 
     private String getDefinitionFile(ServiceShape serviceShape, Shape shape) {
-        if (shape.isMemberShape()) {
-            return getDefinitionFile(serviceShape, model.expectShape(shape.getId().withoutMember()));
-        }
-        return getDefinitionFile(
-            getShapeName(serviceShape, shape).replaceAll("\\s+", "")
-        );
+        return getDefinitionFile(getShapeName(serviceShape, shape).replaceAll("\\s+", ""));
     }
 
     private String getDefinitionFile(String filename) {
@@ -157,11 +176,11 @@ public final class DocSymbolProvider extends ShapeVisitor.Default<Symbol> implem
                 .map(StringTrait::getValue)
                 .orElse(shape.getId().getName());
         }
-        var name = shape.getId().getName(serviceShape);
         if (shape.isMemberShape()) {
-            name += "-" + toMemberName(shape.asMemberShape().get());
+            return toMemberName(shape.asMemberShape().get());
+        } else {
+            return shape.getId().getName(serviceShape);
         }
-        return name;
     }
 
     private String getLinkId(String shapeName) {
@@ -172,7 +191,7 @@ public final class DocSymbolProvider extends ShapeVisitor.Default<Symbol> implem
     // have impact.
     @Override
     protected Symbol getDefault(Shape shape) {
-        return null;
+        return getSymbolBuilder(shape).build();
     }
 
     /**
@@ -209,7 +228,7 @@ public final class DocSymbolProvider extends ShapeVisitor.Default<Symbol> implem
         }
 
         private String addExtension(String path) {
-            if (!path.endsWith(extension)) {
+            if (!StringUtils.isBlank(path) && !path.endsWith(extension)) {
                 path += extension;
             }
             return path;

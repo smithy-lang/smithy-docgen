@@ -12,11 +12,15 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Logger;
 import software.amazon.smithy.codegen.core.CodegenException;
+import software.amazon.smithy.codegen.core.Symbol;
 import software.amazon.smithy.utils.SmithyUnstableApi;
+import software.amazon.smithy.utils.StringUtils;
 
 /**
  * Provides various utility methods.
@@ -82,5 +86,30 @@ public final class DocgenUtils {
      */
     public static String normalizeNewlines(String input) {
         return input.replaceAll("\r?\n", System.lineSeparator());
+    }
+
+    /**
+     * Gets a relative link pointing to a given symbol.
+     *
+     * <p>If the given symbol has no definition file or no
+     * {@link DocSymbolProvider#LINK_ID_PROPERTY}, the response will be empty.
+     *
+     * @param symbol The symbol to link to.
+     * @param relativeTo A path that the symbol should be relative to. This must be the
+     *                   path to the file containing the link.
+     * @return Optionally returns a relative link to the given symbol.
+     */
+    public static Optional<String> getSymbolLink(Symbol symbol, Path relativeTo) {
+        Optional<String> linkId = symbol.getProperty(DocSymbolProvider.LINK_ID_PROPERTY, String.class);
+        var relativeToParent = relativeTo.getParent();
+        if (StringUtils.isBlank(symbol.getDefinitionFile())
+                || linkId.isEmpty()
+                || StringUtils.isBlank(linkId.get())
+                || relativeToParent == null) {
+            return Optional.empty();
+        }
+        return Optional.of(format(
+                "./%s#%s", relativeToParent.relativize(Paths.get(symbol.getDefinitionFile())), linkId.get()
+        ));
     }
 }

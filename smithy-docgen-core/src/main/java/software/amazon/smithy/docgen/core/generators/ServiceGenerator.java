@@ -50,7 +50,7 @@ public final class ServiceGenerator implements Consumer<GenerateServiceDirective
         directive.context().writerDelegator().useShapeWriter(serviceShape, writer -> {
             writer.pushState(new ServiceSection(directive.service(), directive.context()));
             writer.openHeading(serviceSymbol.getName());
-            writer.writeShapeDocs(serviceShape);
+            writer.writeShapeDocs(serviceShape, directive.model());
             writer.injectSection(new ServiceDetailsSection(directive.service(), directive.context()));
             writer.closeHeading();
             writer.popState();
