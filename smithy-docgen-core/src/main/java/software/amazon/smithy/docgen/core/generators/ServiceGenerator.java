@@ -11,6 +11,7 @@ import software.amazon.smithy.docgen.core.DocGenerationContext;
 import software.amazon.smithy.docgen.core.DocSettings;
 import software.amazon.smithy.docgen.core.sections.ServiceDetailsSection;
 import software.amazon.smithy.docgen.core.sections.ServiceSection;
+import software.amazon.smithy.docgen.core.sections.ShapeSubheadingSection;
 import software.amazon.smithy.model.shapes.ServiceShape;
 import software.amazon.smithy.utils.SmithyInternalApi;
 
@@ -23,8 +24,12 @@ import software.amazon.smithy.utils.SmithyInternalApi;
  * sections are guaranteed to be present:
  *
  * <ul>
+ *     <li>{@link ShapeSubheadingSection}: Enables adding additional details that are
+ *     inserted right after the shape's heading, before modeled docs.
+ *
  *     <li>{@link ServiceDetailsSection}: Enables adding in additional details that are
  *     inserted after the service's modeled documentation.
+ *
  *     <li>{@link ServiceSection}: Enables re-writing or overwriting the entire page,
  *     including changes made in other sections.
  * </ul>
@@ -50,6 +55,7 @@ public final class ServiceGenerator implements Consumer<GenerateServiceDirective
         directive.context().writerDelegator().useShapeWriter(serviceShape, writer -> {
             writer.pushState(new ServiceSection(directive.service(), directive.context()));
             writer.openHeading(serviceSymbol.getName());
+            writer.injectSection(new ShapeSubheadingSection(directive.context(), serviceShape));
             writer.writeShapeDocs(serviceShape, directive.model());
             writer.injectSection(new ServiceDetailsSection(directive.service(), directive.context()));
             writer.closeHeading();
