@@ -123,8 +123,10 @@ public class OperationGenerator implements Consumer<GenerateOperationDirective<D
             writer.write("This operation may return any of the following errors:");
             writer.openList(ListType.UNORDERED);
             for (var error : errors) {
+                var errorShape = context.model().expectShape(error);
                 writer.openListItem(ListType.UNORDERED);
-                writer.write("$R", context.symbolProvider().toSymbol(context.model().expectShape(error)));
+                writer.writeInline("$R: ", context.symbolProvider().toSymbol(errorShape));
+                writer.writeShapeDocs(errorShape, context.model());
                 writer.closeListItem(ListType.UNORDERED);
             }
             writer.closeList(ListType.UNORDERED);
