@@ -12,8 +12,36 @@ service DocumentedService {
     operations: [
         DocumentedOperation
     ]
+    errors: [
+        ClientError
+        ServiceError
+    ]
 }
 
+@examples(
+    [
+        {
+            title: "Basic Example"
+            documentation: "This **MUST** also support CommonMark"
+            input: {
+                structure: {
+                    string: "foo"
+                    integer: 4
+                    enum: "BAR"
+                    undocumented: {boolean: false}
+                }
+            }
+            output: {
+                structure: {
+                    string: "spam"
+                    integer: 8
+                    enum: "FOO"
+                    undocumented: {boolean: true}
+                }
+            }
+        }
+    ]
+)
 operation DocumentedOperation {
     input := {
         structure: DocumentedStructure
@@ -21,6 +49,9 @@ operation DocumentedOperation {
     output := {
         structure: DocumentedStructure
     }
+    errors: [
+        DocumentedOperationError
+    ]
 }
 
 /// This structure is an example documentable structure with several members that
@@ -64,3 +95,23 @@ structure UndocumentedStructure {
     blob: Blob
     boolean: Boolean
 }
+
+@mixin
+@error("client")
+structure ErrorMixin {
+    /// The wire-level error identifier.
+    code: String
+
+    /// A message with details about why the error happened.
+    message: String
+}
+
+/// This is an error that is the fault of the calling client.
+structure ClientError with [ErrorMixin] {}
+
+/// This is an error that is the fault of the service.
+@error("server")
+structure ServiceError with [ErrorMixin] {}
+
+/// This error is only returned by DocumentedOperation
+structure DocumentedOperationError with [ErrorMixin] {}

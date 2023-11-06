@@ -11,6 +11,8 @@ import software.amazon.smithy.codegen.core.Symbol;
 import software.amazon.smithy.codegen.core.SymbolWriter;
 import software.amazon.smithy.model.Model;
 import software.amazon.smithy.model.shapes.Shape;
+import software.amazon.smithy.model.traits.DocumentationTrait;
+import software.amazon.smithy.model.traits.StringTrait;
 import software.amazon.smithy.utils.SmithyUnstableApi;
 
 /**
@@ -82,7 +84,25 @@ public abstract class DocWriter extends SymbolWriter<DocWriter, DocImportContain
      * @param model The model whose documentation is being written.
      * @return returns the writer.
      */
-    public abstract DocWriter writeShapeDocs(Shape shape, Model model);
+    public DocWriter writeShapeDocs(Shape shape, Model model) {
+        var documentation = shape.getMemberTrait(model, DocumentationTrait.class).map(StringTrait::getValue)
+                .orElse("Placeholder documentation for `" + shape.getId() + "`");
+        writeCommonMark(documentation.replace("$", "$$"));
+        return this;
+    }
+
+    /**
+     * Writes documentation based on a commonmark string.
+     *
+     * <p>Smithy's documentation trait is in the
+     * <a href="https://spec.commonmark.org">CommonMark</a> format, so writers
+     * for formats that aren't based on CommonMark will need to convert the value to
+     * their format. This includes raw HTML, which CommonMark allows.
+     *
+     * @param commmonMark A string containing CommonMark-formatted documentation.
+     * @return returns the writer.
+     */
+    public abstract DocWriter writeCommonMark(String commmonMark);
 
     /**
      * Writes a heading with the given content.
@@ -207,4 +227,131 @@ public abstract class DocWriter extends SymbolWriter<DocWriter, DocImportContain
      * @return returns the writer.
      */
     public abstract DocWriter writeAnchor(String linkId);
+
+    /**
+     * Writes any opening context needed to form a tab group.
+     *
+     * @return returns the writer.
+     */
+    public abstract DocWriter openTabGroup();
+
+    /**
+     * Writes any context needed to close a tab group.
+     *
+     * @return returns the writer.
+     */
+    public abstract DocWriter closeTabGroup();
+
+    /**
+     * Writes any context needed to open a tab.
+     *
+     * @param title The title text that is displayed on the tab itself.
+     * @return returns the writer.
+     */
+    public abstract DocWriter openTab(String title);
+
+    /**
+     * Writes any context needed to close a tab.
+     *
+     * @return returns the writer.
+     */
+    public abstract DocWriter closeTab();
+
+    /**
+     * Writes any context needed to open a code block.
+     *
+     * <p>For example, a pure HTML writer might write an opening {@code pre} tag.
+     *
+     * @param language the language of the block's code.
+     * @return returns the writer.
+     */
+    public abstract DocWriter openCodeBlock(String language);
+
+    /**
+     * Writes any context needed to close a code block.
+     *
+     * <p>For example, a pure HTML writer might write a closing {@code pre} tag.
+     *
+     * @return returns the writer.
+     */
+    public abstract DocWriter closeCodeBlock();
+
+    /**
+     * Writes any context needed to open a code block tab.
+     *
+     * @param title The title text that is displayed on the tab itself.
+     * @param language the language of the tab's code.
+     * @return returns the writer.
+     */
+    public DocWriter openCodeTab(String title, String language) {
+        return openTab(title).openCodeBlock(language);
+    }
+
+    /**
+     * Writes any context needed to close a code block tab.
+     *
+     * @return returns the writer.
+     */
+    public DocWriter closeCodeTab() {
+        return closeCodeBlock().closeTab();
+    }
+
+    /**
+     * Writes any context needed to open a list of the given type.
+     *
+     * <p>For example, a raw HTML writer might write an opening {@code ul} tag for
+     * an unordered list or an {@code ol} tag for an ordered list.
+     *
+     * @param listType The type of list to open.
+     * @return returns the writer.
+     */
+    public abstract DocWriter openList(ListType listType);
+
+    /**
+     * Writes any context needed to close a list of the given type.
+     *
+     * <p>For example, a raw HTML writer might write a closing {@code ul} tag for
+     * an unordered list or an {@code ol} tag for an ordered list.
+     *
+     * @param listType The type of list to close.
+     * @return returns the writer.
+     */
+    public abstract DocWriter closeList(ListType listType);
+
+    /**
+     * Writes any context needed to open a list item of the given type.
+     *
+     * <p>For example, a raw HTML writer might write an opening {@code li} tag for
+     * a list of any type.
+     *
+     * @param listType The type of list the item is a part of.
+     * @return returns the writer.
+     */
+    public abstract DocWriter openListItem(ListType listType);
+
+    /**
+     * Writes any context needed to close a list item of the given type.
+     *
+     * <p>For example, a raw HTML writer might write a closing {@code li} tag for
+     * a list of any type.
+     *
+     * @param listType The type of list the item is a part of.
+     * @return returns the writer.
+     */
+    public abstract DocWriter closeListItem(ListType listType);
+
+    /**
+     * Represents different types of lists.
+     */
+    public enum ListType {
+        /**
+         * A list whose elements are ordered with numbers.
+         */
+        ORDERED,
+
+        /**
+         * A list whose elements don't have associated numbers.
+         */
+        UNORDERED
+    }
 }

@@ -6,12 +6,12 @@
 package software.amazon.smithy.docgen.core.sections;
 
 import software.amazon.smithy.docgen.core.DocGenerationContext;
-import software.amazon.smithy.model.shapes.StructureShape;
+import software.amazon.smithy.model.shapes.Shape;
 import software.amazon.smithy.utils.CodeSection;
 import software.amazon.smithy.utils.SmithyUnstableApi;
 
 /**
- * Generates documentation for non-service shapes.
+ * Generates documentation for shapes.
  *
  * @param context The context used to generate documentation.
  * @param shape   The shape whose documentation is being generated.
@@ -21,5 +21,5 @@ import software.amazon.smithy.utils.SmithyUnstableApi;
  * @see MemberSection to modify the documentation for an individual shape member.
  */
 @SmithyUnstableApi
-public record ShapeSection(DocGenerationContext context, StructureShape shape) implements CodeSection {
+public record ShapeSection(DocGenerationContext context, Shape shape) implements CodeSection {
 }

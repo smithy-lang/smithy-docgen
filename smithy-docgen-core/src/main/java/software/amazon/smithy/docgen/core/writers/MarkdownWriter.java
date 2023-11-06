@@ -14,10 +14,6 @@ import software.amazon.smithy.codegen.core.CodegenException;
 import software.amazon.smithy.codegen.core.Symbol;
 import software.amazon.smithy.codegen.core.SymbolReference;
 import software.amazon.smithy.codegen.core.SymbolWriter;
-import software.amazon.smithy.model.Model;
-import software.amazon.smithy.model.shapes.Shape;
-import software.amazon.smithy.model.traits.DocumentationTrait;
-import software.amazon.smithy.model.traits.StringTrait;
 import software.amazon.smithy.utils.Pair;
 import software.amazon.smithy.utils.SmithyUnstableApi;
 import software.amazon.smithy.utils.StringUtils;
@@ -97,17 +93,8 @@ public class MarkdownWriter extends DocWriter {
     }
 
     @Override
-    public DocWriter writeShapeDocs(Shape shape, Model model) {
-        Optional<DocumentationTrait> docTrait;
-        if (shape.isMemberShape()) {
-            docTrait = shape.asMemberShape().get().getMemberTrait(model, DocumentationTrait.class);
-        } else {
-            docTrait = shape.getTrait(DocumentationTrait.class);
-        }
-        var documentation = docTrait.map(StringTrait::getValue)
-                .orElse("Placeholder documentation for `" + shape.getId() + "`");
-        writeWithNewline(documentation.replace("$", "$$"));
-        return this;
+    public DocWriter writeCommonMark(String commonMark) {
+        return writeWithNewline(commonMark);
     }
 
     private DocWriter writeWithNewline(Object content, Object... args) {
@@ -134,19 +121,78 @@ public class MarkdownWriter extends DocWriter {
 
     @Override
     public DocWriter openMemberEntry(Symbol memberSymbol, Consumer<DocWriter> writeType) {
-        writeInline("- **$L** (*$C*): ", memberSymbol.getName(), writeType);
+        openListItem(ListType.UNORDERED);
+        writeInline("**$L** (*$C*): ", memberSymbol.getName(), writeType);
         return this;
     }
 
     @Override
     public DocWriter closeMemberEntry() {
-        return this;
+        return closeListItem(ListType.UNORDERED);
     }
 
     @Override
     public DocWriter writeAnchor(String linkId) {
         // Anchors have no meaning in base markdown
         return this;
+    }
+
+    @Override
+    public DocWriter openTabGroup() {
+        return this;
+    }
+
+    @Override
+    public DocWriter closeTabGroup() {
+        return this;
+    }
+
+    @Override
+    public DocWriter openTab(String title) {
+        return write("- $L", title).indent();
+    }
+
+    @Override
+    public DocWriter closeTab() {
+        return dedent();
+    }
+
+    @Override
+    public DocWriter openCodeBlock(String language) {
+        return write("```$L", language);
+    }
+
+    @Override
+    public DocWriter closeCodeBlock() {
+        return write("```");
+    }
+
+    @Override
+    public DocWriter openList(ListType listType) {
+        return this;
+    }
+
+    @Override
+    public DocWriter closeList(ListType listType) {
+        return this;
+    }
+
+    @Override
+    public DocWriter openListItem(ListType listType) {
+        if (listType == ListType.ORDERED) {
+            // We don't actually need to keep track of how far we are in the list because
+            // commonmark will render the list correctly so long as there is any number
+            // in front of the period.
+            writeInline("1. ");
+        } else {
+            writeInline("- ");
+        }
+        return indent();
+    }
+
+    @Override
+    public DocWriter closeListItem(ListType listType) {
+        return dedent();
     }
 
     @Override
