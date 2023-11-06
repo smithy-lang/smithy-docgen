@@ -5,6 +5,10 @@
 
 package software.amazon.smithy.docgen.core;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ServiceLoader;
+import software.amazon.smithy.build.PluginContext;
 import software.amazon.smithy.codegen.core.SymbolProvider;
 import software.amazon.smithy.codegen.core.directed.CreateContextDirective;
 import software.amazon.smithy.codegen.core.directed.CreateSymbolProviderDirective;
@@ -21,6 +25,8 @@ import software.amazon.smithy.docgen.core.generators.MemberGenerator.MemberListi
 import software.amazon.smithy.docgen.core.generators.OperationGenerator;
 import software.amazon.smithy.docgen.core.generators.ResourceGenerator;
 import software.amazon.smithy.docgen.core.generators.ServiceGenerator;
+import software.amazon.smithy.docgen.core.generators.SnippetGenerator;
+import software.amazon.smithy.docgen.core.generators.SnippetGenerator.SnippetComparator;
 import software.amazon.smithy.docgen.core.generators.StructuredShapeGenerator;
 import software.amazon.smithy.model.node.ExpectationNotMetException;
 import software.amazon.smithy.model.traits.InputTrait;
@@ -33,6 +39,12 @@ import software.amazon.smithy.utils.SmithyUnstableApi;
 @SmithyUnstableApi
 final class DirectedDocGen implements DirectedCodegen<DocGenerationContext, DocSettings, DocIntegration> {
 
+    private final PluginContext pluginContext;
+
+    DirectedDocGen(PluginContext pluginContext) {
+        this.pluginContext = pluginContext;
+    }
+
     @Override
     public SymbolProvider createSymbolProvider(CreateSymbolProviderDirective<DocSettings> directive) {
         return new DocSymbolProvider(directive.model(), directive.settings());
@@ -40,12 +52,26 @@ final class DirectedDocGen implements DirectedCodegen<DocGenerationContext, DocS
 
     @Override
     public DocGenerationContext createContext(CreateContextDirective<DocSettings, DocIntegration> directive) {
+        var contextGenerator = new MockPluginContextGenerator(
+                pluginContext, directive.settings().snippetGeneratorSettings());
+        var classLoader = pluginContext.getPluginClassLoader().orElse(getClass().getClassLoader());
+
+        List<SnippetGenerator> snippetGenerators = new ArrayList<>();
+        for (SnippetGenerator generator : ServiceLoader.load(SnippetGenerator.class, classLoader)) {
+            var pluginContext = contextGenerator.getStubbedContext(directive.model(), generator.name());
+            if (generator.configure(pluginContext, directive.service())) {
+                snippetGenerators.add(generator);
+            }
+        }
+        snippetGenerators = snippetGenerators.stream().sorted(new SnippetComparator()).toList();
+
         return new DocGenerationContext(
-            directive.model(),
-            directive.settings(),
-            directive.symbolProvider(),
-            directive.fileManifest(),
-            directive.integrations()
+                directive.model(),
+                directive.settings(),
+                directive.symbolProvider(),
+                directive.fileManifest(),
+                directive.integrations(),
+                snippetGenerators
         );
     }
 
