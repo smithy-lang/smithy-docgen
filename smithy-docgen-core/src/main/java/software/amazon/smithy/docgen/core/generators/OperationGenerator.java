@@ -18,6 +18,7 @@ import software.amazon.smithy.docgen.core.sections.ExampleSection;
 import software.amazon.smithy.docgen.core.sections.ExamplesSection;
 import software.amazon.smithy.docgen.core.sections.ShapeDetailsSection;
 import software.amazon.smithy.docgen.core.sections.ShapeSection;
+import software.amazon.smithy.docgen.core.sections.ShapeSubheadingSection;
 import software.amazon.smithy.docgen.core.writers.DocWriter;
 import software.amazon.smithy.docgen.core.writers.DocWriter.ListType;
 import software.amazon.smithy.model.node.Node;
@@ -35,6 +36,9 @@ import software.amazon.smithy.model.traits.ExamplesTrait.Example;
  * sections are guaranteed to be present:
  *
  * <ul>
+ *     <li>{@link ShapeSubheadingSection}: Enables adding additional details that are
+ *     inserted right after the shape's heading, before modeled docs.
+ *
  *     <li>{@link ShapeDetailsSection}: Enables adding additional details that are inserted
  *     directly after the shape's modeled documentation.
  *
@@ -88,6 +92,7 @@ public class OperationGenerator implements Consumer<GenerateOperationDirective<D
             writer.pushState(new ShapeSection(context, operation));
             var linkId = symbol.expectProperty(DocSymbolProvider.LINK_ID_PROPERTY, String.class);
             writer.openHeading(symbol.getName(), linkId);
+            writer.injectSection(new ShapeSubheadingSection(context, operation));
             writer.writeShapeDocs(operation, directive.model());
             writer.injectSection(new ShapeDetailsSection(context, operation));
 
