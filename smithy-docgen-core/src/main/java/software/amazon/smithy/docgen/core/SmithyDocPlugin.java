@@ -39,8 +39,6 @@ public final class SmithyDocPlugin implements SmithyBuildPlugin {
     @Override
     public void execute(PluginContext pluginContext) {
         LOGGER.fine("Beginning documentation generation.");
-        DocSettings settings = DocSettings.from(pluginContext.getSettings());
-
         CodegenDirector<DocWriter, DocIntegration, DocGenerationContext, DocSettings> runner
                 = new CodegenDirector<>();
 
@@ -48,7 +46,7 @@ public final class SmithyDocPlugin implements SmithyBuildPlugin {
         runner.integrationClass(DocIntegration.class);
         runner.fileManifest(pluginContext.getFileManifest());
         runner.model(getValidatedModel(pluginContext.getModel()).unwrap());
-        runner.settings(settings);
+        DocSettings settings = runner.settings(DocSettings.class, pluginContext.getSettings());
         runner.service(settings.service());
         runner.performDefaultCodegenTransforms();
         runner.run();
