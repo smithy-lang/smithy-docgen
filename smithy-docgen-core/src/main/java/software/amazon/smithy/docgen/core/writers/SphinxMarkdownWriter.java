@@ -9,6 +9,8 @@ import java.util.function.Consumer;
 import software.amazon.smithy.codegen.core.Symbol;
 import software.amazon.smithy.codegen.core.SymbolWriter;
 import software.amazon.smithy.docgen.core.DocSymbolProvider;
+import software.amazon.smithy.model.shapes.MemberShape;
+import software.amazon.smithy.model.traits.EnumValueTrait;
 import software.amazon.smithy.utils.SmithyUnstableApi;
 
 /**
@@ -49,10 +51,21 @@ public final class SphinxMarkdownWriter extends MarkdownWriter {
         memberSymbol.getProperty(DocSymbolProvider.LINK_ID_PROPERTY, String.class).ifPresent(linkId -> {
             write("($L)=", linkId);
         });
+        var member = memberSymbol.expectProperty(DocSymbolProvider.SHAPE_PROPERTY, MemberShape.class);
+
         // Writes the members as a definition list
-        writeInline("""
-                $L: $C
-                :\s""", memberSymbol.getName(), writeType);
+        if (member.hasTrait(EnumValueTrait.class)) {
+            // The type written here will be the literal for enum values. Using
+            // backticks is standard for markdown literals, and it gives some
+            // differentiation between them and normal shape members.
+            writeInline("""
+                    **$L**: `$C`
+                    :\s""", memberSymbol.getName(), writeType);
+        } else {
+            writeInline("""
+                    **$L**: $C
+                    :\s""", memberSymbol.getName(), writeType);
+        }
         indent();
         return this;
     }

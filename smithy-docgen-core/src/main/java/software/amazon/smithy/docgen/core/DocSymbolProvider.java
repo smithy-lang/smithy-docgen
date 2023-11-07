@@ -17,6 +17,8 @@ import software.amazon.smithy.codegen.core.Symbol;
 import software.amazon.smithy.codegen.core.SymbolProvider;
 import software.amazon.smithy.model.Model;
 import software.amazon.smithy.model.knowledge.OperationIndex;
+import software.amazon.smithy.model.shapes.EnumShape;
+import software.amazon.smithy.model.shapes.IntEnumShape;
 import software.amazon.smithy.model.shapes.MemberShape;
 import software.amazon.smithy.model.shapes.OperationShape;
 import software.amazon.smithy.model.shapes.ServiceShape;
@@ -197,6 +199,20 @@ public final class DocSymbolProvider extends ShapeVisitor.Default<Symbol> implem
             builder.definitionFile(getDefinitionFile(serviceShape, shape));
         }
         return builder.build();
+    }
+
+    @Override
+    public Symbol enumShape(EnumShape shape) {
+        return getSymbolBuilder(shape)
+                .definitionFile(getDefinitionFile(serviceShape, shape))
+                .build();
+    }
+
+    @Override
+    public Symbol intEnumShape(IntEnumShape shape) {
+        return getSymbolBuilder(shape)
+                .definitionFile(getDefinitionFile(serviceShape, shape))
+                .build();
     }
 
     @Override

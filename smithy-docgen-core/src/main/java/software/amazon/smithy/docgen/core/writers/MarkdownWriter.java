@@ -14,6 +14,9 @@ import software.amazon.smithy.codegen.core.CodegenException;
 import software.amazon.smithy.codegen.core.Symbol;
 import software.amazon.smithy.codegen.core.SymbolReference;
 import software.amazon.smithy.codegen.core.SymbolWriter;
+import software.amazon.smithy.docgen.core.DocSymbolProvider;
+import software.amazon.smithy.model.shapes.MemberShape;
+import software.amazon.smithy.model.traits.EnumValueTrait;
 import software.amazon.smithy.utils.Pair;
 import software.amazon.smithy.utils.SmithyUnstableApi;
 import software.amazon.smithy.utils.StringUtils;
@@ -122,7 +125,15 @@ public class MarkdownWriter extends DocWriter {
     @Override
     public DocWriter openMemberEntry(Symbol memberSymbol, Consumer<DocWriter> writeType) {
         openListItem(ListType.UNORDERED);
-        writeInline("**$L** (*$C*): ", memberSymbol.getName(), writeType);
+        var member = memberSymbol.expectProperty(DocSymbolProvider.SHAPE_PROPERTY, MemberShape.class);
+        if (member.hasTrait(EnumValueTrait.class)) {
+            // The type written here will be the literal for enum values. Using
+            // backticks is standard for markdown literals, and it gives some
+            // differentiation between them and normal shape members.
+            writeInline("**$L** (`$C`): ", memberSymbol.getName(), writeType);
+        } else {
+            writeInline("**$L** (*$C*): ", memberSymbol.getName(), writeType);
+        }
         return this;
     }
 

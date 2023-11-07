@@ -70,6 +70,9 @@ structure DocumentedStructure {
     // pull the docs from the target shape.
     enum: DocumentedStringEnum
 
+    // This also will pull docs from the shape.
+    intEnum: DocumentedIntEnum
+
     undocumented: UndocumentedStructure
 
     /// This is a self-referential member. This is a thing that should be possible.
@@ -88,6 +91,21 @@ enum DocumentedStringEnum {
 
     /// Another very common placeholder, often seen with `foo`.
     BAR
+}
+
+/// This in an enum that can have one of the following values:
+///
+/// - `SPAM`: `1`
+/// - `EGGS`: `2`
+///
+/// Like other shapes in the model, this doesn't actually mean anything.
+intEnum DocumentedIntEnum {
+    /// The spam and eggs placeholders are really only common in Python code bases.
+    SPAM = 1
+
+    /// They're a reference to a famous Monty Python skit, which is fitting because the
+    /// language itself is named after Monty Python.
+    EGGS = 2
 }
 
 // This structure has no docs anywhere

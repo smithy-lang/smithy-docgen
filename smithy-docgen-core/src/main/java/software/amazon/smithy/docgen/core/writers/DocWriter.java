@@ -199,7 +199,8 @@ public abstract class DocWriter extends SymbolWriter<DocWriter, DocImportContain
      *
      * @param memberSymbol A symbol representing the member being documented.
      * @param writeType A consumer that writes the type, including links to any referenced
-     *                  shapes.
+     *                  shapes. If the member is an enum member, it will write the literal
+     *                  value.
      * @return returns the writer.
      */
     public abstract DocWriter openMemberEntry(Symbol memberSymbol, Consumer<DocWriter> writeType);
