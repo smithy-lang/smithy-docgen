@@ -21,6 +21,7 @@ import software.amazon.smithy.docgen.core.generators.MemberGenerator.MemberListi
 import software.amazon.smithy.docgen.core.generators.OperationGenerator;
 import software.amazon.smithy.docgen.core.generators.ServiceGenerator;
 import software.amazon.smithy.docgen.core.generators.StructuredShapeGenerator;
+import software.amazon.smithy.model.node.ExpectationNotMetException;
 import software.amazon.smithy.model.traits.InputTrait;
 import software.amazon.smithy.model.traits.OutputTrait;
 import software.amazon.smithy.utils.SmithyUnstableApi;
@@ -78,12 +79,15 @@ final class DirectedDocGen implements DirectedCodegen<DocGenerationContext, DocS
 
     @Override
     public void generateEnumShape(GenerateEnumDirective<DocGenerationContext, DocSettings> directive) {
-        // no-op for now
+        new StructuredShapeGenerator(directive.context()).accept(directive.shape(), MemberListingType.OPTIONS);
     }
 
     @Override
     public void generateIntEnumShape(GenerateIntEnumDirective<DocGenerationContext, DocSettings> directive) {
-        // no-op for now
+        var shape = directive.shape();
+        var intEnum = shape.asIntEnumShape().orElseThrow(() -> new ExpectationNotMetException(
+                "Expected an intEnum shape, but found " + shape, shape));
+        new StructuredShapeGenerator(directive.context()).accept(intEnum, MemberListingType.OPTIONS);
     }
 
     @Override

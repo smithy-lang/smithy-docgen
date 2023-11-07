@@ -35,6 +35,7 @@ import software.amazon.smithy.model.shapes.StringShape;
 import software.amazon.smithy.model.shapes.StructureShape;
 import software.amazon.smithy.model.shapes.TimestampShape;
 import software.amazon.smithy.model.shapes.UnionShape;
+import software.amazon.smithy.model.traits.EnumValueTrait;
 import software.amazon.smithy.utils.SmithyUnstableApi;
 
 /**
@@ -99,7 +100,7 @@ public final class MemberGenerator implements Runnable {
 
                 var symbol = context.symbolProvider().toSymbol(member);
                 var target = context.model().expectShape(member.getTarget());
-                writer.openMemberEntry(symbol, w -> target.accept(new MemberTypeVisitor(w, context)));
+                writer.openMemberEntry(symbol, w -> target.accept(new MemberTypeVisitor(w, context, member)));
                 writer.writeShapeDocs(member, context.model());
 
                 writer.closeMemberEntry();
@@ -140,7 +141,14 @@ public final class MemberGenerator implements Runnable {
         /**
          * Indicates the listing is for an operation's output members.
          */
-        OUTPUT("Response Members");
+        OUTPUT("Response Members"),
+
+        /**
+         * Indicates the listing is for enums, intEnums, or unions, which each only
+         * allow one of their members to be selected.
+         *
+         */
+        OPTIONS("Options");
 
         private final String title;
         private final String linkIdSuffix;
@@ -170,10 +178,12 @@ public final class MemberGenerator implements Runnable {
 
         private final DocWriter writer;
         private final DocGenerationContext context;
+        private final MemberShape member;
 
-        MemberTypeVisitor(DocWriter writer, DocGenerationContext context) {
+        MemberTypeVisitor(DocWriter writer, DocGenerationContext context, MemberShape member) {
             this.writer = writer;
             this.context = context;
+            this.member = member;
         }
 
         @Override
@@ -292,7 +302,16 @@ public final class MemberGenerator implements Runnable {
 
         @Override
         public Void structureShape(StructureShape shape) {
-            writeShapeName(shape);
+            if (member.hasTrait(EnumValueTrait.class)) {
+                var trait = member.expectTrait(EnumValueTrait.class);
+                if (trait.getIntValue().isPresent()) {
+                    writer.writeInline("$L", trait.expectIntValue());
+                } else {
+                    writer.writeInline("$S", trait.expectStringValue());
+                }
+            } else {
+                writeShapeName(shape);
+            }
             return null;
         }
 
