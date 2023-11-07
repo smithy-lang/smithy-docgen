@@ -77,6 +77,8 @@ structure DocumentedStructure {
 
     /// This is a self-referential member. This is a thing that should be possible.
     self: DocumentedStructure
+
+    union: DocumentedUnion
 }
 
 /// This in an enum that can have one of the following values:
@@ -133,3 +135,17 @@ structure ServiceError with [ErrorMixin] {}
 
 /// This error is only returned by DocumentedOperation
 structure DocumentedOperationError with [ErrorMixin] {}
+
+/// Unions can only have one member set. The member name is used as a tag to
+/// determine which member is intended at runtime.
+union DocumentedUnion {
+    /// Union members for the most part look like structure members, with the exception
+    /// that exactly one must be set.
+    string: String
+
+    /// It doesn't matter that multiple members target the same type, since the type
+    /// isn't the discriminator, the tag (member name) is.
+    otherString: String
+
+    struct: DocumentedStructure
+}
