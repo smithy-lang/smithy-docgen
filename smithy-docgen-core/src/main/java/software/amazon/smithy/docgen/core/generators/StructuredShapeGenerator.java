@@ -5,19 +5,18 @@
 
 package software.amazon.smithy.docgen.core.generators;
 
-import java.util.function.Consumer;
-import software.amazon.smithy.codegen.core.directed.GenerateErrorDirective;
+import java.util.function.BiConsumer;
 import software.amazon.smithy.docgen.core.DocGenerationContext;
-import software.amazon.smithy.docgen.core.DocSettings;
 import software.amazon.smithy.docgen.core.DocSymbolProvider;
 import software.amazon.smithy.docgen.core.generators.MemberGenerator.MemberListingType;
 import software.amazon.smithy.docgen.core.sections.ShapeDetailsSection;
 import software.amazon.smithy.docgen.core.sections.ShapeSection;
 import software.amazon.smithy.docgen.core.sections.ShapeSubheadingSection;
-import software.amazon.smithy.model.traits.ErrorTrait;
+import software.amazon.smithy.model.shapes.Shape;
+import software.amazon.smithy.utils.SmithyInternalApi;
 
 /**
- * Generates documentation for errors.
+ * Generates documentation for shapes with members.
  *
  * <p>The output of this can be customized in a number of ways. To add details to
  * or re-write particular sections, register an interceptor with
@@ -35,14 +34,14 @@ import software.amazon.smithy.model.traits.ErrorTrait;
  *     including changes made in other sections.
  * </ul>
  *
- * Additionally, if the error has members the following sections will also be present:
+ * Additionally, if the shape has members the following sections will also be present:
  *
  * <ul>
  *     <li>{@link software.amazon.smithy.docgen.core.sections.MemberSection}: enables
- *     modifying documentation for an individual error member.
+ *     modifying documentation for an individual shape member.
  *
  *     <li>{@link software.amazon.smithy.docgen.core.sections.ShapeMembersSection}:
- *     enables modifying the documentation for all of the error's members.
+ *     enables modifying the documentation for all of the shape's members.
  * </ul>
  *
  * <p>To change the intermediate format (e.g. from markdown to restructured text),
@@ -51,24 +50,33 @@ import software.amazon.smithy.model.traits.ErrorTrait;
  *
  * @see MemberGenerator for more details on how member documentation is generated.
  */
-public class ErrorGenerator implements Consumer<GenerateErrorDirective<DocGenerationContext, DocSettings>> {
+@SmithyInternalApi
+public final class StructuredShapeGenerator implements BiConsumer<Shape, MemberListingType> {
+
+    private final DocGenerationContext context;
+
+    /**
+     * Constructs a StructuredShapeGenerator.
+     *
+     * @param context The context used to generate documentation.
+     */
+    public StructuredShapeGenerator(DocGenerationContext context) {
+        this.context = context;
+    }
+
     @Override
-    public void accept(GenerateErrorDirective<DocGenerationContext, DocSettings> directive) {
-        var shape = directive.shape();
-        var symbol = directive.symbolProvider().toSymbol(shape);
-        directive.context().writerDelegator().useShapeWriter(shape, writer -> {
-            writer.pushState(new ShapeSection(directive.context(), shape));
+    public void accept(Shape shape, MemberListingType listingType) {
+        var symbol = context.symbolProvider().toSymbol(shape);
+        context.writerDelegator().useShapeWriter(shape, writer -> {
+            writer.pushState(new ShapeSection(context, shape));
             symbol.getProperty(DocSymbolProvider.LINK_ID_PROPERTY, String.class).ifPresent(writer::writeAnchor);
             writer.openHeading(symbol.getName());
 
-            writer.pushState(new ShapeSubheadingSection(directive.context(), shape));
-            writer.write("This is an error caused by the $L.\n", shape.expectTrait(ErrorTrait.class).getValue());
-            writer.popState();
+            writer.injectSection(new ShapeSubheadingSection(context, shape));
+            writer.writeShapeDocs(shape, context.model());
+            writer.injectSection(new ShapeDetailsSection(context, shape));
 
-            writer.writeShapeDocs(shape, directive.model());
-            writer.injectSection(new ShapeDetailsSection(directive.context(), shape));
-
-            new MemberGenerator(directive.context(), writer, shape, MemberListingType.MEMBERS).run();
+            new MemberGenerator(context, writer, shape, listingType).run();
 
             writer.closeHeading();
             writer.popState();

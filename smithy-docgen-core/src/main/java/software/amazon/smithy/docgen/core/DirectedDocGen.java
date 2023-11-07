@@ -17,10 +17,12 @@ import software.amazon.smithy.codegen.core.directed.GenerateResourceDirective;
 import software.amazon.smithy.codegen.core.directed.GenerateServiceDirective;
 import software.amazon.smithy.codegen.core.directed.GenerateStructureDirective;
 import software.amazon.smithy.codegen.core.directed.GenerateUnionDirective;
-import software.amazon.smithy.docgen.core.generators.ErrorGenerator;
+import software.amazon.smithy.docgen.core.generators.MemberGenerator.MemberListingType;
 import software.amazon.smithy.docgen.core.generators.OperationGenerator;
 import software.amazon.smithy.docgen.core.generators.ServiceGenerator;
-import software.amazon.smithy.docgen.core.generators.StructureGenerator;
+import software.amazon.smithy.docgen.core.generators.StructuredShapeGenerator;
+import software.amazon.smithy.model.traits.InputTrait;
+import software.amazon.smithy.model.traits.OutputTrait;
 import software.amazon.smithy.utils.SmithyUnstableApi;
 
 /**
@@ -52,7 +54,11 @@ final class DirectedDocGen implements DirectedCodegen<DocGenerationContext, DocS
 
     @Override
     public void generateStructure(GenerateStructureDirective<DocGenerationContext, DocSettings> directive) {
-        new StructureGenerator().accept(directive);
+        // Input and output structures are documented alongside the relevant operations.
+        if (directive.shape().hasTrait(InputTrait.class) || directive.shape().hasTrait(OutputTrait.class)) {
+            return;
+        }
+        new StructuredShapeGenerator(directive.context()).accept(directive.shape(), MemberListingType.MEMBERS);
     }
 
     @Override
@@ -62,7 +68,7 @@ final class DirectedDocGen implements DirectedCodegen<DocGenerationContext, DocS
 
     @Override
     public void generateError(GenerateErrorDirective<DocGenerationContext, DocSettings> directive) {
-        new ErrorGenerator().accept(directive);
+        new StructuredShapeGenerator(directive.context()).accept(directive.shape(), MemberListingType.MEMBERS);
     }
 
     @Override
