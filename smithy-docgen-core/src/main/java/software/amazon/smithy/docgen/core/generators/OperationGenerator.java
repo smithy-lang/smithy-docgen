@@ -26,6 +26,7 @@ import software.amazon.smithy.model.shapes.OperationShape;
 import software.amazon.smithy.model.shapes.ServiceShape;
 import software.amazon.smithy.model.traits.ExamplesTrait;
 import software.amazon.smithy.model.traits.ExamplesTrait.Example;
+import software.amazon.smithy.utils.SmithyInternalApi;
 
 /**
  * Generates documentation for operations.
@@ -82,6 +83,7 @@ import software.amazon.smithy.model.traits.ExamplesTrait.Example;
  *
  * @see MemberGenerator for more details on how member documentation is generated.
  */
+@SmithyInternalApi
 public class OperationGenerator implements Consumer<GenerateOperationDirective<DocGenerationContext, DocSettings>> {
     @Override
     public void accept(GenerateOperationDirective<DocGenerationContext, DocSettings> directive) {
