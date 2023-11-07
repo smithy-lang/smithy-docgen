@@ -74,7 +74,7 @@ final class DirectedDocGen implements DirectedCodegen<DocGenerationContext, DocS
 
     @Override
     public void generateUnion(GenerateUnionDirective<DocGenerationContext, DocSettings> directive) {
-        // no-op for now
+        new StructuredShapeGenerator(directive.context()).accept(directive.shape(), MemberListingType.OPTIONS);
     }
 
     @Override

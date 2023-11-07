@@ -26,6 +26,7 @@ import software.amazon.smithy.model.shapes.Shape;
 import software.amazon.smithy.model.shapes.ShapeId;
 import software.amazon.smithy.model.shapes.ShapeVisitor;
 import software.amazon.smithy.model.shapes.StructureShape;
+import software.amazon.smithy.model.shapes.UnionShape;
 import software.amazon.smithy.model.traits.InputTrait;
 import software.amazon.smithy.model.traits.OutputTrait;
 import software.amazon.smithy.model.traits.StringTrait;
@@ -210,6 +211,13 @@ public final class DocSymbolProvider extends ShapeVisitor.Default<Symbol> implem
 
     @Override
     public Symbol intEnumShape(IntEnumShape shape) {
+        return getSymbolBuilder(shape)
+                .definitionFile(getDefinitionFile(serviceShape, shape))
+                .build();
+    }
+
+    @Override
+    public Symbol unionShape(UnionShape shape) {
         return getSymbolBuilder(shape)
                 .definitionFile(getDefinitionFile(serviceShape, shape))
                 .build();
