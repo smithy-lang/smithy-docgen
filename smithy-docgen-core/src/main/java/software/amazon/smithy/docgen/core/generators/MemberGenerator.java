@@ -6,7 +6,9 @@
 package software.amazon.smithy.docgen.core.generators;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import software.amazon.smithy.codegen.core.CodegenException;
 import software.amazon.smithy.docgen.core.DocGenerationContext;
 import software.amazon.smithy.docgen.core.DocSymbolProvider;
@@ -29,6 +31,7 @@ import software.amazon.smithy.model.shapes.LongShape;
 import software.amazon.smithy.model.shapes.MapShape;
 import software.amazon.smithy.model.shapes.MemberShape;
 import software.amazon.smithy.model.shapes.Shape;
+import software.amazon.smithy.model.shapes.ShapeId;
 import software.amazon.smithy.model.shapes.ShapeVisitor;
 import software.amazon.smithy.model.shapes.ShortShape;
 import software.amazon.smithy.model.shapes.StringShape;
@@ -120,8 +123,21 @@ public final class MemberGenerator implements Runnable {
             case OUTPUT -> context.model()
                     .expectShape(shape.asOperationShape().get().getOutputShape())
                     .getAllMembers().values();
+            case RESOURCE_IDENTIFIERS -> synthesizeResourceMembers(shape.asResourceShape().get().getIdentifiers());
+            case RESOURCE_PROPERTIES -> synthesizeResourceMembers(shape.asResourceShape().get().getProperties());
             default -> shape.getAllMembers().values();
         };
+    }
+
+    // Resource identifiers and properties aren't actually members, but they're close
+    // enough that we can treat them like they are for the purposes of the doc generator.
+    private List<MemberShape> synthesizeResourceMembers(Map<String, ShapeId> properties) {
+        return properties.entrySet().stream()
+                .map(entry -> MemberShape.builder()
+                        .id(shape.getId().withMember(entry.getKey()))
+                        .target(entry.getValue())
+                        .build())
+                .toList();
     }
 
     /**
@@ -146,9 +162,18 @@ public final class MemberGenerator implements Runnable {
         /**
          * Indicates the listing is for enums, intEnums, or unions, which each only
          * allow one of their members to be selected.
-         *
          */
-        OPTIONS("Options");
+        OPTIONS("Options"),
+
+        /**
+         * Indicates the listing is for a resource's identifiers.
+         */
+        RESOURCE_IDENTIFIERS("Identifiers"),
+
+        /**
+         * Indicates the listing is for a resource's modeled properties.
+         */
+        RESOURCE_PROPERTIES("Properties");
 
         private final String title;
         private final String linkIdSuffix;

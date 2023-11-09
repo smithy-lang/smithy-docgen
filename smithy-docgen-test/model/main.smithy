@@ -12,6 +12,9 @@ service DocumentedService {
     operations: [
         DocumentedOperation
     ]
+    resources: [
+        DocumentationResource
+    ]
     errors: [
         ClientError
         ServiceError
@@ -148,4 +151,212 @@ union DocumentedUnion {
     otherString: String
 
     struct: DocumentedStructure
+}
+
+/// A resource shape. To have some sense of readability this will represent the concept
+/// of documentation itself as a resource, presenting the image of a service which
+/// stores such things.
+resource DocumentationResource {
+    identifiers: {id: DocumentationId}
+    properties: {contents: DocumentationContents, archived: DocumentationArchived}
+    put: PutDocumentation
+    create: CreateDocumentation
+    read: GetDocumentation
+    update: UpdateDocumentation
+    delete: DeleteDocumentation
+    list: ListDocumentation
+    operations: [
+        ArchiveDocumentation
+    ]
+    collectionOperations: [
+        DeleteArchivedDocumentation
+    ]
+    resources: [
+        DocumentationArtifact
+    ]
+}
+
+/// The identifier for the documentation resoruce.
+///
+/// These properites and identifiers all have their own shapes to enable documentation
+/// sharing, not necessarily because they have meaningful collections of constraints
+/// or other wire-level traits.
+string DocumentationId
+
+/// The actual body of the documentation.
+string DocumentationContents
+
+/// Whether or not the documentation has been archived. This could mean that changes
+/// are rejected, for example.
+boolean DocumentationArchived
+
+/// Put operations create a resource with a user-specified identifier.
+@idempotent
+operation PutDocumentation {
+    input := for DocumentationResource {
+        @required
+        $id
+
+        @required
+        $contents
+    }
+}
+
+/// Create operations instead have the service create the identifier.
+operation CreateDocumentation {
+    input := for DocumentationResource {
+        @required
+        $contents
+    }
+}
+
+/// Gets the contents of a documentation resource.
+@readonly
+operation GetDocumentation {
+    input := for DocumentationResource {
+        @required
+        $id
+    }
+
+    output := for DocumentationResource {
+        @required
+        $id
+
+        @required
+        $contents
+
+        @required
+        $archived
+    }
+}
+
+/// Does an update on the documentation resource. These can often also be the put
+/// lifecycle operation.
+@idempotent
+operation UpdateDocumentation {
+    input := for DocumentationResource {
+        @required
+        $id
+
+        @required
+        $contents
+    }
+}
+
+/// Deletes documentation.
+@idempotent
+operation DeleteDocumentation {
+    input := for DocumentationResource {
+        @required
+        $id
+    }
+}
+
+/// Archives documentation. This is here to be a non-lifecycle instance operation.
+/// We need both instance operations and collection operations that aren't lifecycle
+/// operations to make sure both cases are being documented.
+@idempotent
+operation ArchiveDocumentation {
+    input := for DocumentationResource {
+        @required
+        $id
+    }
+}
+
+/// Deletes all documentation that's been archived. This is a collection operation that
+/// isn't part of a lifecycle operation, which is again needed to make sure everything
+/// is being documented as expected.
+operation DeleteArchivedDocumentation {}
+
+/// Lists the avialable documentation resources.
+@readonly
+operation ListDocumentation {
+    input := {
+        // Whether to list documentation that has been archived.
+        showArchived: Boolean = false
+    }
+
+    output := {
+        /// A list of all the documentation. No pagination here.
+        @required
+        documentation: DocumentationList
+    }
+}
+
+list DocumentationList {
+    member: Documentation
+}
+
+/// A concrete documentation resource instance.
+structure Documentation for DocumentationResource {
+    @required
+    $id
+
+    @required
+    $contents
+
+    @required
+    $archived
+}
+
+/// This would be something like a built PDF.
+resource DocumentationArtifact {
+    identifiers: {id: DocumentationId, artifactId: DocumentationArtifactId}
+    properties: {data: DocumentationArtifactData}
+    put: PutDocumentationArtifact
+    read: GetDocumentationArtifact
+    delete: DeleteDocumentationArtifact
+}
+
+/// Sub-resources need distinct identifiers.
+string DocumentationArtifactId
+
+/// This would be the bytes containing the artifact
+blob DocumentationArtifactData
+
+@idempotent
+operation PutDocumentationArtifact {
+    input := for DocumentationArtifact {
+        @required
+        $id
+
+        @required
+        $artifactId
+
+        @required
+        $data
+    }
+}
+
+@readonly
+operation GetDocumentationArtifact {
+    input := for DocumentationArtifact {
+        @required
+        $id
+
+        @required
+        $artifactId
+    }
+
+    output := for DocumentationArtifact {
+        @required
+        $id
+
+        @required
+        $artifactId
+
+        @required
+        $data
+    }
+}
+
+@idempotent
+operation DeleteDocumentationArtifact {
+    input := for DocumentationArtifact {
+        @required
+        $id
+
+        @required
+        $artifactId
+    }
 }

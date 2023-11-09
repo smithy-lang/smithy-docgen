@@ -5,6 +5,7 @@
 
 package software.amazon.smithy.docgen.core.validation;
 
+import software.amazon.smithy.model.traits.UnitTypeTrait;
 import software.amazon.smithy.model.validation.Severity;
 import software.amazon.smithy.model.validation.ValidationEvent;
 import software.amazon.smithy.model.validation.ValidationEventDecorator;
@@ -29,6 +30,9 @@ public class DocValidationEventDecorator implements ValidationEventDecorator {
 
     @Override
     public ValidationEvent decorate(ValidationEvent event) {
+        if (event.getShapeId().isPresent() && event.getShapeId().get().equals(UnitTypeTrait.UNIT)) {
+            return event.toBuilder().severity(Severity.SUPPRESSED).build();
+        }
         return event.toBuilder()
                 .message(event.getMessage() + " " + REUSE_DOCUMENTATION_CONTEXT)
                 .severity(Severity.DANGER)

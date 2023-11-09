@@ -21,6 +21,7 @@ import software.amazon.smithy.model.shapes.EnumShape;
 import software.amazon.smithy.model.shapes.IntEnumShape;
 import software.amazon.smithy.model.shapes.MemberShape;
 import software.amazon.smithy.model.shapes.OperationShape;
+import software.amazon.smithy.model.shapes.ResourceShape;
 import software.amazon.smithy.model.shapes.ServiceShape;
 import software.amazon.smithy.model.shapes.Shape;
 import software.amazon.smithy.model.shapes.ShapeId;
@@ -75,7 +76,6 @@ import software.amazon.smithy.utils.StringUtils;
  *
  * <p>Decorators provided by {@link DocIntegration#decorateSymbolProvider} MUST set
  * these properties or preserve
- *
  */
 @SmithyUnstableApi
 public final class DocSymbolProvider extends ShapeVisitor.Default<Symbol> implements SymbolProvider {
@@ -182,45 +182,40 @@ public final class DocSymbolProvider extends ShapeVisitor.Default<Symbol> implem
     }
 
     @Override
+    public Symbol resourceShape(ResourceShape shape) {
+        return getSymbolBuilderWithFile(shape).build();
+    }
+
+    @Override
     public Symbol operationShape(OperationShape shape) {
-        return getSymbolBuilder(shape)
-                .definitionFile(getDefinitionFile(serviceShape, shape))
-                .build();
+        return getSymbolBuilderWithFile(shape).build();
     }
 
     @Override
     public Symbol structureShape(StructureShape shape) {
-        var builder = getSymbolBuilder(shape);
+        var builder = getSymbolBuilderWithFile(shape);
         if (ioToOperation.containsKey(shape.getId())) {
             // Input and output structures are documented on the operation's definition page.
             var operation = ioToOperation.get(shape.getId());
             builder.definitionFile(getDefinitionFile(serviceShape, operation));
             builder.putProperty(OPERATION_PROPERTY, operation);
-        } else {
-            builder.definitionFile(getDefinitionFile(serviceShape, shape));
         }
         return builder.build();
     }
 
     @Override
     public Symbol enumShape(EnumShape shape) {
-        return getSymbolBuilder(shape)
-                .definitionFile(getDefinitionFile(serviceShape, shape))
-                .build();
+        return getSymbolBuilderWithFile(shape).build();
     }
 
     @Override
     public Symbol intEnumShape(IntEnumShape shape) {
-        return getSymbolBuilder(shape)
-                .definitionFile(getDefinitionFile(serviceShape, shape))
-                .build();
+        return getSymbolBuilderWithFile(shape).build();
     }
 
     @Override
     public Symbol unionShape(UnionShape shape) {
-        return getSymbolBuilder(shape)
-                .definitionFile(getDefinitionFile(serviceShape, shape))
-                .build();
+        return getSymbolBuilderWithFile(shape).build();
     }
 
     @Override
@@ -245,6 +240,11 @@ public final class DocSymbolProvider extends ShapeVisitor.Default<Symbol> implem
                 .putProperty(SHAPE_PROPERTY, shape)
                 .putProperty(LINK_ID_PROPERTY, getLinkId(name))
                 .putProperty(ENABLE_DEFAULT_FILE_EXTENSION, true);
+    }
+
+    private Symbol.Builder getSymbolBuilderWithFile(Shape shape) {
+        return getSymbolBuilder(shape)
+                .definitionFile(getDefinitionFile(serviceShape, shape));
     }
 
     private String getDefinitionFile(ServiceShape serviceShape, Shape shape) {

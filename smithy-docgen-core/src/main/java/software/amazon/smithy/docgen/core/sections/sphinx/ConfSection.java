@@ -7,6 +7,7 @@ package software.amazon.smithy.docgen.core.sections.sphinx;
 
 import software.amazon.smithy.docgen.core.DocGenerationContext;
 import software.amazon.smithy.utils.CodeSection;
+import software.amazon.smithy.utils.SmithyUnstableApi;
 
 /**
  * Generates the {@code conf.py} file for sphinx.
@@ -14,5 +15,6 @@ import software.amazon.smithy.utils.CodeSection;
  *     sphinx config docs</a>
  * @param context The context used to generate documentation.
  */
+@SmithyUnstableApi
 public record ConfSection(DocGenerationContext context) implements CodeSection {
 }

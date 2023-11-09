@@ -8,6 +8,7 @@ package software.amazon.smithy.docgen.core.sections;
 import software.amazon.smithy.docgen.core.DocGenerationContext;
 import software.amazon.smithy.model.shapes.Shape;
 import software.amazon.smithy.utils.CodeSection;
+import software.amazon.smithy.utils.SmithyUnstableApi;
 
 /**
  * Enables injecting details immediately before a shape's modeled documentation.
@@ -18,5 +19,6 @@ import software.amazon.smithy.utils.CodeSection;
  * @see ShapeSection to modify the shape's entire documentation.
  * @see ShapeDetailsSection to inject docs after modeled documentation.
  */
+@SmithyUnstableApi
 public record ShapeSubheadingSection(DocGenerationContext context, Shape shape) implements CodeSection {
 }

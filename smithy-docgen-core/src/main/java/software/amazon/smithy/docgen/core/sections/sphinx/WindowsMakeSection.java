@@ -7,10 +7,12 @@ package software.amazon.smithy.docgen.core.sections.sphinx;
 
 import software.amazon.smithy.docgen.core.DocGenerationContext;
 import software.amazon.smithy.utils.CodeSection;
+import software.amazon.smithy.utils.SmithyUnstableApi;
 
 /**
  * Generates a batch script that wraps sphinx-build with default arguments.
  * @param context The context used to generate documentation.
  */
+@SmithyUnstableApi
 public record WindowsMakeSection(DocGenerationContext context) implements CodeSection {
 }

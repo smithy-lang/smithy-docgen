@@ -8,6 +8,7 @@ package software.amazon.smithy.docgen.core.sections.sphinx;
 import java.util.List;
 import software.amazon.smithy.docgen.core.DocGenerationContext;
 import software.amazon.smithy.utils.CodeSection;
+import software.amazon.smithy.utils.SmithyUnstableApi;
 
 /**
  * Generates a requirements file needed to install and run sphinx.
@@ -18,5 +19,6 @@ import software.amazon.smithy.utils.CodeSection;
  * @param context The context used to generate documentation.
  * @param requirements The requirements as a list of <a href="https://peps.python.org/pep-0508/">PEP 508</a> strings.
  */
+@SmithyUnstableApi
 public record RequirementsSection(DocGenerationContext context, List<String> requirements) implements CodeSection {
 }

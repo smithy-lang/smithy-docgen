@@ -8,6 +8,7 @@ package software.amazon.smithy.docgen.core.sections;
 import software.amazon.smithy.docgen.core.DocGenerationContext;
 import software.amazon.smithy.model.shapes.Shape;
 import software.amazon.smithy.utils.CodeSection;
+import software.amazon.smithy.utils.SmithyUnstableApi;
 
 /**
  * Contains a listing of all the errors that an operation might throw, or errors common
@@ -22,5 +23,6 @@ import software.amazon.smithy.utils.CodeSection;
  *
  * @see software.amazon.smithy.docgen.core.generators.OperationGenerator
  */
+@SmithyUnstableApi
 public record ErrorsSection(DocGenerationContext context, Shape shape) implements CodeSection {
 }

@@ -9,6 +9,7 @@ import software.amazon.smithy.docgen.core.DocGenerationContext;
 import software.amazon.smithy.model.shapes.OperationShape;
 import software.amazon.smithy.model.traits.ExamplesTrait.Example;
 import software.amazon.smithy.utils.CodeSection;
+import software.amazon.smithy.utils.SmithyUnstableApi;
 
 /**
  * Generates a single operation example as defined by the {@code examples} trait.
@@ -23,6 +24,7 @@ import software.amazon.smithy.utils.CodeSection;
  * @see ExamplesSection
  * @see software.amazon.smithy.docgen.core.generators.OperationGenerator
  */
+@SmithyUnstableApi
 public record ExampleSection(
         DocGenerationContext context,
         OperationShape operation,
