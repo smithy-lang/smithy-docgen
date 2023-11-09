@@ -5,6 +5,7 @@
 
 package software.amazon.smithy.docgen.core.sections.sphinx;
 
+import java.util.Set;
 import software.amazon.smithy.docgen.core.DocGenerationContext;
 import software.amazon.smithy.utils.CodeSection;
 import software.amazon.smithy.utils.SmithyUnstableApi;
@@ -14,7 +15,8 @@ import software.amazon.smithy.utils.SmithyUnstableApi;
  * @see <a href="https://www.sphinx-doc.org/en/master/usage/configuration.html">
  *     sphinx config docs</a>
  * @param context The context used to generate documentation.
+ * @param extensions Extensions needed to generate documentation.
  */
 @SmithyUnstableApi
-public record ConfSection(DocGenerationContext context) implements CodeSection {
+public record ConfSection(DocGenerationContext context, Set<String> extensions) implements CodeSection {
 }

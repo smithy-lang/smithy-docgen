@@ -9,7 +9,7 @@ import static java.lang.String.format;
 import static software.amazon.smithy.docgen.core.DocgenUtils.normalizeNewlines;
 import static software.amazon.smithy.docgen.core.DocgenUtils.runCommand;
 
-import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -28,6 +28,7 @@ import software.amazon.smithy.model.node.ObjectNode;
 import software.amazon.smithy.model.node.StringNode;
 import software.amazon.smithy.model.shapes.ServiceShape;
 import software.amazon.smithy.utils.SmithyInternalApi;
+import software.amazon.smithy.utils.SmithyUnstableApi;
 
 /**
  * Adds Sphinx project scaffolding for compatible formats.
@@ -86,10 +87,19 @@ public final class SphinxIntegration implements DocIntegration {
 
     // The default requirements needed to build the docs.
     private static final List<String> BASE_REQUIREMENTS = List.of(
-        "Sphinx==7.2.6",
-        "myst-parser==2.0.0",
-        "linkify-it-py==2.0.2",
-        "sphinx-inline-tabs==2023.4.21"
+            "Sphinx==7.2.6",
+            "sphinx-inline-tabs==2023.4.21"
+    );
+    private static final List<String> MARKDOWN_REQUIREMENTS = List.of(
+            "myst-parser==2.0.0",
+            "linkify-it-py==2.0.2"
+    );
+
+    private static final List<String> BASE_EXTENSIONS = List.of(
+            "sphinx_inline_tabs"
+    );
+    private static final List<String> MARKDOWN_EXTENSIONS = List.of(
+            "myst_parser"
     );
 
     private SphinxSettings settings = SphinxSettings.fromNode(Node.objectNode());
@@ -136,11 +146,12 @@ public final class SphinxIntegration implements DocIntegration {
     private void writeRequirements(DocGenerationContext context) {
         context.writerDelegator().useFileWriter("requirements.txt", writer -> {
             // Merge base and configured requirements into a single immutable list
-            List<String> requirements = new ArrayList<>(BASE_REQUIREMENTS);
+            Set<String> requirements = new LinkedHashSet<>(BASE_REQUIREMENTS);
+            if (context.docFormat().name().equals(MARKDOWN_FORMAT)) {
+                requirements.addAll(MARKDOWN_REQUIREMENTS);
+            }
             requirements.addAll(settings.extraDependencies());
-            requirements = List.copyOf(requirements);
-
-            writer.pushState(new RequirementsSection(context, requirements));
+            writer.pushState(new RequirementsSection(context, Set.copyOf(requirements)));
             requirements.forEach(writer::write);
             writer.popState();
         });
@@ -151,41 +162,51 @@ public final class SphinxIntegration implements DocIntegration {
         var serviceSymbol = context.symbolProvider().toSymbol(service);
 
         context.writerDelegator().useFileWriter("content/conf.py", writer -> {
-            writer.pushState(new ConfSection(context));
-            writer.write("""
-                # Configuration file for the Sphinx documentation builder.
-                # For the full list of built-in configuration values, see the documentation:
-                # https://www.sphinx-doc.org/en/master/usage/configuration.html
-                project = $1S
-                version = $2S
-                release = $2S
-                templates_path = ["_templates"]
-                html_static_path = ["_static"]
-                html_theme = $3S
-                """,
-                serviceSymbol.getName(),
-                service.getVersion(),
-                settings.theme());
-
+            Set<String> extensions = new LinkedHashSet<>(BASE_EXTENSIONS);
+            extensions.addAll(settings.extraDependencies());
             if (context.docFormat().name().equals(MARKDOWN_FORMAT)) {
-                writer.write("""
-                extensions = [
-                    "myst_parser",
-                    "sphinx_inline_tabs"
-                ]
-                myst_enable_extensions = [
-                    # Makes bare links into actual links
-                    "linkify",
-
-                    # Used to write directives that can be parsed by normal parsers
-                    "colon_fence",
-
-                    # Used to create formatted member lists
-                    "deflist",
-                ]
-                """);
-
+                extensions.addAll(MARKDOWN_EXTENSIONS);
             }
+            extensions = Set.copyOf(extensions);
+
+            writer.pushState(new ConfSection(context, extensions));
+            writer.putContext("extensions", extensions);
+            writer.putContext("isMarkdown", context.docFormat().name().equals(MARKDOWN_FORMAT));
+
+            writer.write("""
+                    # Configuration file for the Sphinx documentation builder.
+                    # For the full list of built-in configuration values, see the documentation:
+                    # https://www.sphinx-doc.org/en/master/usage/configuration.html
+                    project = $1S
+                    version = $2S
+                    release = $2S
+
+                    extensions = [
+                    ${#extensions}
+                        ${value:S},
+                    ${/extensions}
+                    ]
+                    ${?isMarkdown}
+                    myst_enable_extensions = [
+                        # Makes bare links into actual links
+                        "linkify",
+    
+                        # Used to write directives that can be parsed by normal parsers
+                        "colon_fence",
+    
+                        # Used to create formatted member lists
+                        "deflist",
+                    ]
+                    ${/isMarkdown}
+
+                    templates_path = ["_templates"]
+                    html_static_path = ["_static"]
+                    html_theme = $3S
+                    """,
+                    serviceSymbol.getName(),
+                    service.getVersion(),
+                    settings.theme());
+
             writer.popState();
         });
     }
@@ -387,16 +408,20 @@ public final class SphinxIntegration implements DocIntegration {
      * @param extraDependencies Any extra python dependencies that should be added to
      *                          the {@code requirements.txt} file for the sphinx project.
      *                          These can be particularly useful for custom {@link #theme}s.
+     * @param extraExtensions Any extra sphinx extensions that should be added to the
+     *                        {@code conf.py} file for the sphinx project.
      * @param autoBuild Whether to automatically attempt to build the generated sphinx
      *                  project. The default is true. This will attempt to discover Python
      *                  3 on the path, create a virtual environment inside the output
      *                  directory, install all the dependencies into that virtual environment,
      *                  and finally run sphinx-build.
      */
+    @SmithyUnstableApi
     public record SphinxSettings(
             String format,
             String theme,
             List<String> extraDependencies,
+            List<String> extraExtensions,
             boolean autoBuild
     ) {
         /**
@@ -408,13 +433,19 @@ public final class SphinxIntegration implements DocIntegration {
         public static SphinxSettings fromNode(ObjectNode node) {
             List<String> extraDependencies = List.of();
             if (node.containsMember("extraDependencies")) {
-                var array = node.expectArrayMember("extraDependencies");
-                extraDependencies = array.getElementsAs(StringNode::getValue);
+                extraDependencies = node.expectArrayMember("extraDependencies")
+                        .getElementsAs(StringNode::getValue);
+            }
+            List<String> extraExtensions = List.of();
+            if (node.containsMember("extraExtensions")) {
+                extraExtensions = node.expectArrayMember("extraExtensions")
+                        .getElementsAs(StringNode::getValue);
             }
             return new SphinxSettings(
                     node.getStringMemberOrDefault("format", "html"),
                     node.getStringMemberOrDefault("theme", "alabaster"),
                     extraDependencies,
+                    extraExtensions,
                     node.getBooleanMemberOrDefault("autoBuild", true)
             );
         }

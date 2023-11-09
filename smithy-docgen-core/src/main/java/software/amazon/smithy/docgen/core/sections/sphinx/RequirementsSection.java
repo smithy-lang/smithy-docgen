@@ -5,7 +5,7 @@
 
 package software.amazon.smithy.docgen.core.sections.sphinx;
 
-import java.util.List;
+import java.util.Set;
 import software.amazon.smithy.docgen.core.DocGenerationContext;
 import software.amazon.smithy.utils.CodeSection;
 import software.amazon.smithy.utils.SmithyUnstableApi;
@@ -20,5 +20,5 @@ import software.amazon.smithy.utils.SmithyUnstableApi;
  * @param requirements The requirements as a list of <a href="https://peps.python.org/pep-0508/">PEP 508</a> strings.
  */
 @SmithyUnstableApi
-public record RequirementsSection(DocGenerationContext context, List<String> requirements) implements CodeSection {
+public record RequirementsSection(DocGenerationContext context, Set<String> requirements) implements CodeSection {
 }
