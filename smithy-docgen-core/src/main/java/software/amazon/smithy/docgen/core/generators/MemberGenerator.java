@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import software.amazon.smithy.codegen.core.CodegenException;
+import software.amazon.smithy.codegen.core.SymbolReference;
 import software.amazon.smithy.docgen.core.DocGenerationContext;
 import software.amazon.smithy.docgen.core.DocSymbolProvider;
 import software.amazon.smithy.docgen.core.sections.MemberSection;
@@ -40,6 +41,7 @@ import software.amazon.smithy.model.shapes.TimestampShape;
 import software.amazon.smithy.model.shapes.UnionShape;
 import software.amazon.smithy.model.traits.EnumValueTrait;
 import software.amazon.smithy.utils.SmithyUnstableApi;
+import software.amazon.smithy.utils.StringUtils;
 
 /**
  * Generates documentation for shape members.
@@ -348,7 +350,24 @@ public final class MemberGenerator implements Runnable {
 
         private void writeShapeName(Shape shape) {
             var symbol = context.symbolProvider().toSymbol(shape);
-            writer.writeInline("$R", symbol);
+
+            if (StringUtils.isNotBlank(symbol.getDefinitionFile())) {
+                writer.writeInline("$R", symbol);
+            } else {
+                // If the symbol doesn't have a definition file, it can't be linked.
+                // If it can't be linked to, then the actual name of the shape
+                // doesn't matter and would only serve as a confusing dead reference
+                // if displayed in the docs. Instead we just use the shape type name,
+                // which should be more clear in almost every case. A SymbolReference
+                // is passed along rather than writing a literal string so that
+                // implementations can do something with the source symbol if
+                // necessary.
+                var reference = SymbolReference.builder()
+                        .symbol(symbol)
+                        .alias(StringUtils.capitalize(shape.getType().name().toLowerCase(Locale.ENGLISH)))
+                        .build();
+                writer.writeInline("$R", reference);
+            }
         }
     }
 }
