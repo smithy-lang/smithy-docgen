@@ -84,7 +84,8 @@ import software.amazon.smithy.utils.SmithyInternalApi;
  * @see MemberGenerator for more details on how member documentation is generated.
  */
 @SmithyInternalApi
-public class OperationGenerator implements Consumer<GenerateOperationDirective<DocGenerationContext, DocSettings>> {
+public final class OperationGenerator
+        implements Consumer<GenerateOperationDirective<DocGenerationContext, DocSettings>> {
     @Override
     public void accept(GenerateOperationDirective<DocGenerationContext, DocSettings> directive) {
         var operation = directive.shape();
@@ -145,6 +146,11 @@ public class OperationGenerator implements Consumer<GenerateOperationDirective<D
             String operationLinkId
     ) {
         writer.pushState(new ExamplesSection(context, operation, examples));
+        if (examples.isEmpty()) {
+            writer.popState();
+            return;
+        }
+
         writer.openHeading("Examples", operationLinkId + "-examples");
         for (var example : examples) {
             writer.pushState(new ExampleSection(context, operation, example));

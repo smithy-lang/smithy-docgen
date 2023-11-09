@@ -9,10 +9,10 @@ import java.util.function.Consumer;
 import software.amazon.smithy.codegen.core.directed.GenerateServiceDirective;
 import software.amazon.smithy.docgen.core.DocGenerationContext;
 import software.amazon.smithy.docgen.core.DocSettings;
-import software.amazon.smithy.docgen.core.sections.ServiceDetailsSection;
-import software.amazon.smithy.docgen.core.sections.ServiceSection;
+import software.amazon.smithy.docgen.core.sections.ShapeDetailsSection;
+import software.amazon.smithy.docgen.core.sections.ShapeSection;
 import software.amazon.smithy.docgen.core.sections.ShapeSubheadingSection;
-import software.amazon.smithy.model.shapes.ServiceShape;
+import software.amazon.smithy.model.knowledge.TopDownIndex;
 import software.amazon.smithy.utils.SmithyInternalApi;
 
 /**
@@ -24,14 +24,29 @@ import software.amazon.smithy.utils.SmithyInternalApi;
  * sections are guaranteed to be present:
  *
  * <ul>
+ *     <li>{@link ShapeSection}: Enables re-writing or overwriting the entire page,
+ *     including changes made in other sections.
+ *
  *     <li>{@link ShapeSubheadingSection}: Enables adding additional details that are
  *     inserted right after the shape's heading, before modeled docs.
  *
- *     <li>{@link ServiceDetailsSection}: Enables adding in additional details that are
+ *     <li>{@link ShapeDetailsSection}: Enables adding in additional details that are
  *     inserted after the service's modeled documentation.
  *
- *     <li>{@link ServiceSection}: Enables re-writing or overwriting the entire page,
- *     including changes made in other sections.
+ *     <li>{@link software.amazon.smithy.docgen.core.sections.BoundOperationsSection}:
+ *     enables modifying the listing of operations transitively bound to the service,
+ *     which includes operations bound to resources.
+ *
+ *     <li>{@link software.amazon.smithy.docgen.core.sections.BoundOperationSection}:
+ *     enables modifying the listing of an individual operation transitively bound to
+ *     the service.
+ *
+ *     <li>{@link software.amazon.smithy.docgen.core.sections.BoundResourcesSection}:
+ *     enables modifying the listing of resources directly bound to the service.
+ *
+ *     <li>{@link software.amazon.smithy.docgen.core.sections.BoundResourceSection}:
+ *     enables modifying the listing of an individual resource directly bound to
+ *     the service.
  * </ul>
  *
  * <p>To change the intermediate format (e.g. from markdown to restructured text),
@@ -43,21 +58,35 @@ import software.amazon.smithy.utils.SmithyInternalApi;
  * and modify the generated symbol's definition file. See
  * {@link software.amazon.smithy.docgen.core.DocSymbolProvider} for details on other
  * symbol-driven configuration options.
+ *
+ * @see <a href="https://smithy.io/2.0/spec/service-types.html#service">
+ *     Smithy service shape docs.</a>
  */
 @SmithyInternalApi
 public final class ServiceGenerator implements Consumer<GenerateServiceDirective<DocGenerationContext, DocSettings>> {
 
     @Override
     public void accept(GenerateServiceDirective<DocGenerationContext, DocSettings> directive) {
-        ServiceShape serviceShape = directive.service();
-        var serviceSymbol = directive.symbolProvider().toSymbol(serviceShape);
+        var service = directive.service();
+        var context = directive.context();
+        var serviceSymbol = directive.symbolProvider().toSymbol(service);
 
-        directive.context().writerDelegator().useShapeWriter(serviceShape, writer -> {
-            writer.pushState(new ServiceSection(directive.service(), directive.context()));
+        directive.context().writerDelegator().useShapeWriter(service, writer -> {
+            writer.pushState(new ShapeSection(context, service));
             writer.openHeading(serviceSymbol.getName());
-            writer.injectSection(new ShapeSubheadingSection(directive.context(), serviceShape));
-            writer.writeShapeDocs(serviceShape, directive.model());
-            writer.injectSection(new ServiceDetailsSection(directive.service(), directive.context()));
+            writer.injectSection(new ShapeSubheadingSection(context, service));
+            writer.writeShapeDocs(service, directive.model());
+            writer.injectSection(new ShapeDetailsSection(context, service));
+
+            var topDownIndex = TopDownIndex.of(context.model());
+
+            // TODO: topographically sort resources
+            var resources = topDownIndex.getContainedResources(service).stream().sorted().toList();
+            ServiceShapeGeneratorUtils.generateResourceListing(context, writer, service, resources);
+
+            var operations = topDownIndex.getContainedOperations(service).stream().sorted().toList();
+            ServiceShapeGeneratorUtils.generateOperationListing(context, writer, service, operations);
+
             writer.closeHeading();
             writer.popState();
         });
