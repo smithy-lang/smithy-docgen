@@ -6,6 +6,7 @@
 package software.amazon.smithy.docgen.core.generators;
 
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.function.BiConsumer;
 import software.amazon.smithy.codegen.core.SymbolReference;
 import software.amazon.smithy.docgen.core.DocGenerationContext;
@@ -22,6 +23,7 @@ import software.amazon.smithy.docgen.core.writers.DocWriter.ListType;
 import software.amazon.smithy.model.shapes.OperationShape;
 import software.amazon.smithy.model.shapes.ResourceShape;
 import software.amazon.smithy.utils.SmithyInternalApi;
+import software.amazon.smithy.utils.StringUtils;
 
 /**
  * Generates documentation for the resources.
@@ -190,7 +192,7 @@ public final class ResourceGenerator implements BiConsumer<DocGenerationContext,
         writer.openListItem(ListType.UNORDERED);
         var reference = SymbolReference.builder()
                 .symbol(context.symbolProvider().toSymbol(operation))
-                .alias(lifecycleType.name())
+                .alias(StringUtils.capitalize(lifecycleType.name().toLowerCase(Locale.ENGLISH)))
                 .build();
         writer.writeInline("$R: ", reference).writeShapeDocs(operation, context.model());
         writer.closeListItem(ListType.UNORDERED);
