@@ -88,15 +88,19 @@ public final class SphinxIntegration implements DocIntegration {
     // The default requirements needed to build the docs.
     private static final List<String> BASE_REQUIREMENTS = List.of(
             "Sphinx==7.2.6",
-            "sphinx-inline-tabs==2023.4.21"
+            "sphinx_inline_tabs==2023.4.21",
+            "sphinx-copybutton==0.5.2",
+            "Pygments==2.16.1"
     );
+    private static final List<String> FURO_REQUIREMENTS = List.of("furo==2023.9.10");
     private static final List<String> MARKDOWN_REQUIREMENTS = List.of(
             "myst-parser==2.0.0",
             "linkify-it-py==2.0.2"
     );
 
     private static final List<String> BASE_EXTENSIONS = List.of(
-            "sphinx_inline_tabs"
+            "sphinx_inline_tabs",
+            "sphinx_copybutton"
     );
     private static final List<String> MARKDOWN_EXTENSIONS = List.of(
             "myst_parser"
@@ -150,6 +154,9 @@ public final class SphinxIntegration implements DocIntegration {
             if (context.docFormat().name().equals(MARKDOWN_FORMAT)) {
                 requirements.addAll(MARKDOWN_REQUIREMENTS);
             }
+            if (settings.theme().equals("furo")) {
+                requirements.addAll(FURO_REQUIREMENTS);
+            }
             requirements.addAll(settings.extraDependencies());
             writer.pushState(new RequirementsSection(context, Set.copyOf(requirements)));
             requirements.forEach(writer::write);
@@ -190,10 +197,10 @@ public final class SphinxIntegration implements DocIntegration {
                     myst_enable_extensions = [
                         # Makes bare links into actual links
                         "linkify",
-    
+
                         # Used to write directives that can be parsed by normal parsers
                         "colon_fence",
-    
+
                         # Used to create formatted member lists
                         "deflist",
                     ]
@@ -202,6 +209,9 @@ public final class SphinxIntegration implements DocIntegration {
                     templates_path = ["_templates"]
                     html_static_path = ["_static"]
                     html_theme = $3S
+
+                    pygments_style = "default"
+                    pygments_dark_style = "gruvbox-dark"
                     """,
                     serviceSymbol.getName(),
                     service.getVersion(),
@@ -443,7 +453,7 @@ public final class SphinxIntegration implements DocIntegration {
             }
             return new SphinxSettings(
                     node.getStringMemberOrDefault("format", "html"),
-                    node.getStringMemberOrDefault("theme", "alabaster"),
+                    node.getStringMemberOrDefault("theme", "furo"),
                     extraDependencies,
                     extraExtensions,
                     node.getBooleanMemberOrDefault("autoBuild", true)
