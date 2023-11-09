@@ -248,11 +248,19 @@ public final class DocSymbolProvider extends ShapeVisitor.Default<Symbol> implem
     }
 
     private String getDefinitionFile(ServiceShape serviceShape, Shape shape) {
-        return getDefinitionFile(getShapeName(serviceShape, shape).replaceAll("\\s+", ""));
+        var path = getShapeName(serviceShape, shape).replaceAll("\\s+", "");
+        if (shape.isResourceShape()) {
+            path = "resources/" + path;
+        } else if (shape.isOperationShape()) {
+            path = "operations/" + path;
+        } else {
+            path = "shapes/" + path;
+        }
+        return getDefinitionFile(path);
     }
 
-    private String getDefinitionFile(String filename) {
-        return "content/" + filename;
+    private String getDefinitionFile(String path) {
+        return "content/" + path;
     }
 
     private String getShapeName(ServiceShape serviceShape, Shape shape) {
