@@ -51,8 +51,8 @@ public class BuiltinsIntegration implements DocIntegration {
             DocGenerationContext context) {
         return List.of(
                 new ErrorFaultInterceptor(),
-                new NullabilityInterceptor(),
-                new DefaultValueInterceptor()
+                new DefaultValueInterceptor(),
+                new NullabilityInterceptor() // This goes last so that its output is always first.
         );
     }
 }
