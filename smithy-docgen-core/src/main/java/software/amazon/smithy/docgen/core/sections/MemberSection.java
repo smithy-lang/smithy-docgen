@@ -16,7 +16,8 @@ import software.amazon.smithy.utils.SmithyUnstableApi;
  * @param context The context used to generate documentation.
  * @param member The member whose documentation is being generated.
  *
- * @see ShapeMembersSection to modify the entire member listing.
+ * @see ShapeMembersSection to modify the listing of all members of the shape.
+ * @see ShapeSubheadingSection to add context immediately before the member's docs.
  */
 @SmithyUnstableApi
 public record MemberSection(DocGenerationContext context, MemberShape member) implements CodeSection {

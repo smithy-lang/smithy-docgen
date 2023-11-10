@@ -66,6 +66,11 @@ public class MarkdownWriter extends DocWriter {
         }
     }
 
+    @Override
+    String boldFormatter(Object value) {
+        return String.format("**%s**", formatLiteral(value).replace("*", "\\*"));
+    }
+
     private Pair<String, Optional<String>> getReferencePair(Object value) {
         String text;
         Optional<String> ref;

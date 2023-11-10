@@ -15,6 +15,7 @@ import software.amazon.smithy.docgen.core.DocGenerationContext;
 import software.amazon.smithy.docgen.core.DocSymbolProvider;
 import software.amazon.smithy.docgen.core.sections.MemberSection;
 import software.amazon.smithy.docgen.core.sections.ShapeMembersSection;
+import software.amazon.smithy.docgen.core.sections.ShapeSubheadingSection;
 import software.amazon.smithy.docgen.core.writers.DocWriter;
 import software.amazon.smithy.model.shapes.BigDecimalShape;
 import software.amazon.smithy.model.shapes.BigIntegerShape;
@@ -106,8 +107,8 @@ public final class MemberGenerator implements Runnable {
                 var symbol = context.symbolProvider().toSymbol(member);
                 var target = context.model().expectShape(member.getTarget());
                 writer.openMemberEntry(symbol, w -> target.accept(new MemberTypeVisitor(w, context, member)));
+                writer.injectSection(new ShapeSubheadingSection(context, member));
                 writer.writeShapeDocs(member, context.model());
-
                 writer.closeMemberEntry();
                 writer.popState();
             }

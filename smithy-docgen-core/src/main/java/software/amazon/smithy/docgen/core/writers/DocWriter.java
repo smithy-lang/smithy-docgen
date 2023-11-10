@@ -41,6 +41,7 @@ public abstract class DocWriter extends SymbolWriter<DocWriter, DocImportContain
         super(importContainer);
         this.filename = filename;
         putFormatter('R', (s, i) -> referenceFormatter(s));
+        putFormatter('B', (s, i) -> boldFormatter(s));
         trimTrailingSpaces();
     }
 
@@ -67,6 +68,16 @@ public abstract class DocWriter extends SymbolWriter<DocWriter, DocImportContain
      * @return returns a string formatted to reference the given value.
      */
     abstract String referenceFormatter(Object value);
+
+    /**
+     * Formats the given object as a bold string.
+     *
+     * <p>For example, a raw HTML writer might surround the given text with {@code b} tags.
+     *
+     * @param value The value to format.
+     * @return returns the value formatted as a bold string.
+     */
+    abstract String boldFormatter(Object value);
 
     /**
      * Writes out the content of the shape's

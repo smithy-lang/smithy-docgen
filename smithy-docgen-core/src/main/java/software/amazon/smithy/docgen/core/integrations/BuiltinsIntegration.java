@@ -11,6 +11,7 @@ import software.amazon.smithy.docgen.core.DocGenerationContext;
 import software.amazon.smithy.docgen.core.DocIntegration;
 import software.amazon.smithy.docgen.core.DocSettings;
 import software.amazon.smithy.docgen.core.interceptors.ErrorFaultInterceptor;
+import software.amazon.smithy.docgen.core.interceptors.NullabilityInterceptor;
 import software.amazon.smithy.docgen.core.writers.DocWriter;
 import software.amazon.smithy.docgen.core.writers.MarkdownWriter;
 import software.amazon.smithy.utils.CodeInterceptor;
@@ -47,6 +48,9 @@ public class BuiltinsIntegration implements DocIntegration {
     @Override
     public List<? extends CodeInterceptor<? extends CodeSection, DocWriter>> interceptors(
             DocGenerationContext context) {
-        return List.of(new ErrorFaultInterceptor());
+        return List.of(
+                new ErrorFaultInterceptor(),
+                new NullabilityInterceptor()
+        );
     }
 }
