@@ -41,6 +41,7 @@ public abstract class DocWriter extends SymbolWriter<DocWriter, DocImportContain
         super(importContainer);
         this.filename = filename;
         putFormatter('R', (s, i) -> referenceFormatter(s));
+        trimTrailingSpaces();
     }
 
     /**

@@ -99,7 +99,8 @@ public final class ResourceGenerator implements BiConsumer<DocGenerationContext,
 
         context.writerDelegator().useShapeWriter(resource, writer -> {
             writer.pushState(new ShapeSection(context, resource));
-            writer.openHeading(symbol.getName());
+            var linkId = symbol.expectProperty(DocSymbolProvider.LINK_ID_PROPERTY, String.class);
+            writer.openHeading(symbol.getName(), linkId);
             writer.injectSection(new ShapeSubheadingSection(context, resource));
             writer.writeShapeDocs(resource, context.model());
             writer.injectSection(new ShapeDetailsSection(context, resource));

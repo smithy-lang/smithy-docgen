@@ -9,16 +9,22 @@ import static java.lang.String.format;
 import static software.amazon.smithy.docgen.core.DocgenUtils.normalizeNewlines;
 import static software.amazon.smithy.docgen.core.DocgenUtils.runCommand;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import software.amazon.smithy.codegen.core.CodegenException;
 import software.amazon.smithy.docgen.core.DocFormat;
 import software.amazon.smithy.docgen.core.DocGenerationContext;
 import software.amazon.smithy.docgen.core.DocIntegration;
 import software.amazon.smithy.docgen.core.DocSettings;
 import software.amazon.smithy.docgen.core.sections.sphinx.ConfSection;
+import software.amazon.smithy.docgen.core.sections.sphinx.IndexSection;
 import software.amazon.smithy.docgen.core.sections.sphinx.MakefileSection;
 import software.amazon.smithy.docgen.core.sections.sphinx.RequirementsSection;
 import software.amazon.smithy.docgen.core.sections.sphinx.WindowsMakeSection;
@@ -29,6 +35,7 @@ import software.amazon.smithy.model.node.StringNode;
 import software.amazon.smithy.model.shapes.ServiceShape;
 import software.amazon.smithy.utils.SmithyInternalApi;
 import software.amazon.smithy.utils.SmithyUnstableApi;
+import software.amazon.smithy.utils.StringUtils;
 
 /**
  * Adds Sphinx project scaffolding for compatible formats.
@@ -141,6 +148,7 @@ public final class SphinxIntegration implements DocIntegration {
             return;
         }
         LOGGER.info("Generating Sphinx project files.");
+        writeIndexes(context);
         writeRequirements(context);
         writeConf(context);
         writeMakefile(context);
@@ -209,6 +217,7 @@ public final class SphinxIntegration implements DocIntegration {
                     templates_path = ["_templates"]
                     html_static_path = ["_static"]
                     html_theme = $3S
+                    html_title = $1S
 
                     pygments_style = "default"
                     pygments_dark_style = "gruvbox-dark"
@@ -377,6 +386,87 @@ public final class SphinxIntegration implements DocIntegration {
             context.fileManifest().getBaseDir(),
             settings.format()
         );
+    }
+
+    private void writeIndexes(DocGenerationContext context) {
+        Set<Path> paths = new HashSet<>(context.fileManifest().getFiles());
+        for (var stagedFile : context.writerDelegator().getWriters().keySet()) {
+            paths.add(context.fileManifest().resolvePath(Paths.get(stagedFile)));
+        }
+
+        Map<Path, Set<Path>> directories = paths.stream()
+                .filter(path -> path.toString().endsWith(".md") || path.toString().endsWith(".rst"))
+                .collect(Collectors.groupingBy(Path::getParent, Collectors.toSet()));
+
+        for (var directory : directories.entrySet()) {
+            if (shouldGenerateIndex(directory.getValue())) {
+                writeIndex(context, directory.getKey(), directory.getValue());
+            }
+        }
+
+        var service = context.model().expectShape(context.settings().service(), ServiceShape.class);
+        var serviceSymbol = context.symbolProvider().toSymbol(service);
+        var serivceDirectory = Paths.get(serviceSymbol.getDefinitionFile()).getParent();
+        var sourceDirectories = directories.keySet().stream()
+                .filter(path -> !path.equals(context.fileManifest().resolvePath(serivceDirectory)))
+                .map(Path::getFileName)
+                .map(Object::toString)
+                .distinct()
+                .sorted()
+                .toList();
+
+        if (!sourceDirectories.isEmpty()) {
+            context.writerDelegator().useShapeWriter(service, writer -> {
+                writer.putContext("sourceDirectories", sourceDirectories);
+                writer.write("""
+                        :::{toctree}
+                        :hidden: true
+
+                        ${#sourceDirectories}
+                        ${value:L}/index
+                        ${/sourceDirectories}
+                        :::
+                        """);
+            });
+        }
+    }
+
+    private boolean shouldGenerateIndex(Set<Path> directory) {
+        for (var file : directory) {
+            Path fileNamePath = file.getFileName();
+            if (fileNamePath == null) {
+                continue;
+            }
+            var fileName = fileNamePath.toString();
+            if (fileName.equals("index.md") || fileName.equals("index.rst")) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private void writeIndex(DocGenerationContext context, Path directory, Set<Path> contents) {
+        context.writerDelegator().useFileWriter(directory.resolve("index.md").toString(), writer -> {
+            var sourceFiles = contents.stream()
+                    .map(Path::getFileName)
+                    .map(Object::toString)
+                    .distinct()
+                    .sorted()
+                    .toList();
+
+            writer.pushState(new IndexSection(context, directory, contents));
+            writer.putContext("sourceFiles", sourceFiles);
+            writer.openHeading(StringUtils.capitalize(directory.getFileName().toString()));
+            writer.write("""
+                    :::{toctree}
+                    ${#sourceFiles}
+                    ${value:L}
+                    ${/sourceFiles}
+                    :::
+                    """);
+            writer.closeHeading();
+            writer.popState();
+        });
     }
 
     /**
