@@ -42,6 +42,7 @@ public abstract class DocWriter extends SymbolWriter<DocWriter, DocImportContain
         this.filename = filename;
         putFormatter('R', (s, i) -> referenceFormatter(s));
         putFormatter('B', (s, i) -> boldFormatter(s));
+        putFormatter('`', (s, i) -> inlineLiteralFormatter(s));
         trimTrailingSpaces();
     }
 
@@ -78,6 +79,16 @@ public abstract class DocWriter extends SymbolWriter<DocWriter, DocImportContain
      * @return returns the value formatted as a bold string.
      */
     abstract String boldFormatter(Object value);
+
+    /**
+     * Formats the given object an inline literal.
+     *
+     * <p>This is the equivalent of surrounding text with backticks (`) in markdown.
+     *
+     * @param value The value to format.
+     * @return returns the value formatted an inline literal.
+     */
+    abstract String inlineLiteralFormatter(Object value);
 
     /**
      * Writes out the content of the shape's
