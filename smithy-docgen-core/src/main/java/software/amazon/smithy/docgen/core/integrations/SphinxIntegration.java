@@ -106,6 +106,11 @@ public final class SphinxIntegration implements DocIntegration {
     }
 
     @Override
+    public void configure(DocSettings settings, ObjectNode integrationSettings) {
+        this.settings = SphinxSettings.fromNode(integrationSettings);
+    }
+
+    @Override
     public List<DocFormat> docFormats(DocSettings settings) {
         return List.of(
             new DocFormat(MARKDOWN_FORMAT, ".md", new SphinxMarkdownWriter.Factory())
