@@ -7,16 +7,16 @@ package software.amazon.smithy.docgen.core.interceptors;
 
 import software.amazon.smithy.docgen.core.sections.ShapeSubheadingSection;
 import software.amazon.smithy.docgen.core.writers.DocWriter;
-import software.amazon.smithy.model.traits.ErrorTrait;
+import software.amazon.smithy.model.knowledge.NullableIndex;
+import software.amazon.smithy.model.knowledge.NullableIndex.CheckMode;
 import software.amazon.smithy.utils.CodeInterceptor;
 import software.amazon.smithy.utils.SmithyInternalApi;
 
 /**
- * Adds a line to the error shape docs to indicate whether the error is a client or
- * service error.
+ * Adds nullability information to member docs.
  */
 @SmithyInternalApi
-public class ErrorFaultInterceptor implements CodeInterceptor<ShapeSubheadingSection, DocWriter> {
+public class NullabilityInterceptor implements CodeInterceptor<ShapeSubheadingSection, DocWriter> {
     @Override
     public Class<ShapeSubheadingSection> sectionType() {
         return ShapeSubheadingSection.class;
@@ -24,16 +24,21 @@ public class ErrorFaultInterceptor implements CodeInterceptor<ShapeSubheadingSec
 
     @Override
     public boolean isIntercepted(ShapeSubheadingSection section) {
-        return section.shape().hasTrait(ErrorTrait.class);
+        if (!section.shape().isMemberShape()) {
+            return false;
+        }
+
+        // It might seem crazy to create this for *every member*, but knowledge indexes
+        // actually get cached on the model so in reality it's only created once.
+        var index = NullableIndex.of(section.context().model());
+        return !index.isMemberNullable(section.shape().asMemberShape().get(), CheckMode.SERVER);
     }
 
     @Override
     public void write(DocWriter writer, String previousText, ShapeSubheadingSection section) {
-        var fault = section.shape().expectTrait(ErrorTrait.class).getValue();
         writer.write("""
-                This is an error caused by the $L.
+                $B
 
-                $L
-                """, fault, previousText);
+                $L""", "REQUIRED", previousText);
     }
 }
