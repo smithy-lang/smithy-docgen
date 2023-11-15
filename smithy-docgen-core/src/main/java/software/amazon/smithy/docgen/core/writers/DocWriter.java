@@ -7,7 +7,6 @@ package software.amazon.smithy.docgen.core.writers;
 
 import java.util.function.Consumer;
 import software.amazon.smithy.codegen.core.CodegenException;
-import software.amazon.smithy.codegen.core.Symbol;
 import software.amazon.smithy.codegen.core.SymbolWriter;
 import software.amazon.smithy.model.Model;
 import software.amazon.smithy.model.shapes.Shape;
@@ -192,51 +191,69 @@ public abstract class DocWriter extends SymbolWriter<DocWriter, DocImportContain
     }
 
     /**
-     * Writes any context needed before listing members.
+     * Writes any context needed to open a definition list.
      *
-     * <p>For example, a direct HTML writer might need to write out a {@code ul} tag.
+     * <p>A definition list is a list where each element has an emphasized title or
+     * term. A basic way to represent this might be an unordered list where the term
+     * is followed by a colon.
+     *
+     * <p>This will primarily be used to list members, with the element titles being
+     * the member names, member types, and a link to those member types where
+     * applicable. It will also be used for resource lifecycle operations, which will
+     * have similar titles.
      *
      * @return returns the writer.
      */
-    public abstract DocWriter openMemberListing();
+    public abstract DocWriter openDefinitionList();
 
     /**
-     * Writes any closing context needed before ending a member listing.
+     * Writes any context needed to close a definition list.
      *
-     * <p>For example, a direct HTML writer might need to write a closing {@code ul}
-     * tag.
+     * <p>A definition list is a list where each element has an emphasized title or
+     * term. A basic way to represent this might be an unordered list where the term
+     * is followed by a colon.
+     *
+     * <p>This will primarily be used to list members, with the element titles being
+     * the member names, member types, and a link to those member types where
+     * applicable. It will also be used for resource lifecycle operations, which will
+     * have similar titles.
      *
      * @return returns the writer.
      */
-    public abstract DocWriter closeMemberListing();
+    public abstract DocWriter closeDefinitionList();
 
     /**
-     * Writes out the heading information for a member's documentation.
+     * Writes any context needed to open a definition list item.
      *
-     * <p>For example, a direct HTML writer that renders member listings as HTML lists
-     * might write an opening {@code li} tag.
+     * <p>A definition list is a list where each element has an emphasized title or
+     * term. A basic way to represent this might be an unordered list where the term
+     * is followed by a colon.
      *
-     * <p>Implementations MUST create a linkable element where possible if the
-     * {@link software.amazon.smithy.docgen.core.DocSymbolProvider#LINK_ID_PROPERTY}
-     * is set.
+     * <p>This will primarily be used to list members, with the element titles being
+     * the member names, member types, and a link to those member types where
+     * applicable. It will also be used for resource lifecycle operations, which will
+     * have similar titles.
      *
-     * @param memberSymbol A symbol representing the member being documented.
-     * @param writeType A consumer that writes the type, including links to any referenced
-     *                  shapes. If the member is an enum member, it will write the literal
-     *                  value.
+     * @param titleWriter writes the title or term for the definition list item.
      * @return returns the writer.
      */
-    public abstract DocWriter openMemberEntry(Symbol memberSymbol, Consumer<DocWriter> writeType);
+    public abstract DocWriter openDefinitionListItem(Consumer<DocWriter> titleWriter);
 
     /**
-     * Writes any context needed to close out the documentation for a member.
+     * Writes any context needed to close a definition list item.
      *
-     * <p>For example, a direct HTML writer might need to write a closing {@code li}
-     * tag.
+     * <p>A definition list is a list where each element has an emphasized title or
+     * term. A basic way to represent this might be an unordered list where the term
+     * is followed by a colon.
+     *
+     * <p>This will primarily be used to list members, with the element titles being
+     * the member names, member types, and a link to those member types where
+     * applicable. It will also be used for resource lifecycle operations, which will
+     * have similar titles.
      *
      * @return returns the writer.
      */
-    public abstract DocWriter closeMemberEntry();
+    public abstract DocWriter closeDefinitionListItem();
 
     /**
      * Writes a linkable element to the documentation with the given identifier.

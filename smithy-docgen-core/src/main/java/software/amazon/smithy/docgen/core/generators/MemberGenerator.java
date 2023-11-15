@@ -100,19 +100,22 @@ public final class MemberGenerator implements Runnable {
                 writer.writeAnchor(linkId + "-" + listingType.getLinkIdSuffix());
             });
             writer.openHeading(listingType.getTitle());
-            writer.openMemberListing();
+            writer.openDefinitionList();
             for (MemberShape member : members) {
                 writer.pushState(new MemberSection(context, member));
 
                 var symbol = context.symbolProvider().toSymbol(member);
                 var target = context.model().expectShape(member.getTarget());
-                writer.openMemberEntry(symbol, w -> target.accept(new MemberTypeVisitor(w, context, member)));
+
+                var typeWriter = writer.consumer(w -> target.accept(new MemberTypeVisitor(w, context, member)));
+                writer.openDefinitionListItem(w -> w.writeInline("$L ($C)", symbol.getName(), typeWriter));
+
                 writer.injectSection(new ShapeSubheadingSection(context, member));
                 writer.writeShapeDocs(member, context.model());
-                writer.closeMemberEntry();
+                writer.closeDefinitionListItem();
                 writer.popState();
             }
-            writer.closeMemberListing();
+            writer.closeDefinitionList();
             writer.closeHeading();
         }
         writer.popState();
@@ -333,9 +336,9 @@ public final class MemberGenerator implements Runnable {
             if (member.hasTrait(EnumValueTrait.class)) {
                 var trait = member.expectTrait(EnumValueTrait.class);
                 if (trait.getIntValue().isPresent()) {
-                    writer.writeInline("$L", trait.expectIntValue());
+                    writer.writeInline("$`", trait.expectIntValue());
                 } else {
-                    writer.writeInline("$S", trait.expectStringValue());
+                    writer.writeInline("$`", trait.expectStringValue());
                 }
             } else {
                 writeShapeName(shape);

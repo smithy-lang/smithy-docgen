@@ -14,9 +14,6 @@ import software.amazon.smithy.codegen.core.CodegenException;
 import software.amazon.smithy.codegen.core.Symbol;
 import software.amazon.smithy.codegen.core.SymbolReference;
 import software.amazon.smithy.codegen.core.SymbolWriter;
-import software.amazon.smithy.docgen.core.DocSymbolProvider;
-import software.amazon.smithy.model.shapes.MemberShape;
-import software.amazon.smithy.model.traits.EnumValueTrait;
 import software.amazon.smithy.utils.Pair;
 import software.amazon.smithy.utils.SmithyUnstableApi;
 import software.amazon.smithy.utils.StringUtils;
@@ -123,33 +120,26 @@ public class MarkdownWriter extends DocWriter {
     }
 
     @Override
-    public DocWriter openMemberListing() {
+    public DocWriter openDefinitionList() {
         return this;
     }
 
     @Override
-    public DocWriter closeMemberListing() {
+    public DocWriter closeDefinitionList() {
         return this;
     }
 
     @Override
-    public DocWriter openMemberEntry(Symbol memberSymbol, Consumer<DocWriter> writeType) {
+    public DocWriter openDefinitionListItem(Consumer<DocWriter> titleWriter) {
         openListItem(ListType.UNORDERED);
-        var member = memberSymbol.expectProperty(DocSymbolProvider.SHAPE_PROPERTY, MemberShape.class);
-        if (member.hasTrait(EnumValueTrait.class)) {
-            // The type written here will be the literal for enum values. Using
-            // backticks is standard for markdown literals, and it gives some
-            // differentiation between them and normal shape members.
-            writeInline("**$L** (`$C`): ", memberSymbol.getName(), writeType);
-        } else {
-            writeInline("**$L** (*$C*): ", memberSymbol.getName(), writeType);
-        }
+        writeInline("**$C** - ", titleWriter);
         return this;
     }
 
     @Override
-    public DocWriter closeMemberEntry() {
-        return closeListItem(ListType.UNORDERED);
+    public DocWriter closeDefinitionListItem() {
+        closeListItem(ListType.UNORDERED);
+        return this;
     }
 
     @Override
