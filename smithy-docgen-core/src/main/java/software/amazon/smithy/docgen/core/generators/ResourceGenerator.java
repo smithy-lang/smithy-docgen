@@ -19,7 +19,6 @@ import software.amazon.smithy.docgen.core.sections.ShapeDetailsSection;
 import software.amazon.smithy.docgen.core.sections.ShapeSection;
 import software.amazon.smithy.docgen.core.sections.ShapeSubheadingSection;
 import software.amazon.smithy.docgen.core.writers.DocWriter;
-import software.amazon.smithy.docgen.core.writers.DocWriter.ListType;
 import software.amazon.smithy.model.shapes.OperationShape;
 import software.amazon.smithy.model.shapes.ResourceShape;
 import software.amazon.smithy.utils.SmithyInternalApi;
@@ -136,7 +135,7 @@ public final class ResourceGenerator implements BiConsumer<DocGenerationContext,
         var linkId = context.symbolProvider().toSymbol(resource)
                 .expectProperty(DocSymbolProvider.LINK_ID_PROPERTY, String.class);
         writer.openHeading("Lifecycle Operations", linkId + "-lifecycle-operations");
-        writer.openList(ListType.UNORDERED);
+        writer.openDefinitionList();
 
         if (resource.getPut().isPresent()) {
             var put = context.model().expectShape(resource.getPut().get(), OperationShape.class);
@@ -168,7 +167,7 @@ public final class ResourceGenerator implements BiConsumer<DocGenerationContext,
             writeLifecycleListing(context, writer, resource, list, LifecycleType.LIST);
         }
 
-        writer.closeList(ListType.UNORDERED);
+        writer.closeDefinitionList();
         writer.closeHeading();
         writer.popState();
     }
@@ -190,13 +189,15 @@ public final class ResourceGenerator implements BiConsumer<DocGenerationContext,
             LifecycleType lifecycleType
     ) {
         writer.pushState(new LifecycleOperationSection(context, resource, operation, lifecycleType));
-        writer.openListItem(ListType.UNORDERED);
+        var lifecycleName = StringUtils.capitalize(lifecycleType.name().toLowerCase(Locale.ENGLISH));
+        var operationName = context.symbolProvider().toSymbol(operation).getName();
         var reference = SymbolReference.builder()
                 .symbol(context.symbolProvider().toSymbol(operation))
-                .alias(StringUtils.capitalize(lifecycleType.name().toLowerCase(Locale.ENGLISH)))
+                .alias(String.format("%s (%s)", lifecycleName, operationName))
                 .build();
-        writer.writeInline("$R: ", reference).writeShapeDocs(operation, context.model());
-        writer.closeListItem(ListType.UNORDERED);
+        writer.openDefinitionListItem(w -> w.writeInline("$R", reference));
+        writer.writeShapeDocs(operation, context.model());
+        writer.closeDefinitionListItem();
         writer.popState();
     }
 }
