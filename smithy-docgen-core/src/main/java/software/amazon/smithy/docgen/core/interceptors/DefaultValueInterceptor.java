@@ -12,6 +12,9 @@ import software.amazon.smithy.model.traits.DefaultTrait;
 import software.amazon.smithy.utils.CodeInterceptor;
 import software.amazon.smithy.utils.SmithyInternalApi;
 
+/**
+ * Adds default value information to trait documentation.
+ */
 @SmithyInternalApi
 public class DefaultValueInterceptor implements CodeInterceptor<ShapeSubheadingSection, DocWriter> {
     @Override
