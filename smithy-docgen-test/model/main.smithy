@@ -123,6 +123,7 @@ intEnum DocumentedIntEnum {
 }
 
 // This structure has no docs anywhere
+@unstable
 structure UndocumentedStructure {
     blob: Blob
     boolean: Boolean
