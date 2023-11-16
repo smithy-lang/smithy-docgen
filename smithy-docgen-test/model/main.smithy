@@ -126,6 +126,8 @@ intEnum DocumentedIntEnum {
 @unstable
 structure UndocumentedStructure {
     blob: SensitiveBlob
+
+    @internal
     boolean: Boolean
 }
 
