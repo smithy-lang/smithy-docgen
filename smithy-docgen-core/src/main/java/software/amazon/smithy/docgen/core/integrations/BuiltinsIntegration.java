@@ -17,6 +17,7 @@ import software.amazon.smithy.docgen.core.interceptors.ExternalDocsInterceptor;
 import software.amazon.smithy.docgen.core.interceptors.NullabilityInterceptor;
 import software.amazon.smithy.docgen.core.interceptors.RecommendedInterceptor;
 import software.amazon.smithy.docgen.core.interceptors.SinceInterceptor;
+import software.amazon.smithy.docgen.core.interceptors.UnstableInterceptor;
 import software.amazon.smithy.docgen.core.writers.DocWriter;
 import software.amazon.smithy.docgen.core.writers.MarkdownWriter;
 import software.amazon.smithy.utils.CodeInterceptor;
@@ -58,6 +59,7 @@ public class BuiltinsIntegration implements DocIntegration {
                 new ErrorFaultInterceptor(),
                 new DefaultValueInterceptor(),
                 new SinceInterceptor(),
+                new UnstableInterceptor(),
                 new DeprecatedInterceptor(),
                 new RecommendedInterceptor(),
                 new NullabilityInterceptor() // This goes last so that its output is always first.
