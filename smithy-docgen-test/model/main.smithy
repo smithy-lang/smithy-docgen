@@ -89,6 +89,7 @@ structure DocumentedStructure {
     /// This is a self-referential member. This is a thing that should be possible.
     self: DocumentedStructure
 
+    @recommended(reason: "Because unions are cool")
     union: DocumentedUnion
 }
 
