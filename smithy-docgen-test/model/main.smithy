@@ -64,6 +64,7 @@ operation DocumentedOperation {
 structure DocumentedStructure {
     /// This is a simple string member.
     /// It has documentation that can span multiple lines.
+    @since("2023-11-16")
     string: String
 
     /// This is a simple integer member.
