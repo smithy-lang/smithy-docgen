@@ -25,7 +25,7 @@ public final class UnstableInterceptor implements CodeInterceptor<ShapeSubheadin
 
     @Override
     public boolean isIntercepted(ShapeSubheadingSection section) {
-        return section.shape().hasTrait(UnstableTrait.class);
+        return section.shape().getMemberTrait(section.context().model(), UnstableTrait.class).isPresent();
     }
 
     @Override
@@ -33,5 +33,6 @@ public final class UnstableInterceptor implements CodeInterceptor<ShapeSubheadin
         writer.openAdmonition(AdmonitionType.WARNING);
         writer.write("This is unstable or experimental and MAY change in the future.");
         writer.closeAdmonition();
+        writer.writeWithNoFormatting(previousText);
     }
 }

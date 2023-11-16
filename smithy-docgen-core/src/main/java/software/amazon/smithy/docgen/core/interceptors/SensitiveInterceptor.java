@@ -37,5 +37,6 @@ public final class SensitiveInterceptor implements CodeInterceptor<ShapeSubheadi
                 It MUST NOT be exposed in things like exception messages or log \
                 output, except for full wire logs.""");
         writer.closeAdmonition();
+        writer.writeWithNoFormatting(previousText);
     }
 }

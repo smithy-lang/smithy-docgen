@@ -26,7 +26,7 @@ public final class SinceInterceptor  implements CodeInterceptor<ShapeSubheadingS
 
     @Override
     public boolean isIntercepted(ShapeSubheadingSection section) {
-        return section.shape().hasTrait(SinceTrait.class);
+        return section.shape().getMemberTrait(section.context().model(), SinceTrait.class).isPresent();
     }
 
     @Override
