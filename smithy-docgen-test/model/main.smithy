@@ -61,6 +61,10 @@ operation DocumentedOperation {
 /// also must be documented. This is intended as a base case with standard members
 /// that don't do anything crazy. More complex use cases should be put in their own
 /// structure to ensure this model is easy to traverse.
+@externalDocumentation(
+    "Smithy Reference": "https://smithy.io/"
+    Structures: "https://smithy.io/2.0/spec/aggregate-types.html#structure"
+)
 structure DocumentedStructure {
     /// This is a simple string member.
     /// It has documentation that can span multiple lines.

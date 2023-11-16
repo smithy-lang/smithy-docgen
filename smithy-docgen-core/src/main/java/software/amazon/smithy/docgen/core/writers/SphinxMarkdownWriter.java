@@ -114,12 +114,19 @@ public final class SphinxMarkdownWriter extends MarkdownWriter {
                 :::{admonition} $C
                 :class: $L
 
-                """, titleWriter, type.toString().toLowerCase(Locale.ENGLISH));
+                """, titleWriter, getAdmonitionName(type));
     }
 
     @Override
     public DocWriter openAdmonition(AdmonitionType type) {
-        return write(":::{$L}", type.toString().toLowerCase(Locale.ENGLISH));
+        return write(":::{$L}", getAdmonitionName(type));
+    }
+
+    private String getAdmonitionName(AdmonitionType type) {
+        if (type.equals(AdmonitionType.SEE_ALSO)) {
+            return "seealso";
+        }
+        return type.toString().toLowerCase(Locale.ENGLISH);
     }
 
     @Override

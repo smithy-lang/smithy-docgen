@@ -1,0 +1,41 @@
+/*
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+package software.amazon.smithy.docgen.core.interceptors;
+
+import software.amazon.smithy.docgen.core.sections.ShapeDetailsSection;
+import software.amazon.smithy.docgen.core.writers.DocWriter;
+import software.amazon.smithy.docgen.core.writers.DocWriter.AdmonitionType;
+import software.amazon.smithy.model.traits.ExternalDocumentationTrait;
+import software.amazon.smithy.utils.CodeInterceptor;
+import software.amazon.smithy.utils.Pair;
+
+/**
+ * Adds external doc links after a shape's modeled docs based on the
+ * <a href="https://smithy.io/2.0/spec/documentation-traits.html#externaldocumentation-trait">
+ * externalDocumentation</a> trait.
+ */
+public final class ExternalDocsInterceptor implements CodeInterceptor<ShapeDetailsSection, DocWriter> {
+    @Override
+    public Class<ShapeDetailsSection> sectionType() {
+        return ShapeDetailsSection.class;
+    }
+
+    @Override
+    public boolean isIntercepted(ShapeDetailsSection section) {
+        return section.shape().hasTrait(ExternalDocumentationTrait.class);
+    }
+
+    @Override
+    public void write(DocWriter writer, String previousText, ShapeDetailsSection section) {
+        var trait = section.shape().expectTrait(ExternalDocumentationTrait.class);
+        writer.openAdmonition(AdmonitionType.SEE_ALSO);
+        trait.getUrls().entrySet().stream()
+                .map(entry -> Pair.of(entry.getKey(), entry.getValue()))
+                .forEach(pair -> writer.write("$R\n", pair));
+        writer.closeAdmonition();
+        writer.writeWithNoFormatting(previousText);
+    }
+}
