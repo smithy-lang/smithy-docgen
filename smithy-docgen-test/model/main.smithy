@@ -67,15 +67,18 @@ structure DocumentedStructure {
     string: String
 
     /// This is a simple integer member.
+    @deprecated
     integer: Integer
 
     // This doesn't have a doc string (this is just a normal comment), so it should
     // pull the docs from the target shape.
+    @deprecated(message: "Please use intEnum instead")
     enum: DocumentedStringEnum
 
     // This also will pull docs from the shape.
     intEnum: DocumentedIntEnum
 
+    @deprecated(since: "2023-11-15")
     undocumented: UndocumentedStructure
 
     /// This is a self-referential member. This is a thing that should be possible.
