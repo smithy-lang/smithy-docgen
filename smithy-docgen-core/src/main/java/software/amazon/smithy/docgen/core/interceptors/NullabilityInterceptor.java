@@ -16,7 +16,7 @@ import software.amazon.smithy.utils.SmithyInternalApi;
  * Adds nullability information to member docs.
  */
 @SmithyInternalApi
-public class NullabilityInterceptor implements CodeInterceptor<ShapeSubheadingSection, DocWriter> {
+public final class NullabilityInterceptor implements CodeInterceptor<ShapeSubheadingSection, DocWriter> {
     @Override
     public Class<ShapeSubheadingSection> sectionType() {
         return ShapeSubheadingSection.class;

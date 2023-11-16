@@ -16,7 +16,7 @@ import software.amazon.smithy.utils.SmithyInternalApi;
  * service error.
  */
 @SmithyInternalApi
-public class ErrorFaultInterceptor implements CodeInterceptor<ShapeSubheadingSection, DocWriter> {
+public final class ErrorFaultInterceptor implements CodeInterceptor<ShapeSubheadingSection, DocWriter> {
     @Override
     public Class<ShapeSubheadingSection> sectionType() {
         return ShapeSubheadingSection.class;
