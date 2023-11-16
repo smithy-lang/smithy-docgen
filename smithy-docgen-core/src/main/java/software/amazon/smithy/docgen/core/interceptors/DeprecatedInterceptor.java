@@ -24,7 +24,7 @@ public final class DeprecatedInterceptor implements CodeInterceptor<ShapeSubhead
 
     @Override
     public boolean isIntercepted(ShapeSubheadingSection section) {
-        return section.shape().hasTrait(DeprecatedTrait.class);
+        return section.shape().getMemberTrait(section.context().model(), DeprecatedTrait.class).isPresent();
     }
 
     @Override

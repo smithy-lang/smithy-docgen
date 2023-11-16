@@ -25,7 +25,7 @@ public final class ExternalDocsInterceptor implements CodeInterceptor<ShapeDetai
 
     @Override
     public boolean isIntercepted(ShapeDetailsSection section) {
-        return section.shape().hasTrait(ExternalDocumentationTrait.class);
+        return section.shape().getMemberTrait(section.context().model(), ExternalDocumentationTrait.class).isPresent();
     }
 
     @Override
