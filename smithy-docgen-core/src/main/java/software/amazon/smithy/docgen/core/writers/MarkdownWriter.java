@@ -221,4 +221,19 @@ public class MarkdownWriter extends DocWriter {
         // Ensure there's exactly one trailing newline
         return super.toString().stripTrailing() + "\n";
     }
+
+    @Override
+    public DocWriter openAdmonition(AdmonitionType type, Consumer<DocWriter> titleWriter) {
+        return writeInline("**$C:** ", titleWriter);
+    }
+
+    @Override
+    public DocWriter openAdmonition(AdmonitionType type) {
+        return writeInline("**$L:** ", type.toString());
+    }
+
+    @Override
+    public DocWriter closeAdmonition() {
+        return this;
+    }
 }

@@ -5,6 +5,7 @@
 
 package software.amazon.smithy.docgen.core.writers;
 
+import java.util.Locale;
 import java.util.function.Consumer;
 import software.amazon.smithy.codegen.core.Symbol;
 import software.amazon.smithy.codegen.core.SymbolWriter;
@@ -105,5 +106,25 @@ public final class SphinxMarkdownWriter extends MarkdownWriter {
     @Override
     public DocWriter closeTab() {
         return write(":::");
+    }
+
+    @Override
+    public DocWriter openAdmonition(AdmonitionType type, Consumer<DocWriter> titleWriter) {
+        return write("""
+                :::{admonition} $C
+                :class: $L
+
+                """, titleWriter, type.toString().toLowerCase(Locale.ENGLISH));
+    }
+
+    @Override
+    public DocWriter openAdmonition(AdmonitionType type) {
+        return write(":::{$L}", type.toString().toLowerCase(Locale.ENGLISH));
+    }
+
+    @Override
+    public DocWriter closeAdmonition() {
+        write(":::");
+        return this;
     }
 }

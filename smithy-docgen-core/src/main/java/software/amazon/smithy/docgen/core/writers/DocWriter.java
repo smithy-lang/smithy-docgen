@@ -378,4 +378,65 @@ public abstract class DocWriter extends SymbolWriter<DocWriter, DocImportContain
          */
         UNORDERED
     }
+
+    /**
+     * Opens an admonition with a custom title.
+     *
+     * <p>An admonition is an emphasized callout that typically have color-coded
+     * severity. A warning admonition, for example, might have a yellow or red
+     * banner that emphasizes the importance of the body text.
+     *
+     * @param type The type of admonition to open.
+     * @param titleWriter A consumer that writes out the title.
+     * @return returns the writer.
+     */
+    public abstract DocWriter openAdmonition(AdmonitionType type, Consumer<DocWriter> titleWriter);
+
+    /**
+     * Opens an admonition with a default title.
+     *
+     * <p>An admonition is an emphasized callout that typically have color-coded
+     * severity. A warning admonition, for example, might have a yellow or red
+     * banner that emphasizes the importance of the body text.
+     *
+     * @param type The type of admonition to open.
+     * @return returns the writer.
+     */
+    public abstract DocWriter openAdmonition(AdmonitionType type);
+
+    /**
+     * Closes the body of an admonition.
+     *
+     * @return returns the writer.
+     */
+    public abstract DocWriter closeAdmonition();
+
+    /**
+     * The type of admonition.
+     *
+     * <p>This affects the default title of the admonition, as well as styling.
+     */
+    public enum AdmonitionType {
+        /**
+         * An admonition that adds context without any strong severity.
+         */
+        NOTE,
+
+        /**
+         * An admonition that adds context which is important, but not severely so.
+         */
+        IMPORTANT,
+
+        /**
+         * An admonition that adds context with strong severity.
+         *
+         * <p>This might be used by deprecation notices, for example.
+         */
+        WARNING,
+
+        /**
+         * An admonition that refers to external context.
+         */
+        SEE_ALSO
+    }
 }
