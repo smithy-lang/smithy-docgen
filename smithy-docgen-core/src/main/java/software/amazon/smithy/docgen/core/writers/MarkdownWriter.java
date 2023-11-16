@@ -219,7 +219,14 @@ public class MarkdownWriter extends DocWriter {
 
     @Override
     public DocWriter openAdmonition(AdmonitionType type) {
-        return writeInline("**$L:** ", type.toString());
+        return writeInline("**$L:** ", getAdmonitionName(type));
+    }
+
+    private String getAdmonitionName(AdmonitionType type) {
+        if (type.equals(AdmonitionType.SEE_ALSO)) {
+            return "See Also";
+        }
+        return type.toString();
     }
 
     @Override
