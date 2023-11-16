@@ -452,6 +452,14 @@ public abstract class DocWriter extends SymbolWriter<DocWriter, DocImportContain
         WARNING,
 
         /**
+         * An admonition that adds context with extreme severity.
+         *
+         * <p>This might be used to add information about security-related concerns,
+         * such as sensitive shapes and members.
+         */
+        DANGER,
+
+        /**
          * An admonition that refers to external context.
          */
         SEE_ALSO
