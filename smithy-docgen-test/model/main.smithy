@@ -125,9 +125,12 @@ intEnum DocumentedIntEnum {
 // This structure has no docs anywhere
 @unstable
 structure UndocumentedStructure {
-    blob: Blob
+    blob: SensitiveBlob
     boolean: Boolean
 }
+
+@sensitive
+blob SensitiveBlob
 
 @mixin
 @error("client")

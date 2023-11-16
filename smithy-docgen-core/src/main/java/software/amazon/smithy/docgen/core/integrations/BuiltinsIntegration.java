@@ -16,6 +16,7 @@ import software.amazon.smithy.docgen.core.interceptors.ErrorFaultInterceptor;
 import software.amazon.smithy.docgen.core.interceptors.ExternalDocsInterceptor;
 import software.amazon.smithy.docgen.core.interceptors.NullabilityInterceptor;
 import software.amazon.smithy.docgen.core.interceptors.RecommendedInterceptor;
+import software.amazon.smithy.docgen.core.interceptors.SensitiveInterceptor;
 import software.amazon.smithy.docgen.core.interceptors.SinceInterceptor;
 import software.amazon.smithy.docgen.core.interceptors.UnstableInterceptor;
 import software.amazon.smithy.docgen.core.writers.DocWriter;
@@ -54,6 +55,10 @@ public class BuiltinsIntegration implements DocIntegration {
     @Override
     public List<? extends CodeInterceptor<? extends CodeSection, DocWriter>> interceptors(
             DocGenerationContext context) {
+        // Due to the way that interceptors work, the elements at the bottom of the list will
+        // be called last. Since most of these append data to their sections, that means that
+        // the ones at the end will be at the top of the rendered pages. Therefore, interceptors
+        // that provide more critical information should appear at the bottom of this list.
         return List.of(
                 new ExternalDocsInterceptor(),
                 new ErrorFaultInterceptor(),
@@ -62,7 +67,8 @@ public class BuiltinsIntegration implements DocIntegration {
                 new UnstableInterceptor(),
                 new DeprecatedInterceptor(),
                 new RecommendedInterceptor(),
-                new NullabilityInterceptor() // This goes last so that its output is always first.
+                new NullabilityInterceptor(),
+                new SensitiveInterceptor()
         );
     }
 }
