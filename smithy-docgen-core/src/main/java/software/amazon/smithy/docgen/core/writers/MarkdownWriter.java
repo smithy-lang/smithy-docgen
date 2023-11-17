@@ -77,7 +77,9 @@ public class MarkdownWriter extends DocWriter {
         String text;
         Optional<String> ref;
         var relativeTo = Paths.get(filename);
-        if (value instanceof Symbol symbolValue) {
+        if (value instanceof Optional<?> optional && optional.isPresent()) {
+            return getReferencePair(optional.get());
+        } else if (value instanceof Symbol symbolValue) {
             text = symbolValue.getName();
             ref = getSymbolLink(symbolValue, relativeTo);
         } else if (value instanceof SymbolReference referenceValue) {

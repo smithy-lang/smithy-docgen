@@ -171,6 +171,7 @@ union DocumentedUnion {
 /// A resource shape. To have some sense of readability this will represent the concept
 /// of documentation itself as a resource, presenting the image of a service which
 /// stores such things.
+@noReplace
 resource DocumentationResource {
     identifiers: {id: DocumentationId}
     properties: {contents: DocumentationContents, archived: DocumentationArchived}
