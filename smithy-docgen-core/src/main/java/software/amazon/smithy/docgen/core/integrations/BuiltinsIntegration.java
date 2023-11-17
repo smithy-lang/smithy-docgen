@@ -15,6 +15,8 @@ import software.amazon.smithy.docgen.core.interceptors.DeprecatedInterceptor;
 import software.amazon.smithy.docgen.core.interceptors.ErrorFaultInterceptor;
 import software.amazon.smithy.docgen.core.interceptors.ExternalDocsInterceptor;
 import software.amazon.smithy.docgen.core.interceptors.InternalInterceptor;
+import software.amazon.smithy.docgen.core.interceptors.NoReplaceBindingInterceptor;
+import software.amazon.smithy.docgen.core.interceptors.NoReplaceOperationInterceptor;
 import software.amazon.smithy.docgen.core.interceptors.NullabilityInterceptor;
 import software.amazon.smithy.docgen.core.interceptors.RecommendedInterceptor;
 import software.amazon.smithy.docgen.core.interceptors.SensitiveInterceptor;
@@ -61,6 +63,8 @@ public class BuiltinsIntegration implements DocIntegration {
         // the ones at the end will be at the top of the rendered pages. Therefore, interceptors
         // that provide more critical information should appear at the bottom of this list.
         return List.of(
+                new NoReplaceBindingInterceptor(),
+                new NoReplaceOperationInterceptor(),
                 new ExternalDocsInterceptor(),
                 new ErrorFaultInterceptor(),
                 new DefaultValueInterceptor(),
