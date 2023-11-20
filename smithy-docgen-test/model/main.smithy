@@ -48,6 +48,7 @@ service DocumentedService {
 operation DocumentedOperation {
     input := {
         structure: DocumentedStructure
+        lengthExamples: LengthTraitExamples
     }
     output := {
         structure: DocumentedStructure
@@ -105,6 +106,30 @@ enum DocumentedStringEnum {
 
     /// Another very common placeholder, often seen with `foo`.
     BAR
+}
+
+/// This shows how the length trait is applied to various types.
+structure LengthTraitExamples {
+    @length(min: 4)
+    string: String
+
+    @length(max: 255)
+    blob: Blob
+
+    @length(min: 2, max: 4)
+    list: StringList
+
+    map: StringMap
+}
+
+list StringList {
+    member: String
+}
+
+@length(max: 16)
+map StringMap {
+    key: String
+    value: String
 }
 
 /// This in an enum that can have one of the following values:
