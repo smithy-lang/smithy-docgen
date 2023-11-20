@@ -31,7 +31,7 @@ public final class SinceInterceptor  implements CodeInterceptor<ShapeSubheadingS
 
     @Override
     public void write(DocWriter writer, String previousText, ShapeSubheadingSection section) {
-        var trait = section.shape().expectTrait(SinceTrait.class);
+        var trait = section.shape().getMemberTrait(section.context().model(), SinceTrait.class).get();
         writer.openAdmonition(AdmonitionType.NOTE);
         writer.write("New in version $L.", trait.getValue());
         writer.closeAdmonition();

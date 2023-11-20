@@ -30,7 +30,7 @@ public final class ExternalDocsInterceptor implements CodeInterceptor<ShapeDetai
 
     @Override
     public void write(DocWriter writer, String previousText, ShapeDetailsSection section) {
-        var trait = section.shape().expectTrait(ExternalDocumentationTrait.class);
+        var trait = section.shape().getMemberTrait(section.context().model(), ExternalDocumentationTrait.class).get();
         writer.openAdmonition(AdmonitionType.SEE_ALSO);
         trait.getUrls().entrySet().stream()
                 .map(entry -> Pair.of(entry.getKey(), entry.getValue()))
