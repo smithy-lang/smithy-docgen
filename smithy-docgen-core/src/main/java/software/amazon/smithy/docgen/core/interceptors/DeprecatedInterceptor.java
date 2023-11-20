@@ -29,7 +29,7 @@ public final class DeprecatedInterceptor implements CodeInterceptor<ShapeSubhead
 
     @Override
     public void write(DocWriter writer, String previousText, ShapeSubheadingSection section) {
-        var trait = section.shape().expectTrait(DeprecatedTrait.class);
+        var trait = section.shape().getMemberTrait(section.context().model(), DeprecatedTrait.class).get();
         writer.putContext("since", trait.getSince());
         writer.openAdmonition(AdmonitionType.WARNING, w -> {
             w.write("Deprecated${?since} since ${since:L}${/since}");
