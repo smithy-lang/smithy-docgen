@@ -315,19 +315,19 @@ public final class MemberGenerator implements Runnable {
 
         @Override
         public Void listShape(ListShape shape) {
-            writer.writeInline("List<");
+            writer.writeInline("List\\<");
             context.model().expectShape(shape.getMember().getTarget()).accept(this);
-            writer.writeInline(">");
+            writer.writeInline("\\>");
             return null;
         }
 
         @Override
         public Void mapShape(MapShape shape) {
-            writer.writeInline("Map<");
+            writer.writeInline("Map\\<");
             context.model().expectShape(shape.getKey().getTarget()).accept(this);
             writer.writeInline(", ");
             context.model().expectShape(shape.getValue().getTarget()).accept(this);
-            writer.writeInline(">");
+            writer.writeInline("\\>");
             return null;
         }
 
