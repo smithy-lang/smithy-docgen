@@ -122,12 +122,14 @@ structure LengthTraitExamples {
     blob: Blob
 
     @length(min: 2, max: 4)
-    list: StringList
+    list: StringSet
 
     map: StringMap
 }
 
-list StringList {
+/// A set of strings.
+@uniqueItems
+list StringSet {
     member: String
 }
 
