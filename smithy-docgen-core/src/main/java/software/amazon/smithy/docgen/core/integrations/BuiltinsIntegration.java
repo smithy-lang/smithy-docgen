@@ -20,6 +20,7 @@ import software.amazon.smithy.docgen.core.interceptors.NoReplaceBindingIntercept
 import software.amazon.smithy.docgen.core.interceptors.NoReplaceOperationInterceptor;
 import software.amazon.smithy.docgen.core.interceptors.NullabilityInterceptor;
 import software.amazon.smithy.docgen.core.interceptors.PatternInterceptor;
+import software.amazon.smithy.docgen.core.interceptors.RangeInterceptor;
 import software.amazon.smithy.docgen.core.interceptors.RecommendedInterceptor;
 import software.amazon.smithy.docgen.core.interceptors.SensitiveInterceptor;
 import software.amazon.smithy.docgen.core.interceptors.SinceInterceptor;
@@ -68,6 +69,7 @@ public class BuiltinsIntegration implements DocIntegration {
                 new NoReplaceBindingInterceptor(),
                 new NoReplaceOperationInterceptor(),
                 new PatternInterceptor(),
+                new RangeInterceptor(),
                 new LengthInterceptor(),
                 new ExternalDocsInterceptor(),
                 new ErrorFaultInterceptor(),
