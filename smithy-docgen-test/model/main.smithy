@@ -133,6 +133,8 @@ list StringSet {
     member: String
 }
 
+/// A string map that allows null values.
+@sparse
 @length(max: 16)
 map StringMap {
     key: String
