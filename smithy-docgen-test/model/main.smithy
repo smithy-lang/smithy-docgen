@@ -49,6 +49,7 @@ operation DocumentedOperation {
     input := {
         structure: DocumentedStructure
         lengthExamples: LengthTraitExamples
+        rangeExamples: RangeTraitExamples
     }
     output := {
         structure: DocumentedStructure
@@ -134,6 +135,18 @@ list StringList {
 map StringMap {
     key: String
     value: String
+}
+
+/// This shows how the range trait is applied to various types.
+structure RangeTraitExamples {
+    @range(min: 0)
+    positive: Integer
+
+    @range(max: 0)
+    negative: Long
+
+    @range(min: 0, max: 255)
+    unsignedByte: Short
 }
 
 /// This in an enum that can have one of the following values:
