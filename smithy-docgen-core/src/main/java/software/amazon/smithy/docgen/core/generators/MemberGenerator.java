@@ -14,6 +14,7 @@ import software.amazon.smithy.codegen.core.SymbolReference;
 import software.amazon.smithy.docgen.core.DocGenerationContext;
 import software.amazon.smithy.docgen.core.DocSymbolProvider;
 import software.amazon.smithy.docgen.core.sections.MemberSection;
+import software.amazon.smithy.docgen.core.sections.ShapeDetailsSection;
 import software.amazon.smithy.docgen.core.sections.ShapeMembersSection;
 import software.amazon.smithy.docgen.core.sections.ShapeSubheadingSection;
 import software.amazon.smithy.docgen.core.writers.DocWriter;
@@ -112,6 +113,7 @@ public final class MemberGenerator implements Runnable {
 
                 writer.injectSection(new ShapeSubheadingSection(context, member));
                 writer.writeShapeDocs(member, context.model());
+                writer.injectSection(new ShapeDetailsSection(context, member));
                 writer.closeDefinitionListItem();
                 writer.popState();
             }
