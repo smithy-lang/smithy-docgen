@@ -72,6 +72,10 @@ structure DocumentedStructure {
     @since("2023-11-16")
     string: String
 
+    /// This member has a pattern trait on it.
+    @pattern("^[A-Za-z]+$")
+    pattern: String
+
     /// This is a simple integer member.
     @deprecated
     integer: Integer
