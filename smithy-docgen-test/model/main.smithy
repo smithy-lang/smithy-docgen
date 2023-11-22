@@ -45,6 +45,9 @@ service DocumentedService {
         }
     ]
 )
+@requestCompression(
+    encodings: ["gzip"]
+)
 operation DocumentedOperation {
     input := {
         /// This is an idempotency token, which will inherently mark this operation
