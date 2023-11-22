@@ -344,16 +344,22 @@ operation DeleteArchivedDocumentation {}
 
 /// Lists the avialable documentation resources.
 @readonly
+@paginated(inputToken: "paginationToken", outputToken: "paginationToken", items: "documentation", pageSize: "pageSize")
 operation ListDocumentation {
     input := {
         // Whether to list documentation that has been archived.
         showArchived: Boolean = false
+
+        paginationToken: String
+
+        pageSize: Integer
     }
 
     output := {
-        /// A list of all the documentation. No pagination here.
         @required
         documentation: DocumentationList
+
+        paginationToken: String
     }
 }
 

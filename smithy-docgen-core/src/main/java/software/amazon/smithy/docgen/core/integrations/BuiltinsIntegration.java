@@ -20,6 +20,7 @@ import software.amazon.smithy.docgen.core.interceptors.LengthInterceptor;
 import software.amazon.smithy.docgen.core.interceptors.NoReplaceBindingInterceptor;
 import software.amazon.smithy.docgen.core.interceptors.NoReplaceOperationInterceptor;
 import software.amazon.smithy.docgen.core.interceptors.NullabilityInterceptor;
+import software.amazon.smithy.docgen.core.interceptors.PaginationInterceptor;
 import software.amazon.smithy.docgen.core.interceptors.PatternInterceptor;
 import software.amazon.smithy.docgen.core.interceptors.RangeInterceptor;
 import software.amazon.smithy.docgen.core.interceptors.RecommendedInterceptor;
@@ -70,6 +71,7 @@ public class BuiltinsIntegration implements DocIntegration {
         // the ones at the end will be at the top of the rendered pages. Therefore, interceptors
         // that provide more critical information should appear at the bottom of this list.
         return List.of(
+                new PaginationInterceptor(),
                 new RequestCompressionInterceptor(),
                 new NoReplaceBindingInterceptor(),
                 new NoReplaceOperationInterceptor(),
