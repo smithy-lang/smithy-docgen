@@ -47,13 +47,22 @@ service DocumentedService {
 )
 operation DocumentedOperation {
     input := {
+        /// This is an idempotency token, which will inherently mark this operation
+        /// as idempotent.
+        @idempotencyToken
+        token: String
+
         structure: DocumentedStructure
+
         lengthExamples: LengthTraitExamples
+
         rangeExamples: RangeTraitExamples
     }
+
     output := {
         structure: DocumentedStructure
     }
+
     errors: [
         DocumentedOperationError
     ]
