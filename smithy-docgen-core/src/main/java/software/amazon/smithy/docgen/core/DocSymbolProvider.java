@@ -28,10 +28,12 @@ import software.amazon.smithy.model.shapes.ShapeId;
 import software.amazon.smithy.model.shapes.ShapeVisitor;
 import software.amazon.smithy.model.shapes.StructureShape;
 import software.amazon.smithy.model.shapes.UnionShape;
+import software.amazon.smithy.model.traits.AuthDefinitionTrait;
 import software.amazon.smithy.model.traits.InputTrait;
 import software.amazon.smithy.model.traits.OutputTrait;
 import software.amazon.smithy.model.traits.StringTrait;
 import software.amazon.smithy.model.traits.TitleTrait;
+import software.amazon.smithy.model.traits.TraitDefinition;
 import software.amazon.smithy.utils.SmithyUnstableApi;
 import software.amazon.smithy.utils.StringUtils;
 
@@ -129,6 +131,7 @@ public final class DocSymbolProvider extends ShapeVisitor.Default<Symbol> implem
     public static final String ENABLE_DEFAULT_FILE_EXTENSION = "enableDefaultFileExtension";
 
     private static final Logger LOGGER = Logger.getLogger(DocSymbolProvider.class.getName());
+    private static final String SERVICE_FILE = "index";
 
     private final Model model;
     private final DocSettings docSettings;
@@ -177,7 +180,7 @@ public final class DocSymbolProvider extends ShapeVisitor.Default<Symbol> implem
     @Override
     public Symbol serviceShape(ServiceShape shape) {
         return getSymbolBuilder(shape)
-            .definitionFile(getDefinitionFile("index"))
+            .definitionFile(getDefinitionFile(SERVICE_FILE))
             .build();
     }
 
@@ -193,7 +196,15 @@ public final class DocSymbolProvider extends ShapeVisitor.Default<Symbol> implem
 
     @Override
     public Symbol structureShape(StructureShape shape) {
-        var builder = getSymbolBuilderWithFile(shape);
+        var builder = getSymbolBuilder(shape);
+        if (shape.hasTrait(TraitDefinition.class)) {
+            if (shape.hasTrait(AuthDefinitionTrait.class)) {
+                builder.definitionFile(getDefinitionFile(SERVICE_FILE));
+            }
+            return builder.build();
+        }
+
+        builder.definitionFile(getDefinitionFile(serviceShape, shape));
         if (ioToOperation.containsKey(shape.getId())) {
             // Input and output structures are documented on the operation's definition page.
             var operation = ioToOperation.get(shape.getId());

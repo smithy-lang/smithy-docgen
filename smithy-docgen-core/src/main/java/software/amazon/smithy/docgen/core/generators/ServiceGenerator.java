@@ -9,10 +9,17 @@ import java.util.function.Consumer;
 import software.amazon.smithy.codegen.core.directed.GenerateServiceDirective;
 import software.amazon.smithy.docgen.core.DocGenerationContext;
 import software.amazon.smithy.docgen.core.DocSettings;
+import software.amazon.smithy.docgen.core.DocgenUtils;
+import software.amazon.smithy.docgen.core.sections.AuthSection;
 import software.amazon.smithy.docgen.core.sections.ShapeDetailsSection;
 import software.amazon.smithy.docgen.core.sections.ShapeSection;
 import software.amazon.smithy.docgen.core.sections.ShapeSubheadingSection;
+import software.amazon.smithy.docgen.core.writers.DocWriter;
+import software.amazon.smithy.model.knowledge.ServiceIndex;
+import software.amazon.smithy.model.knowledge.ServiceIndex.AuthSchemeMode;
 import software.amazon.smithy.model.knowledge.TopDownIndex;
+import software.amazon.smithy.model.shapes.ServiceShape;
+import software.amazon.smithy.model.traits.synthetic.NoAuthTrait;
 import software.amazon.smithy.utils.SmithyInternalApi;
 
 /**
@@ -47,6 +54,10 @@ import software.amazon.smithy.utils.SmithyInternalApi;
  *     <li>{@link software.amazon.smithy.docgen.core.sections.BoundResourceSection}:
  *     enables modifying the listing of an individual resource directly bound to
  *     the service.
+ *
+ *     <li>{@link AuthSection} enables modifying the documentation for the different
+ *     auth schemes available on the service. This section will not be present if
+ *     the service has no auth traits.
  * </ul>
  *
  * <p>To change the intermediate format (e.g. from markdown to restructured text),
@@ -87,9 +98,53 @@ public final class ServiceGenerator implements Consumer<GenerateServiceDirective
             var operations = topDownIndex.getContainedOperations(service).stream().sorted().toList();
             ServiceShapeGeneratorUtils.generateOperationListing(context, writer, service, operations);
 
+            writeAuthSection(context, writer, service);
+
             writer.closeHeading();
             writer.popState();
         });
     }
 
+    private void writeAuthSection(DocGenerationContext context, DocWriter writer, ServiceShape service) {
+        var authSchemes = DocgenUtils.getPrioritizedServiceAuth(context.model(), service);
+        if (authSchemes.isEmpty()) {
+            return;
+        }
+
+        writer.pushState(new AuthSection(context, service));
+        writer.openHeading("Auth");
+
+        var index = ServiceIndex.of(context.model());
+        writer.putContext("optional", index.getEffectiveAuthSchemes(service, AuthSchemeMode.NO_AUTH_AWARE)
+                .containsKey(NoAuthTrait.ID));
+        writer.putContext("multipleSchemes", authSchemes.size() > 1);
+        writer.write("""
+                Operations on the service ${?optional}may optionally${/optional}${^optional}MUST${/optional} \
+                be called with ${?multipleSchemes}one of the following priority-ordered auth schemes${/multipleSchemes}\
+                ${^multipleSchemes}the following auth scheme${/multipleSchemes}. Additionally, authentication for \
+                individual operations may be optional${?multipleSchemes}, have a different priority order, support \
+                fewer schemes,${/multipleSchemes} or be disabled entirely.
+                """);
+
+        writer.openDefinitionList();
+
+        for (var scheme : authSchemes) {
+            var authTraitShape = context.model().expectShape(scheme);
+            var authTraitSymbol = context.symbolProvider().toSymbol(authTraitShape);
+
+            writer.pushState(new ShapeSection(context, authTraitShape));
+            writer.openDefinitionListItem(w -> w.write("$R", authTraitSymbol));
+
+            writer.injectSection(new ShapeSubheadingSection(context, authTraitShape));
+            writer.writeShapeDocs(authTraitShape, context.model());
+            writer.injectSection(new ShapeDetailsSection(context, authTraitShape));
+
+            writer.closeDefinitionListItem();
+            writer.popState();
+        }
+
+        writer.closeDefinitionList();
+        writer.closeHeading();
+        writer.popState();
+    }
 }
