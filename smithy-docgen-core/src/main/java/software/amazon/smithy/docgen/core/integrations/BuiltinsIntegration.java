@@ -10,6 +10,7 @@ import software.amazon.smithy.docgen.core.DocFormat;
 import software.amazon.smithy.docgen.core.DocGenerationContext;
 import software.amazon.smithy.docgen.core.DocIntegration;
 import software.amazon.smithy.docgen.core.DocSettings;
+import software.amazon.smithy.docgen.core.interceptors.ApiKeyAuthInterceptor;
 import software.amazon.smithy.docgen.core.interceptors.DefaultValueInterceptor;
 import software.amazon.smithy.docgen.core.interceptors.DeprecatedInterceptor;
 import software.amazon.smithy.docgen.core.interceptors.ErrorFaultInterceptor;
@@ -20,6 +21,7 @@ import software.amazon.smithy.docgen.core.interceptors.LengthInterceptor;
 import software.amazon.smithy.docgen.core.interceptors.NoReplaceBindingInterceptor;
 import software.amazon.smithy.docgen.core.interceptors.NoReplaceOperationInterceptor;
 import software.amazon.smithy.docgen.core.interceptors.NullabilityInterceptor;
+import software.amazon.smithy.docgen.core.interceptors.OperationAuthInterceptor;
 import software.amazon.smithy.docgen.core.interceptors.PaginationInterceptor;
 import software.amazon.smithy.docgen.core.interceptors.PatternInterceptor;
 import software.amazon.smithy.docgen.core.interceptors.RangeInterceptor;
@@ -71,6 +73,8 @@ public class BuiltinsIntegration implements DocIntegration {
         // the ones at the end will be at the top of the rendered pages. Therefore, interceptors
         // that provide more critical information should appear at the bottom of this list.
         return List.of(
+                new OperationAuthInterceptor(),
+                new ApiKeyAuthInterceptor(),
                 new PaginationInterceptor(),
                 new RequestCompressionInterceptor(),
                 new NoReplaceBindingInterceptor(),

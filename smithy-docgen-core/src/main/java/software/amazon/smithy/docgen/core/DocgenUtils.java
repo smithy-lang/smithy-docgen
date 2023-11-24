@@ -14,11 +14,17 @@ import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
 import software.amazon.smithy.codegen.core.CodegenException;
 import software.amazon.smithy.codegen.core.Symbol;
+import software.amazon.smithy.model.Model;
+import software.amazon.smithy.model.knowledge.ServiceIndex;
+import software.amazon.smithy.model.knowledge.ServiceIndex.AuthSchemeMode;
+import software.amazon.smithy.model.shapes.ShapeId;
+import software.amazon.smithy.model.shapes.ToShapeId;
 import software.amazon.smithy.utils.SmithyUnstableApi;
 import software.amazon.smithy.utils.StringUtils;
 
@@ -111,5 +117,32 @@ public final class DocgenUtils {
         return Optional.of(format(
                 "./%s#%s", relativeToParent.relativize(Paths.get(symbol.getDefinitionFile())), linkId.get()
         ));
+    }
+
+    /**
+     * Gets a priority-ordered list of the service's auth types.
+     *
+     * <p>This includes all the auth types bound to the service, not just those present
+     * in the {@code auth} trait. Auth types not present in the auth trait are at the
+     * end of the list, in alphabetical order.
+     *
+     * @param model The model being generated from.
+     * @param service The service being documented.
+     * @return returns a priority-ordered list of service auth types.
+     */
+    public static List<ShapeId> getPrioritizedServiceAuth(Model model, ToShapeId service) {
+        var index = ServiceIndex.of(model);
+
+        // Get the effective auth schemes first and add them to an ordered set. This
+        // is important to do because the effective schemes are explicitly ordered in
+        // the model by the auth trait, and we want to document the auth options in
+        // that same order.
+        var authSchemes = new LinkedHashSet<>(index.getEffectiveAuthSchemes(service, AuthSchemeMode.MODELED).keySet());
+
+        // Since the auth trait can exclude some of the service's auth types, we need
+        // to add those in last.
+        authSchemes.addAll(index.getAuthSchemes(service).keySet());
+
+        return List.copyOf(authSchemes);
     }
 }

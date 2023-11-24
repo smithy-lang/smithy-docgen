@@ -7,10 +7,19 @@ namespace com.example
 /// should handle. For example, the implementation <b>must</b> be able to handle HTML
 /// tags since that's part of the [CommonMark spec](https://spec.commonmark.org/).
 @title("Documented Service")
+@httpBasicAuth
+@httpDigestAuth
+@httpBearerAuth
+@httpApiKeyAuth(name: "auth-bearing-header", in: "header", scheme: "Bearer")
+@auth([httpApiKeyAuth, httpBearerAuth, httpDigestAuth])
 service DocumentedService {
     version: "2023-10-13"
     operations: [
         DocumentedOperation
+        UnauthenticatedOperation
+        OptionalAuthOperation
+        LimitedAuthOperation
+        LimitedOptionalAuthOperation
     ]
     resources: [
         DocumentationResource
@@ -20,6 +29,23 @@ service DocumentedService {
         ServiceError
     ]
 }
+
+/// This operation does not support any of the service's auth types.
+@auth([])
+operation UnauthenticatedOperation {}
+
+/// This operation supports all of the service's auth types, but optionally.
+@optionalAuth
+operation OptionalAuthOperation {}
+
+/// This operation supports a limited set of the service's auth.
+@auth([httpBasicAuth, httpApiKeyAuth])
+operation LimitedAuthOperation {}
+
+/// This operation supports a limited set of the service's auth, optionally.
+@optionalAuth
+@auth([httpBasicAuth, httpDigestAuth])
+operation LimitedOptionalAuthOperation {}
 
 @examples(
     [
