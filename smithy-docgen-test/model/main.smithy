@@ -116,6 +116,8 @@ structure DocumentedStructure {
     /// This is a simple string member.
     /// It has documentation that can span multiple lines.
     @since("2023-11-16")
+    @jsonName("foo")
+    @xmlName("bar")
     string: String
 
     /// This member has a pattern trait on it.
