@@ -147,11 +147,28 @@ structure DocumentedStructure {
 
     @recommended(reason: "Because unions are cool")
     union: DocumentedUnion
+
+    xmlTraits: XmlTraits
 }
 
 /// Timestamp in RFC3339 format
 @timestampFormat("date-time")
 timestamp DateTime
+
+/// This structure showcases various XML traits
+@xmlName("foo")
+structure XmlTraits {
+    /// This shows that the xml name isn't inherited from the target.
+    nested: XmlTraits
+
+    /// This shows an xml name targeting a normal shape.
+    @xmlName("bar")
+    xmlName: String
+
+    /// This shows how xml attributes are displayed.
+    @xmlAttribute
+    xmlAttribute: String
+}
 
 /// This in an enum that can have one of the following values:
 ///
