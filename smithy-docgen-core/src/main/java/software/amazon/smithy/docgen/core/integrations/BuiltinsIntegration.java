@@ -33,6 +33,7 @@ import software.amazon.smithy.docgen.core.interceptors.SinceInterceptor;
 import software.amazon.smithy.docgen.core.interceptors.SparseInterceptor;
 import software.amazon.smithy.docgen.core.interceptors.UniqueItemsInterceptor;
 import software.amazon.smithy.docgen.core.interceptors.UnstableInterceptor;
+import software.amazon.smithy.docgen.core.interceptors.XmlNameInterceptor;
 import software.amazon.smithy.docgen.core.writers.DocWriter;
 import software.amazon.smithy.docgen.core.writers.MarkdownWriter;
 import software.amazon.smithy.utils.CodeInterceptor;
@@ -77,6 +78,7 @@ public class BuiltinsIntegration implements DocIntegration {
                 new OperationAuthInterceptor(),
                 new ApiKeyAuthInterceptor(),
                 new JsonNameInterceptor(),
+                new XmlNameInterceptor(),
                 new PaginationInterceptor(),
                 new RequestCompressionInterceptor(),
                 new NoReplaceBindingInterceptor(),
