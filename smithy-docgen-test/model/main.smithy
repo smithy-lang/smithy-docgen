@@ -128,6 +128,9 @@ structure DocumentedStructure {
     @deprecated
     integer: Integer
 
+    /// This is a timestamp with a custom format
+    timestamp: DateTime
+
     // This doesn't have a doc string (this is just a normal comment), so it should
     // pull the docs from the target shape.
     @deprecated(message: "Please use intEnum instead")
@@ -145,6 +148,10 @@ structure DocumentedStructure {
     @recommended(reason: "Because unions are cool")
     union: DocumentedUnion
 }
+
+/// Timestamp in RFC3339 format
+@timestampFormat("date-time")
+timestamp DateTime
 
 /// This in an enum that can have one of the following values:
 ///
