@@ -93,10 +93,10 @@ public final class ServiceGenerator implements Consumer<GenerateServiceDirective
 
             // TODO: topographically sort resources
             var resources = topDownIndex.getContainedResources(service).stream().sorted().toList();
-            ServiceShapeGeneratorUtils.generateResourceListing(context, writer, service, resources);
+            GeneratorUtils.generateResourceListing(context, writer, service, resources);
 
             var operations = topDownIndex.getContainedOperations(service).stream().sorted().toList();
-            ServiceShapeGeneratorUtils.generateOperationListing(context, writer, service, operations);
+            GeneratorUtils.generateOperationListing(context, writer, service, operations);
 
             writeAuthSection(context, writer, service);
 

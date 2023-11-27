@@ -32,6 +32,15 @@ import software.amazon.smithy.utils.SmithyInternalApi;
  *
  *     <li>{@link ShapeSection}: Enables re-writing or overwriting the entire page,
  *     including changes made in other sections.
+ *
+ *     <li>{@link software.amazon.smithy.docgen.core.sections.ProtocolSection} Enables adding
+ *     traits that are specific to a particular protocol. This section will only be present if
+ *     there are protocol traits applied to the service. If there are multiple protocol traits,
+ *     this section will appear once per protocol. This section will also appear for each member.
+ *
+ *     <li>{@link software.amazon.smithy.docgen.core.sections.ProtocolsSection} Enables
+ *     modifying the tab group containing all the protocol traits for all the protocols. This
+ *     section will also appear for each member.
  * </ul>
  *
  * Additionally, if the shape has members the following sections will also be present:
@@ -75,6 +84,7 @@ public final class StructuredShapeGenerator implements BiConsumer<Shape, MemberL
             writer.injectSection(new ShapeSubheadingSection(context, shape));
             writer.writeShapeDocs(shape, context.model());
             writer.injectSection(new ShapeDetailsSection(context, shape));
+            GeneratorUtils.writeProtocolsSection(context, writer, shape);
 
             new MemberGenerator(context, writer, shape, listingType).run();
 
