@@ -35,6 +35,7 @@ import software.amazon.smithy.docgen.core.interceptors.TimestampFormatIntercepto
 import software.amazon.smithy.docgen.core.interceptors.UniqueItemsInterceptor;
 import software.amazon.smithy.docgen.core.interceptors.UnstableInterceptor;
 import software.amazon.smithy.docgen.core.interceptors.XmlAttributeInterceptor;
+import software.amazon.smithy.docgen.core.interceptors.XmlFlattenedInterceptor;
 import software.amazon.smithy.docgen.core.interceptors.XmlNameInterceptor;
 import software.amazon.smithy.docgen.core.writers.DocWriter;
 import software.amazon.smithy.docgen.core.writers.MarkdownWriter;
@@ -83,6 +84,7 @@ public class BuiltinsIntegration implements DocIntegration {
                 new JsonNameInterceptor(),
                 new XmlAttributeInterceptor(),
                 new XmlNameInterceptor(),
+                new XmlFlattenedInterceptor(),
                 new PaginationInterceptor(),
                 new RequestCompressionInterceptor(),
                 new NoReplaceBindingInterceptor(),

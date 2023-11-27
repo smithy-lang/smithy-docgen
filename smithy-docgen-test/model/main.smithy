@@ -168,6 +168,24 @@ structure XmlTraits {
     /// This shows how xml attributes are displayed.
     @xmlAttribute
     xmlAttribute: String
+
+    /// This list uses the default nesting behavior.
+    nestedList: StringList
+
+    /// This list uses the non-default flat list behavior.
+    @xmlFlattened
+    flatList: StringList
+
+    /// This map uses the default nesting behavior.
+    nestedMap: StringMap
+
+    /// This map uses the non-default flat map behavior.
+    @xmlFlattened
+    flatMap: StringMap
+}
+
+list StringList {
+    member: String
 }
 
 /// This in an enum that can have one of the following values:
