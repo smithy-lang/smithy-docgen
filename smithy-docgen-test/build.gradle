@@ -30,4 +30,5 @@ repositories {
 
 dependencies {
     implementation(project(":smithy-docgen-core"))
+    implementation("software.amazon.smithy:smithy-aws-traits:$smithyVersion")
 }

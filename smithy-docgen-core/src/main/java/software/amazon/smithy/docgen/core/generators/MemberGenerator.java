@@ -51,12 +51,21 @@ import software.amazon.smithy.utils.StringUtils;
  * <p>The output of this can be customized in a number of ways. To add details to
  * or re-write particular sections, register an interceptor with
  * {@link software.amazon.smithy.docgen.core.DocIntegration#interceptors}. The following
- * sections are guaranteed to be present:
+ * sections will be present:
  *
  * <ul>
  *     <li>{@link MemberSection}: Enables re-writing the documentation for specific members.
+ *
  *     <li>{@link ShapeMembersSection}: Enables re-writing or overwriting the entire list
  *     of members, including changes made in other sections.
+ *
+ *     <li>{@link software.amazon.smithy.docgen.core.sections.ProtocolSection} Enables adding
+ *     traits that are specific to a particular protocol. This section will only be present if
+ *     there are protocol traits applied to the service. If there are multiple protocol traits,
+ *     this section will appear once per protocol.
+ *
+ *     <li>{@link software.amazon.smithy.docgen.core.sections.ProtocolsSection} Enables
+ *     modifying the tab group containing all the protocol traits for all the protocols.
  * </ul>
  *
  * <p>To change the intermediate format (e.g. from markdown to restructured text),
@@ -114,6 +123,7 @@ public final class MemberGenerator implements Runnable {
                 writer.injectSection(new ShapeSubheadingSection(context, member));
                 writer.writeShapeDocs(member, context.model());
                 writer.injectSection(new ShapeDetailsSection(context, member));
+                GeneratorUtils.writeProtocolsSection(context, writer, member);
                 writer.closeDefinitionListItem();
                 writer.popState();
             }

@@ -52,6 +52,14 @@ import software.amazon.smithy.utils.SmithyInternalApi;
  *     the operation might return. If a synthetic error needs to be applied to an
  *     operation, it is better to simply add it to the shape with
  *     {@link software.amazon.smithy.docgen.core.DocIntegration#preprocessModel}.
+ *
+ *     <li>{@link software.amazon.smithy.docgen.core.sections.ProtocolSection} Enables adding
+ *     traits that are specific to a particular protocol. This section will only be present if
+ *     there are protocol traits applied to the service. If there are multiple protocol traits,
+ *     this section will appear once per protocol.
+ *
+ *     <li>{@link software.amazon.smithy.docgen.core.sections.ProtocolsSection} Enables
+ *     modifying the tab group containing all the protocol traits for all the protocols.
  * </ul>
  *
  * Additionally, if the operation's input or output shapes have members the following
@@ -98,6 +106,7 @@ public final class OperationGenerator
             writer.injectSection(new ShapeSubheadingSection(context, operation));
             writer.writeShapeDocs(operation, directive.model());
             writer.injectSection(new ShapeDetailsSection(context, operation));
+            GeneratorUtils.writeProtocolsSection(context, writer, operation);
 
             new MemberGenerator(context, writer, operation, MemberListingType.INPUT).run();
             new MemberGenerator(context, writer, operation, MemberListingType.OUTPUT).run();

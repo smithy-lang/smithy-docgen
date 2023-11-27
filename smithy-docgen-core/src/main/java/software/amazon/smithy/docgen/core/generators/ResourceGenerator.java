@@ -103,6 +103,7 @@ public final class ResourceGenerator implements BiConsumer<DocGenerationContext,
             writer.injectSection(new ShapeSubheadingSection(context, resource));
             writer.writeShapeDocs(resource, context.model());
             writer.injectSection(new ShapeDetailsSection(context, resource));
+            GeneratorUtils.writeProtocolsSection(context, writer, resource);
 
             new MemberGenerator(context, writer, resource, MemberListingType.RESOURCE_IDENTIFIERS).run();
             new MemberGenerator(context, writer, resource, MemberListingType.RESOURCE_PROPERTIES).run();
@@ -110,7 +111,7 @@ public final class ResourceGenerator implements BiConsumer<DocGenerationContext,
             var subResources = resource.getResources().stream().sorted()
                     .map(id -> context.model().expectShape(id, ResourceShape.class))
                     .toList();
-            ServiceShapeGeneratorUtils.generateResourceListing(context, writer, resource, subResources);
+            GeneratorUtils.generateResourceListing(context, writer, resource, subResources);
 
             generateLifecycleDocs(context, writer, resource);
 
@@ -119,7 +120,7 @@ public final class ResourceGenerator implements BiConsumer<DocGenerationContext,
             var operations = operationIds.stream().sorted()
                     .map(id -> context.model().expectShape(id, OperationShape.class))
                     .toList();
-            ServiceShapeGeneratorUtils.generateOperationListing(context, writer, resource, operations);
+            GeneratorUtils.generateOperationListing(context, writer, resource, operations);
 
             writer.closeHeading();
             writer.popState();

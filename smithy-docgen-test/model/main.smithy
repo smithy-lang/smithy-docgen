@@ -2,6 +2,10 @@ $version: "2.0"
 
 namespace com.example
 
+use aws.protocols#awsJson1_0
+use aws.protocols#restJson1
+use aws.protocols#restXml
+
 /// This service is not intended to be representative of a real service. Rather, it is
 /// meant to exercise different kinds of behavior that the documentation generator
 /// should handle. For example, the implementation <b>must</b> be able to handle HTML
@@ -12,6 +16,9 @@ namespace com.example
 @httpBearerAuth
 @httpApiKeyAuth(name: "auth-bearing-header", in: "header", scheme: "Bearer")
 @auth([httpApiKeyAuth, httpBearerAuth, httpDigestAuth])
+@awsJson1_0
+@restJson1
+@restXml
 service DocumentedService {
     version: "2023-10-13"
     operations: [
