@@ -14,7 +14,7 @@ import software.amazon.smithy.utils.SmithyInternalApi;
 
 /**
  * Notes that a member is an
- * <a href="https://smithy.io/2.0/spec/protocol-traits.html#xmlnattribute-trait">
+ * <a href="https://smithy.io/2.0/spec/protocol-traits.html#xmlattribute-trait">
  * xml attribute</a> in the {@link ProtocolSection} if the protocol supports it.
  */
 @SmithyInternalApi
@@ -31,6 +31,7 @@ public final class XmlAttributeInterceptor extends ProtocolTraitInterceptor<XmlA
 
     @Override
     void write(DocWriter writer, String previousText, ProtocolSection section, XmlAttributeTrait trait) {
+        writer.writeWithNoFormatting(previousText + "\n");
         writer.openAdmonition(AdmonitionType.IMPORTANT);
         writer.write("This member represents an XML attribute rather than a nested tag.");
         writer.closeAdmonition();
