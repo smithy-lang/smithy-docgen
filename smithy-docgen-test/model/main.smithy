@@ -39,19 +39,23 @@ service DocumentedService {
 
 /// This operation does not support any of the service's auth types.
 @auth([])
+@http(method: "POST", uri: "/UnauthenticatedOperation")
 operation UnauthenticatedOperation {}
 
 /// This operation supports all of the service's auth types, but optionally.
 @optionalAuth
+@http(method: "POST", uri: "/OptionalAuthOperation")
 operation OptionalAuthOperation {}
 
 /// This operation supports a limited set of the service's auth.
 @auth([httpBasicAuth, httpApiKeyAuth])
+@http(method: "POST", uri: "/LimitedAuthOperation")
 operation LimitedAuthOperation {}
 
 /// This operation supports a limited set of the service's auth, optionally.
 @optionalAuth
 @auth([httpBasicAuth, httpDigestAuth])
+@http(method: "POST", uri: "/LimitedOptionalAuthOperation")
 operation LimitedOptionalAuthOperation {}
 
 @examples(
@@ -81,6 +85,7 @@ operation LimitedOptionalAuthOperation {}
 @requestCompression(
     encodings: ["gzip"]
 )
+@http(method: "POST", uri: "/DocumentedOperation")
 operation DocumentedOperation {
     input := {
         /// This is an idempotency token, which will inherently mark this operation
@@ -347,9 +352,11 @@ boolean DocumentationArchived
 
 /// Put operations create a resource with a user-specified identifier.
 @idempotent
+@http(method: "PUT", uri: "/DocumentationResource/{id}")
 operation PutDocumentation {
     input := for DocumentationResource {
         @required
+        @httpLabel
         $id
 
         @required
@@ -358,6 +365,7 @@ operation PutDocumentation {
 }
 
 /// Create operations instead have the service create the identifier.
+@http(method: "POST", uri: "/DocumentationResource")
 operation CreateDocumentation {
     input := for DocumentationResource {
         @required
@@ -367,9 +375,11 @@ operation CreateDocumentation {
 
 /// Gets the contents of a documentation resource.
 @readonly
+@http(method: "GET", uri: "/DocumentationResource/{id}")
 operation GetDocumentation {
     input := for DocumentationResource {
         @required
+        @httpLabel
         $id
     }
 
@@ -388,9 +398,11 @@ operation GetDocumentation {
 /// Does an update on the documentation resource. These can often also be the put
 /// lifecycle operation.
 @idempotent
+@http(method: "PUT", uri: "/DocumentationResource")
 operation UpdateDocumentation {
     input := for DocumentationResource {
         @required
+        @httpQuery("id")
         $id
 
         @required
@@ -400,9 +412,11 @@ operation UpdateDocumentation {
 
 /// Deletes documentation.
 @idempotent
+@http(method: "DELETE", uri: "/DocumentationResource/{id}")
 operation DeleteDocumentation {
     input := for DocumentationResource {
         @required
+        @httpLabel
         $id
     }
 }
@@ -411,9 +425,11 @@ operation DeleteDocumentation {
 /// We need both instance operations and collection operations that aren't lifecycle
 /// operations to make sure both cases are being documented.
 @idempotent
+@http(method: "PUT", uri: "/DocumentationResource/{id}/archive")
 operation ArchiveDocumentation {
     input := for DocumentationResource {
         @required
+        @httpLabel
         $id
     }
 }
@@ -421,18 +437,24 @@ operation ArchiveDocumentation {
 /// Deletes all documentation that's been archived. This is a collection operation that
 /// isn't part of a lifecycle operation, which is again needed to make sure everything
 /// is being documented as expected.
+@http(method: "DELETE", uri: "/DocumentationResource?delete-archived")
+@idempotent
 operation DeleteArchivedDocumentation {}
 
 /// Lists the avialable documentation resources.
 @readonly
+@http(method: "GET", uri: "/DocumentationResource")
 @paginated(inputToken: "paginationToken", outputToken: "paginationToken", items: "documentation", pageSize: "pageSize")
 operation ListDocumentation {
     input := {
-        // Whether to list documentation that has been archived.
+        /// Whether to list documentation that has been archived.
+        @httpQuery("showArchived")
         showArchived: Boolean = false
 
+        @httpHeader("x-example-pagination-token")
         paginationToken: String
 
+        @httpHeader("x-example-page-size")
         pageSize: Integer
     }
 
@@ -476,12 +498,15 @@ string DocumentationArtifactId
 blob DocumentationArtifactData
 
 @idempotent
+@http(method: "PUT", uri: "/DocumentationResource/{id}/artifact/{artifactId}")
 operation PutDocumentationArtifact {
     input := for DocumentationArtifact {
         @required
+        @httpLabel
         $id
 
         @required
+        @httpLabel
         $artifactId
 
         @required
@@ -490,12 +515,15 @@ operation PutDocumentationArtifact {
 }
 
 @readonly
+@http(method: "GET", uri: "/DocumentationResource/{id}/artifact/{artifactId}")
 operation GetDocumentationArtifact {
     input := for DocumentationArtifact {
         @required
+        @httpLabel
         $id
 
         @required
+        @httpLabel
         $artifactId
     }
 
@@ -512,12 +540,15 @@ operation GetDocumentationArtifact {
 }
 
 @idempotent
+@http(method: "DELETE", uri: "/DocumentationResource/{id}/artifact/{artifactId}")
 operation DeleteDocumentationArtifact {
     input := for DocumentationArtifact {
         @required
+        @httpLabel
         $id
 
         @required
+        @httpLabel
         $artifactId
     }
 }
