@@ -182,6 +182,10 @@ structure XmlTraits {
     /// This map uses the non-default flat map behavior.
     @xmlFlattened
     flatMap: StringMap
+
+    /// This string tag needs an xml namespace added to it.
+    @xmlNamespace(prefix: "example", uri: "https://example.com")
+    xmlNamespace: String
 }
 
 list StringList {
