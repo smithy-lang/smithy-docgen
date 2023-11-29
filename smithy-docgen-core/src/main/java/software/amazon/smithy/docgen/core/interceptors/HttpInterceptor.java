@@ -30,10 +30,16 @@ public final class HttpInterceptor extends ProtocolTraitInterceptor<HttpTrait> {
 
     @Override
     void write(DocWriter writer, String previousText, ProtocolSection section, HttpTrait trait) {
+        writer.putContext("hasLabels", !trait.getUri().getLabels().isEmpty());
         writer.write("""
                 $B $`
 
                 $B $`
+                ${?hasLabels}
+
+                To resolve the path segment of the URI, replace any segments surrounded with
+                brackets with the URI-escaped value of the corresponding member.
+                ${/hasLabels}
 
                 $L""", "HTTP Method:", trait.getMethod(), "URI:", trait.getUri(), previousText);
     }
