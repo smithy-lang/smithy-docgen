@@ -30,9 +30,13 @@ public final class HttpQueryInterceptor extends ProtocolTraitInterceptor<HttpQue
 
     @Override
     void write(DocWriter writer, String previousText, ProtocolSection section, HttpQueryTrait trait) {
+        var target = section.context().model().expectShape(section.shape().asMemberShape().get().getTarget());
         writer.putContext("param", trait.getValue());
+        writer.putContext("list", target.isListShape());
         writer.write("""
-                This is bound to the HTTP query parameter ${param:`}.
+                This is bound to the HTTP query parameter ${param:`}.${?list} Each element in \
+                the list is represented by its own key-value pair, each instance using the \
+                same key.${/list}
 
                 $L""", previousText);
     }
