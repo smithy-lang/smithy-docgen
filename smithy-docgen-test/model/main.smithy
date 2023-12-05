@@ -1,5 +1,10 @@
 $version: "2.0"
 
+metadata suppressions = [
+    {id: "UnstableTrait", namespace: "com.example", reason: "These are used for examples."}
+    {id: "DeprecatedTrait", namespace: "com.example", reason: "These are used for examples."}
+]
+
 namespace com.example
 
 use aws.protocols#awsJson1_0
@@ -27,6 +32,7 @@ service DocumentedService {
         OptionalAuthOperation
         LimitedAuthOperation
         LimitedOptionalAuthOperation
+        HttpTraits
     ]
     resources: [
         DocumentationResource
@@ -35,6 +41,59 @@ service DocumentedService {
         ClientError
         ServiceError
     ]
+}
+
+/// This operation showcases most of the various HTTP traits.
+@http(method: "POST", uri: "/HttpTraits/{label}/{greedyLabel+}?static", code: 200)
+@httpChecksumRequired
+operation HttpTraits {
+    input := {
+        /// This is a label member that's bound to a normal label.
+        @httpLabel
+        @required
+        label: String
+
+        /// This is a label member that's bound to a greedy label.
+        @httpLabel
+        @required
+        greedyLabel: String
+
+        /// This is a header member bound to a single static header.
+        @httpHeader("x-custom-header")
+        singletonHeader: String
+
+        /// This is a header member that's bound to a list.
+        @httpHeader("x-list-header")
+        listHeader: StringList
+
+        /// This is a header member that's bound to a map with a prefix.
+        @httpPrefixHeaders("prefix-")
+        prefixHeaders: DenseStringMap
+
+        /// This is a query param that's bound to a single param.
+        @httpQuery("singelton")
+        singletonQuery: String
+
+        /// This is a query param that's bound to a list.
+        @httpQuery("list")
+        listQuery: StringList
+
+        /// This is an open listing of all query params.
+        @httpQueryParams
+        mapQuery: StringMap
+
+        /// This is the operation's payload, only useable since everything
+        /// else is bound to some other part of the HTTP request.
+        @httpPayload
+        payload: Blob
+    }
+
+    output := {
+        /// This allows people to more easily interact with the http response
+        /// without having to leak the response object.
+        @httpResponseCode
+        responseCode: Integer
+    }
 }
 
 /// This operation does not support any of the service's auth types.
@@ -239,6 +298,12 @@ map StringMap {
     value: String
 }
 
+/// A map that disallows null values.
+map DenseStringMap {
+    key: String
+    value: String
+}
+
 /// This shows how the range trait is applied to various types.
 structure RangeTraitExamples {
     @range(min: 0)
@@ -280,6 +345,7 @@ blob SensitiveBlob
 
 @mixin
 @error("client")
+@httpError(400)
 structure ErrorMixin {
     /// The wire-level error identifier.
     code: String
@@ -293,6 +359,7 @@ structure ClientError with [ErrorMixin] {}
 
 /// This is an error that is the fault of the service.
 @error("server")
+@httpError(500)
 structure ServiceError with [ErrorMixin] {}
 
 /// This error is only returned by DocumentedOperation
