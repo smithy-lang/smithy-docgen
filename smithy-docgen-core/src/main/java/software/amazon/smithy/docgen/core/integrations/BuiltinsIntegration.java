@@ -23,6 +23,7 @@ import software.amazon.smithy.docgen.core.interceptors.HttpPayloadInterceptor;
 import software.amazon.smithy.docgen.core.interceptors.HttpPrefixHeadersInterceptor;
 import software.amazon.smithy.docgen.core.interceptors.HttpQueryInterceptor;
 import software.amazon.smithy.docgen.core.interceptors.HttpQueryParamsInterceptor;
+import software.amazon.smithy.docgen.core.interceptors.HttpResponseCodeInterceptor;
 import software.amazon.smithy.docgen.core.interceptors.IdempotencyInterceptor;
 import software.amazon.smithy.docgen.core.interceptors.InternalInterceptor;
 import software.amazon.smithy.docgen.core.interceptors.JsonNameInterceptor;
@@ -95,6 +96,7 @@ public class BuiltinsIntegration implements DocIntegration {
                 new XmlAttributeInterceptor(),
                 new XmlNameInterceptor(),
                 new XmlFlattenedInterceptor(),
+                new HttpResponseCodeInterceptor(),
                 new HttpPayloadInterceptor(),
                 new HttpErrorInterceptor(),
                 new HttpHeaderInterceptor(),
