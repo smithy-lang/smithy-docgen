@@ -7,6 +7,7 @@ package software.amazon.smithy.docgen.core.interceptors;
 
 import software.amazon.smithy.docgen.core.sections.ProtocolSection;
 import software.amazon.smithy.docgen.core.writers.DocWriter;
+import software.amazon.smithy.model.pattern.SmithyPattern.Segment;
 import software.amazon.smithy.model.shapes.ShapeId;
 import software.amazon.smithy.model.traits.HttpTrait;
 import software.amazon.smithy.utils.SmithyInternalApi;
@@ -31,6 +32,8 @@ public final class HttpInterceptor extends ProtocolTraitInterceptor<HttpTrait> {
     @Override
     void write(DocWriter writer, String previousText, ProtocolSection section, HttpTrait trait) {
         writer.putContext("hasLabels", !trait.getUri().getLabels().isEmpty());
+        writer.putContext("greedyLabel",
+                trait.getUri().getGreedyLabel().map(Segment::getContent));
         writer.write("""
                 $B $`
 
@@ -38,9 +41,11 @@ public final class HttpInterceptor extends ProtocolTraitInterceptor<HttpTrait> {
                 ${?hasLabels}
 
                 To resolve the path segment of the URI, replace any segments surrounded with
-                brackets with the URI-escaped value of the corresponding member.
+                brackets with the URI-escaped value of the corresponding member.${?greedyLabel} \
+                When escaping the value of the ${greedyLabel:`} segment, do not escape any \
+                backslashes ($`).${/greedyLabel}
                 ${/hasLabels}
 
-                $L""", "HTTP Method:", trait.getMethod(), "URI:", trait.getUri(), previousText);
+                $L""", "HTTP Method:", trait.getMethod(), "URI:", trait.getUri(), "/", previousText);
     }
 }
