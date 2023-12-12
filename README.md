@@ -124,6 +124,7 @@ which have default support.
 * [references](https://smithy.io/2.0/spec/resource-traits.html#smithy-api-references-trait)
 * [requestCompression](https://smithy.io/2.0/spec/behavior-traits.html#smithy-api-requestcompression-trait)
 * [retryable](https://smithy.io/2.0/spec/behavior-traits.html#smithy-api-retryable-trait)
+* [endpoint](https://smithy.io/2.0/spec/endpoint-traits.html)
 
 ## Security
 
