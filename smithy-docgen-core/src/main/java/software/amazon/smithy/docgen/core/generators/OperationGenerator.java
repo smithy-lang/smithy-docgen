@@ -21,7 +21,6 @@ import software.amazon.smithy.docgen.core.sections.ShapeSection;
 import software.amazon.smithy.docgen.core.sections.ShapeSubheadingSection;
 import software.amazon.smithy.docgen.core.writers.DocWriter;
 import software.amazon.smithy.docgen.core.writers.DocWriter.ListType;
-import software.amazon.smithy.model.node.Node;
 import software.amazon.smithy.model.shapes.OperationShape;
 import software.amazon.smithy.model.shapes.ServiceShape;
 import software.amazon.smithy.model.traits.ExamplesTrait;
@@ -168,17 +167,11 @@ public final class OperationGenerator
             example.getDocumentation().ifPresent(writer::writeCommonMark);
 
             writer.openTabGroup();
-            // TODO: create example writer interface allow integrations to register them
-
-            // This is just a dummy placehodler tab here to exercise tab creation before
-            // there's an interface for it.
-            writer.openCodeTab("Input", "json");
-            writer.write(Node.prettyPrintJson(example.getInput()));
-            writer.closeCodeTab();
-            writer.openCodeTab("Output", "json");
-            writer.write(Node.prettyPrintJson(example.getOutput().orElse(Node.objectNode())));
-            writer.closeCodeTab();
-
+            for (var snippetGenerator : context.snippetGenerators()) {
+                writer.openCodeTab(snippetGenerator.tabTitle(), snippetGenerator.language());
+                writer.write(snippetGenerator.generateExampleSnippet(operation, example));
+                writer.closeCodeTab();
+            }
             writer.closeTabGroup();
 
             writer.closeHeading();
