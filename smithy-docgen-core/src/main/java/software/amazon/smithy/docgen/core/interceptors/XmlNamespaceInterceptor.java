@@ -7,7 +7,7 @@ package software.amazon.smithy.docgen.core.interceptors;
 
 import software.amazon.smithy.docgen.core.sections.ProtocolSection;
 import software.amazon.smithy.docgen.core.writers.DocWriter;
-import software.amazon.smithy.docgen.core.writers.DocWriter.AdmonitionType;
+import software.amazon.smithy.docgen.core.writers.DocWriter.NoticeType;
 import software.amazon.smithy.model.shapes.ShapeId;
 import software.amazon.smithy.model.traits.XmlNamespaceTrait;
 import software.amazon.smithy.utils.SmithyInternalApi;
@@ -37,7 +37,7 @@ public final class XmlNamespaceInterceptor extends ProtocolTraitInterceptor<XmlN
             namespace += ":" + trait.getPrefix().get();
         }
         namespace += "=\"" + trait.getUri() + "\"";
-        writer.openAdmonition(AdmonitionType.IMPORTANT);
+        writer.openAdmonition(NoticeType.IMPORTANT);
         writer.write("""
                 This tag must contain the following XML namespace $`
                 """, namespace);

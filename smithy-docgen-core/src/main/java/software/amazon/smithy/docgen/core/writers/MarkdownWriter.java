@@ -215,17 +215,17 @@ public class MarkdownWriter extends DocWriter {
     }
 
     @Override
-    public DocWriter openAdmonition(AdmonitionType type, Consumer<DocWriter> titleWriter) {
+    public DocWriter openAdmonition(NoticeType type, Consumer<DocWriter> titleWriter) {
         return writeInline("**$C:** ", titleWriter);
     }
 
     @Override
-    public DocWriter openAdmonition(AdmonitionType type) {
+    public DocWriter openAdmonition(NoticeType type) {
         return writeInline("**$L:** ", getAdmonitionName(type));
     }
 
-    private String getAdmonitionName(AdmonitionType type) {
-        if (type.equals(AdmonitionType.SEE_ALSO)) {
+    private String getAdmonitionName(NoticeType type) {
+        if (type.equals(NoticeType.INFO)) {
             return "See Also";
         }
         return type.toString();
@@ -234,5 +234,10 @@ public class MarkdownWriter extends DocWriter {
     @Override
     public DocWriter closeAdmonition() {
         return this;
+    }
+
+    @Override
+    public DocWriter writeBadge(NoticeType type, String text) {
+        return writeInline("`$L`", text);
     }
 }

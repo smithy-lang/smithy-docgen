@@ -7,7 +7,7 @@ package software.amazon.smithy.docgen.core.interceptors;
 
 import software.amazon.smithy.docgen.core.sections.ShapeSubheadingSection;
 import software.amazon.smithy.docgen.core.writers.DocWriter;
-import software.amazon.smithy.docgen.core.writers.DocWriter.AdmonitionType;
+import software.amazon.smithy.docgen.core.writers.DocWriter.NoticeType;
 import software.amazon.smithy.model.traits.SensitiveTrait;
 import software.amazon.smithy.utils.CodeInterceptor;
 import software.amazon.smithy.utils.SmithyInternalApi;
@@ -31,7 +31,7 @@ public final class SensitiveInterceptor implements CodeInterceptor<ShapeSubheadi
 
     @Override
     public void write(DocWriter writer, String previousText, ShapeSubheadingSection section) {
-        writer.openAdmonition(AdmonitionType.DANGER);
+        writer.openAdmonition(NoticeType.DANGER);
         writer.write("""
                 The data this contains is sensitive and MUST be handled with care. \
                 It MUST NOT be exposed in things like exception messages or log \

@@ -9,7 +9,7 @@ import java.util.Optional;
 import software.amazon.smithy.codegen.core.SymbolReference;
 import software.amazon.smithy.docgen.core.sections.ShapeDetailsSection;
 import software.amazon.smithy.docgen.core.writers.DocWriter;
-import software.amazon.smithy.docgen.core.writers.DocWriter.AdmonitionType;
+import software.amazon.smithy.docgen.core.writers.DocWriter.NoticeType;
 import software.amazon.smithy.model.Model;
 import software.amazon.smithy.model.knowledge.OperationIndex;
 import software.amazon.smithy.model.shapes.MemberShape;
@@ -75,7 +75,7 @@ public final class IdempotencyInterceptor implements CodeInterceptor<ShapeDetail
     @Override
     public void write(DocWriter writer, String previousText, ShapeDetailsSection section) {
         if (section.shape().isMemberShape()) {
-            writer.openAdmonition(AdmonitionType.NOTE);
+            writer.openAdmonition(NoticeType.NOTE);
             writer.write("""
                     This value will be used by the service to ensure the request is $R. \
                     Clients SHOULD automatically populate this (typically with a $R) if \
@@ -95,7 +95,7 @@ public final class IdempotencyInterceptor implements CodeInterceptor<ShapeDetail
                         .symbol(symbol)
                         .build());
         writer.putContext("token", idempotencyToken);
-        writer.openAdmonition(AdmonitionType.NOTE);
+        writer.openAdmonition(NoticeType.NOTE);
         writer.write("""
                 This operation is $R${?token} when the ${token:R} is set${/token}.
 

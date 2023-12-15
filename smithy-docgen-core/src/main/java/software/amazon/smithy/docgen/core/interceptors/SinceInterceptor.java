@@ -7,7 +7,7 @@ package software.amazon.smithy.docgen.core.interceptors;
 
 import software.amazon.smithy.docgen.core.sections.ShapeSubheadingSection;
 import software.amazon.smithy.docgen.core.writers.DocWriter;
-import software.amazon.smithy.docgen.core.writers.DocWriter.AdmonitionType;
+import software.amazon.smithy.docgen.core.writers.DocWriter.NoticeType;
 import software.amazon.smithy.model.traits.SinceTrait;
 import software.amazon.smithy.utils.CodeInterceptor;
 import software.amazon.smithy.utils.SmithyInternalApi;
@@ -32,7 +32,7 @@ public final class SinceInterceptor  implements CodeInterceptor<ShapeSubheadingS
     @Override
     public void write(DocWriter writer, String previousText, ShapeSubheadingSection section) {
         var trait = section.shape().getMemberTrait(section.context().model(), SinceTrait.class).get();
-        writer.openAdmonition(AdmonitionType.NOTE);
+        writer.openAdmonition(NoticeType.NOTE);
         writer.write("New in version $L.", trait.getValue());
         writer.closeAdmonition();
         writer.writeWithNoFormatting(previousText);

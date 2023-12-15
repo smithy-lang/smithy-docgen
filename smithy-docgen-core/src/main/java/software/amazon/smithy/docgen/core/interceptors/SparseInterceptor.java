@@ -8,7 +8,7 @@ package software.amazon.smithy.docgen.core.interceptors;
 import java.util.Locale;
 import software.amazon.smithy.docgen.core.sections.ShapeDetailsSection;
 import software.amazon.smithy.docgen.core.writers.DocWriter;
-import software.amazon.smithy.docgen.core.writers.DocWriter.AdmonitionType;
+import software.amazon.smithy.docgen.core.writers.DocWriter.NoticeType;
 import software.amazon.smithy.model.traits.SparseTrait;
 import software.amazon.smithy.utils.CodeInterceptor;
 import software.amazon.smithy.utils.SmithyInternalApi;
@@ -36,7 +36,7 @@ public final class SparseInterceptor implements CodeInterceptor<ShapeDetailsSect
                 ? section.context().model().expectShape(section.shape().asMemberShape().get().getTarget())
                 : section.shape();
         writer.writeWithNoFormatting(previousText);
-        writer.openAdmonition(AdmonitionType.NOTE);
+        writer.openAdmonition(NoticeType.NOTE);
         writer.write("This $L may contain null values.", target.getType().toString().toLowerCase(Locale.ENGLISH));
         writer.closeAdmonition();
     }
