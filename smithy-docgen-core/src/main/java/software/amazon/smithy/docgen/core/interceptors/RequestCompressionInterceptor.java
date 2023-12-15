@@ -8,7 +8,7 @@ package software.amazon.smithy.docgen.core.interceptors;
 import java.util.Optional;
 import software.amazon.smithy.docgen.core.sections.ShapeDetailsSection;
 import software.amazon.smithy.docgen.core.writers.DocWriter;
-import software.amazon.smithy.docgen.core.writers.DocWriter.AdmonitionType;
+import software.amazon.smithy.docgen.core.writers.DocWriter.NoticeType;
 import software.amazon.smithy.model.traits.RequestCompressionTrait;
 import software.amazon.smithy.utils.CodeInterceptor;
 import software.amazon.smithy.utils.SmithyInternalApi;
@@ -33,7 +33,7 @@ public final class RequestCompressionInterceptor implements CodeInterceptor<Shap
     @Override
     public void write(DocWriter writer, String previousText, ShapeDetailsSection section) {
         var trait = section.shape().expectTrait(RequestCompressionTrait.class);
-        writer.openAdmonition(AdmonitionType.IMPORTANT);
+        writer.openAdmonition(NoticeType.IMPORTANT);
 
         // Have particular support for single-element lists.
         writer.putContext("encoding", trait.getEncodings().size() == 1

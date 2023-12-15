@@ -97,7 +97,8 @@ public final class SphinxIntegration implements DocIntegration {
             "Sphinx==7.2.6",
             "sphinx_inline_tabs==2023.4.21",
             "sphinx-copybutton==0.5.2",
-            "Pygments==2.16.1"
+            "Pygments==2.16.1",
+            "sphinx-design==0.5.0"
     );
     private static final List<String> FURO_REQUIREMENTS = List.of("furo==2023.9.10");
     private static final List<String> MARKDOWN_REQUIREMENTS = List.of(
@@ -107,7 +108,8 @@ public final class SphinxIntegration implements DocIntegration {
 
     private static final List<String> BASE_EXTENSIONS = List.of(
             "sphinx_inline_tabs",
-            "sphinx_copybutton"
+            "sphinx_copybutton",
+            "sphinx_design"
     );
     private static final List<String> MARKDOWN_EXTENSIONS = List.of(
             "myst_parser"

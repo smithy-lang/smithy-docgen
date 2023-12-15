@@ -7,6 +7,7 @@ package software.amazon.smithy.docgen.core.interceptors;
 
 import software.amazon.smithy.docgen.core.sections.ShapeSubheadingSection;
 import software.amazon.smithy.docgen.core.writers.DocWriter;
+import software.amazon.smithy.docgen.core.writers.DocWriter.NoticeType;
 import software.amazon.smithy.model.knowledge.NullableIndex;
 import software.amazon.smithy.model.knowledge.NullableIndex.CheckMode;
 import software.amazon.smithy.utils.CodeInterceptor;
@@ -36,9 +37,7 @@ public final class NullabilityInterceptor implements CodeInterceptor<ShapeSubhea
 
     @Override
     public void write(DocWriter writer, String previousText, ShapeSubheadingSection section) {
-        writer.write("""
-                $B
-
-                $L""", "REQUIRED", previousText);
+        writer.writeBadge(NoticeType.WARNING, "REQUIRED")
+                .write("\n\n$L", previousText);
     }
 }

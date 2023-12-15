@@ -96,7 +96,7 @@ public final class SphinxMarkdownWriter extends MarkdownWriter {
     }
 
     @Override
-    public DocWriter openAdmonition(AdmonitionType type, Consumer<DocWriter> titleWriter) {
+    public DocWriter openAdmonition(NoticeType type, Consumer<DocWriter> titleWriter) {
         return write("""
                 :::{admonition} $C
                 :class: $L
@@ -105,12 +105,12 @@ public final class SphinxMarkdownWriter extends MarkdownWriter {
     }
 
     @Override
-    public DocWriter openAdmonition(AdmonitionType type) {
+    public DocWriter openAdmonition(NoticeType type) {
         return write(":::{$L}", getAdmonitionName(type));
     }
 
-    private String getAdmonitionName(AdmonitionType type) {
-        if (type.equals(AdmonitionType.SEE_ALSO)) {
+    private String getAdmonitionName(NoticeType type) {
+        if (type.equals(NoticeType.INFO)) {
             return "seealso";
         }
         return type.toString().toLowerCase(Locale.ENGLISH);
@@ -120,5 +120,18 @@ public final class SphinxMarkdownWriter extends MarkdownWriter {
     public DocWriter closeAdmonition() {
         write(":::");
         return this;
+    }
+
+    @Override
+    public DocWriter writeBadge(NoticeType type, String text) {
+        switch (type) {
+            case NOTE -> writeInline("{bdg-primary}");
+            case IMPORTANT -> writeInline("{bdg-success}");
+            case WARNING -> writeInline("{bdg-warning}");
+            case DANGER -> writeInline("{bdg-danger}");
+            case INFO -> writeInline("{bdg-info}");
+            default -> writeInline("{bdg}");
+        }
+        return writeInline("`$L`", text);
     }
 }

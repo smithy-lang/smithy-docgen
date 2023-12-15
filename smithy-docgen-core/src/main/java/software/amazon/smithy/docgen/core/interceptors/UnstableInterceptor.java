@@ -7,7 +7,7 @@ package software.amazon.smithy.docgen.core.interceptors;
 
 import software.amazon.smithy.docgen.core.sections.ShapeSubheadingSection;
 import software.amazon.smithy.docgen.core.writers.DocWriter;
-import software.amazon.smithy.docgen.core.writers.DocWriter.AdmonitionType;
+import software.amazon.smithy.docgen.core.writers.DocWriter.NoticeType;
 import software.amazon.smithy.model.traits.UnstableTrait;
 import software.amazon.smithy.utils.CodeInterceptor;
 import software.amazon.smithy.utils.SmithyInternalApi;
@@ -30,7 +30,7 @@ public final class UnstableInterceptor implements CodeInterceptor<ShapeSubheadin
 
     @Override
     public void write(DocWriter writer, String previousText, ShapeSubheadingSection section) {
-        writer.openAdmonition(AdmonitionType.WARNING);
+        writer.openAdmonition(NoticeType.WARNING);
         writer.write("This is unstable or experimental and MAY change in the future.");
         writer.closeAdmonition();
         writer.writeWithNoFormatting(previousText);

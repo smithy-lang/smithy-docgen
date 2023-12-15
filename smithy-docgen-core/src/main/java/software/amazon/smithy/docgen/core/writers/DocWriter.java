@@ -407,7 +407,7 @@ public abstract class DocWriter extends SymbolWriter<DocWriter, DocImportContain
      * @param titleWriter A consumer that writes out the title.
      * @return returns the writer.
      */
-    public abstract DocWriter openAdmonition(AdmonitionType type, Consumer<DocWriter> titleWriter);
+    public abstract DocWriter openAdmonition(NoticeType type, Consumer<DocWriter> titleWriter);
 
     /**
      * Opens an admonition with a default title.
@@ -419,7 +419,7 @@ public abstract class DocWriter extends SymbolWriter<DocWriter, DocImportContain
      * @param type The type of admonition to open.
      * @return returns the writer.
      */
-    public abstract DocWriter openAdmonition(AdmonitionType type);
+    public abstract DocWriter openAdmonition(NoticeType type);
 
     /**
      * Closes the body of an admonition.
@@ -429,30 +429,46 @@ public abstract class DocWriter extends SymbolWriter<DocWriter, DocImportContain
     public abstract DocWriter closeAdmonition();
 
     /**
+     * Writes text as a badge.
+     *
+     * <p>Implementations SHOULD write inline.
+     *
+     * <p>A badge in this context means text enclosed in a color-coded rectangular
+     * shape. The color should be based on the given type.
+     *
+     * @param type The notice type of the badge that determines styling.
+     * @param text The text to put in the badge.
+     * @return returns the writer.
+     */
+    public abstract DocWriter writeBadge(NoticeType type, String text);
+
+    /**
      * The type of admonition.
      *
      * <p>This affects the default title of the admonition, as well as styling.
      */
-    public enum AdmonitionType {
+    @SmithyUnstableApi
+    public enum NoticeType {
         /**
-         * An admonition that adds context without any strong severity.
+         * An notice that adds context without any strong severity.
          */
         NOTE,
 
         /**
-         * An admonition that adds context which is important, but not severely so.
+         * An notice that adds context which is important, but not severely so.
          */
         IMPORTANT,
 
         /**
-         * An admonition that adds context with strong severity.
+         * A notice that adds context with strong severity.
          *
-         * <p>This might be used by deprecation notices, for example.
+         * <p>This might be used by deprecation notices or required badges, for
+         * example.
          */
         WARNING,
 
         /**
-         * An admonition that adds context with extreme severity.
+         * A notice that adds context with extreme severity.
          *
          * <p>This might be used to add information about security-related concerns,
          * such as sensitive shapes and members.
@@ -460,8 +476,8 @@ public abstract class DocWriter extends SymbolWriter<DocWriter, DocImportContain
         DANGER,
 
         /**
-         * An admonition that refers to external context.
+         * A notice that refers to external context or highlights information.
          */
-        SEE_ALSO
+        INFO
     }
 }

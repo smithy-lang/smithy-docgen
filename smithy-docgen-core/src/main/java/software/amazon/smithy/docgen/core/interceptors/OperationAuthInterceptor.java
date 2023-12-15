@@ -9,7 +9,7 @@ import java.util.List;
 import software.amazon.smithy.docgen.core.DocgenUtils;
 import software.amazon.smithy.docgen.core.sections.ShapeDetailsSection;
 import software.amazon.smithy.docgen.core.writers.DocWriter;
-import software.amazon.smithy.docgen.core.writers.DocWriter.AdmonitionType;
+import software.amazon.smithy.docgen.core.writers.DocWriter.NoticeType;
 import software.amazon.smithy.model.knowledge.ServiceIndex;
 import software.amazon.smithy.model.knowledge.ServiceIndex.AuthSchemeMode;
 import software.amazon.smithy.model.shapes.ToShapeId;
@@ -51,7 +51,7 @@ public final class OperationAuthInterceptor implements CodeInterceptor<ShapeDeta
     @Override
     public void write(DocWriter writer, String previousText, ShapeDetailsSection section) {
         writer.writeWithNoFormatting(previousText);
-        writer.openAdmonition(AdmonitionType.IMPORTANT);
+        writer.openAdmonition(NoticeType.IMPORTANT);
 
         var index = ServiceIndex.of(section.context().model());
         var service = section.context().settings().service();

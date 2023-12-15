@@ -9,7 +9,7 @@ import java.util.Optional;
 import software.amazon.smithy.codegen.core.SymbolReference;
 import software.amazon.smithy.docgen.core.DocGenerationContext;
 import software.amazon.smithy.docgen.core.writers.DocWriter;
-import software.amazon.smithy.docgen.core.writers.DocWriter.AdmonitionType;
+import software.amazon.smithy.docgen.core.writers.DocWriter.NoticeType;
 import software.amazon.smithy.model.knowledge.BottomUpIndex;
 import software.amazon.smithy.model.shapes.ResourceShape;
 import software.amazon.smithy.model.shapes.Shape;
@@ -52,7 +52,7 @@ abstract class NoReplaceInterceptor<S extends CodeSection> implements CodeInterc
                 .map(symbol -> SymbolReference.builder().alias("update lifecycle operation").symbol(symbol).build());
         writer.putContext("update", updateSymbolReference);
         writer.writeWithNoFormatting(previousText);
-        writer.openAdmonition(AdmonitionType.NOTE);
+        writer.openAdmonition(NoticeType.NOTE);
         writer.write("""
                 This operation cannot be used to update the $1R.\
                 ${?update} To update the $1R, use the ${update:R}.${/update}""",

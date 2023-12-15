@@ -7,6 +7,7 @@ package software.amazon.smithy.docgen.core.interceptors;
 
 import software.amazon.smithy.docgen.core.sections.ShapeSubheadingSection;
 import software.amazon.smithy.docgen.core.writers.DocWriter;
+import software.amazon.smithy.docgen.core.writers.DocWriter.NoticeType;
 import software.amazon.smithy.model.traits.RecommendedTrait;
 import software.amazon.smithy.utils.CodeInterceptor;
 import software.amazon.smithy.utils.SmithyInternalApi;
@@ -32,9 +33,10 @@ public final class RecommendedInterceptor  implements CodeInterceptor<ShapeSubhe
     public void write(DocWriter writer, String previousText, ShapeSubheadingSection section) {
         var trait = section.shape().expectTrait(RecommendedTrait.class);
         writer.putContext("reason", trait.getReason());
+        writer.writeBadge(NoticeType.IMPORTANT, "RECOMMENDED");
         writer.write("""
-                $B${?reason}: ${reason:L}${/reason}
+                ${?reason} ${reason:L}${/reason}
 
-                $L""", "RECOMMENDED", previousText);
+                $L""", previousText);
     }
 }

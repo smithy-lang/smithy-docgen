@@ -8,7 +8,7 @@ package software.amazon.smithy.docgen.core.interceptors;
 import software.amazon.smithy.codegen.core.SymbolReference;
 import software.amazon.smithy.docgen.core.sections.ShapeDetailsSection;
 import software.amazon.smithy.docgen.core.writers.DocWriter;
-import software.amazon.smithy.docgen.core.writers.DocWriter.AdmonitionType;
+import software.amazon.smithy.docgen.core.writers.DocWriter.NoticeType;
 import software.amazon.smithy.model.knowledge.PaginatedIndex;
 import software.amazon.smithy.model.traits.PaginatedTrait;
 import software.amazon.smithy.utils.CodeInterceptor;
@@ -46,7 +46,7 @@ public final class PaginationInterceptor implements CodeInterceptor<ShapeDetails
                 .alias("output token")
                 .build());
 
-        writer.openAdmonition(AdmonitionType.IMPORTANT);
+        writer.openAdmonition(NoticeType.IMPORTANT);
         writer.write("""
                 This operation returns partial results in pages${?size}, whose maximum size may be
                 configured with ${size:R}${/size}. Each request may return an ${outputToken:R} that \

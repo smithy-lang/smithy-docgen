@@ -7,7 +7,7 @@ package software.amazon.smithy.docgen.core.interceptors;
 
 import software.amazon.smithy.docgen.core.sections.ShapeSubheadingSection;
 import software.amazon.smithy.docgen.core.writers.DocWriter;
-import software.amazon.smithy.docgen.core.writers.DocWriter.AdmonitionType;
+import software.amazon.smithy.docgen.core.writers.DocWriter.NoticeType;
 import software.amazon.smithy.model.traits.DeprecatedTrait;
 import software.amazon.smithy.utils.CodeInterceptor;
 import software.amazon.smithy.utils.SmithyInternalApi;
@@ -31,7 +31,7 @@ public final class DeprecatedInterceptor implements CodeInterceptor<ShapeSubhead
     public void write(DocWriter writer, String previousText, ShapeSubheadingSection section) {
         var trait = section.shape().getMemberTrait(section.context().model(), DeprecatedTrait.class).get();
         writer.putContext("since", trait.getSince());
-        writer.openAdmonition(AdmonitionType.WARNING, w -> {
+        writer.openAdmonition(NoticeType.WARNING, w -> {
             w.write("Deprecated${?since} since ${since:L}${/since}");
         });
         writer.putContext("message", trait.getMessage());

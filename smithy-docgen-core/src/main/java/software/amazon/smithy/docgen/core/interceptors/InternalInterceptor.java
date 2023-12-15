@@ -8,7 +8,7 @@ package software.amazon.smithy.docgen.core.interceptors;
 import java.util.logging.Logger;
 import software.amazon.smithy.docgen.core.sections.ShapeSubheadingSection;
 import software.amazon.smithy.docgen.core.writers.DocWriter;
-import software.amazon.smithy.docgen.core.writers.DocWriter.AdmonitionType;
+import software.amazon.smithy.docgen.core.writers.DocWriter.NoticeType;
 import software.amazon.smithy.model.traits.InternalTrait;
 import software.amazon.smithy.utils.CodeInterceptor;
 import software.amazon.smithy.utils.SmithyInternalApi;
@@ -41,7 +41,7 @@ public final class InternalInterceptor implements CodeInterceptor<ShapeSubheadin
                 to filter out internal shapes: \
                 https://smithy.io/2.0/guides/building-models/build-config.html#excludeshapesbytrait""",
                 section.shape().getId()));
-        writer.openAdmonition(AdmonitionType.DANGER);
+        writer.openAdmonition(NoticeType.DANGER);
         writer.write("This is part of the internal API not available to external customers.");
         writer.closeAdmonition();
         writer.writeWithNoFormatting(previousText);

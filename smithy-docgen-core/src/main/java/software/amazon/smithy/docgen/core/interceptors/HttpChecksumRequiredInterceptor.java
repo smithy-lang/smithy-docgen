@@ -7,7 +7,7 @@ package software.amazon.smithy.docgen.core.interceptors;
 
 import software.amazon.smithy.docgen.core.sections.ProtocolSection;
 import software.amazon.smithy.docgen.core.writers.DocWriter;
-import software.amazon.smithy.docgen.core.writers.DocWriter.AdmonitionType;
+import software.amazon.smithy.docgen.core.writers.DocWriter.NoticeType;
 import software.amazon.smithy.model.shapes.ShapeId;
 import software.amazon.smithy.model.traits.HttpChecksumRequiredTrait;
 import software.amazon.smithy.utils.Pair;
@@ -37,7 +37,7 @@ public final class HttpChecksumRequiredInterceptor extends ProtocolTraitIntercep
     @Override
     void write(DocWriter writer, String previousText, ProtocolSection section, HttpChecksumRequiredTrait trait) {
         writer.writeWithNoFormatting(previousText + "\n");
-        writer.openAdmonition(AdmonitionType.IMPORTANT);
+        writer.openAdmonition(NoticeType.IMPORTANT);
         writer.write("This operation REQUIRES a checksum, such as $R.", CONTENT_MD5);
         writer.closeAdmonition();
     }

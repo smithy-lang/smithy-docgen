@@ -7,7 +7,7 @@ package software.amazon.smithy.docgen.core.interceptors;
 
 import software.amazon.smithy.docgen.core.sections.ShapeDetailsSection;
 import software.amazon.smithy.docgen.core.writers.DocWriter;
-import software.amazon.smithy.docgen.core.writers.DocWriter.AdmonitionType;
+import software.amazon.smithy.docgen.core.writers.DocWriter.NoticeType;
 import software.amazon.smithy.model.traits.ExternalDocumentationTrait;
 import software.amazon.smithy.utils.CodeInterceptor;
 import software.amazon.smithy.utils.Pair;
@@ -31,7 +31,7 @@ public final class ExternalDocsInterceptor implements CodeInterceptor<ShapeDetai
     @Override
     public void write(DocWriter writer, String previousText, ShapeDetailsSection section) {
         var trait = section.shape().getMemberTrait(section.context().model(), ExternalDocumentationTrait.class).get();
-        writer.openAdmonition(AdmonitionType.SEE_ALSO);
+        writer.openAdmonition(NoticeType.INFO);
         trait.getUrls().entrySet().stream()
                 .map(entry -> Pair.of(entry.getKey(), entry.getValue()))
                 .forEach(pair -> writer.write("$R\n", pair));
