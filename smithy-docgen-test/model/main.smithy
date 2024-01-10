@@ -359,7 +359,7 @@ operation BehaviorTraits with [AllAuth] {
 }
 
 /// An error that's explicitly retryable.
-@retryable
+@retryable(throttling: true)
 @error("server")
 @httpError(500)
 structure RetryableError with [ErrorMixin] {}
