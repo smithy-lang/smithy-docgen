@@ -38,6 +38,7 @@ import software.amazon.smithy.docgen.core.interceptors.PatternInterceptor;
 import software.amazon.smithy.docgen.core.interceptors.RangeInterceptor;
 import software.amazon.smithy.docgen.core.interceptors.RecommendedInterceptor;
 import software.amazon.smithy.docgen.core.interceptors.RequestCompressionInterceptor;
+import software.amazon.smithy.docgen.core.interceptors.RetryableInterceptor;
 import software.amazon.smithy.docgen.core.interceptors.SensitiveInterceptor;
 import software.amazon.smithy.docgen.core.interceptors.SinceInterceptor;
 import software.amazon.smithy.docgen.core.interceptors.SparseInterceptor;
@@ -119,6 +120,7 @@ public class BuiltinsIntegration implements DocIntegration {
                 new ExternalDocsInterceptor(),
                 new IdempotencyInterceptor(),
                 new ErrorFaultInterceptor(),
+                new RetryableInterceptor(),
                 new DefaultValueInterceptor(),
                 new SinceInterceptor(),
                 new InternalInterceptor(),
