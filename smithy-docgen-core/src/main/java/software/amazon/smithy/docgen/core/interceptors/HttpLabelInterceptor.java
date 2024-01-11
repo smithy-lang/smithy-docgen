@@ -5,12 +5,9 @@
 
 package software.amazon.smithy.docgen.core.interceptors;
 
-import java.util.Optional;
-import software.amazon.smithy.docgen.core.DocGenerationContext;
 import software.amazon.smithy.docgen.core.sections.ProtocolSection;
 import software.amazon.smithy.docgen.core.writers.DocWriter;
-import software.amazon.smithy.model.shapes.OperationShape;
-import software.amazon.smithy.model.shapes.Shape;
+import software.amazon.smithy.model.knowledge.OperationIndex;
 import software.amazon.smithy.model.shapes.ShapeId;
 import software.amazon.smithy.model.traits.HttpLabelTrait;
 import software.amazon.smithy.model.traits.HttpTrait;
@@ -34,8 +31,17 @@ public final class HttpLabelInterceptor extends ProtocolTraitInterceptor<HttpLab
     }
 
     @Override
+    public boolean isIntercepted(ProtocolSection section) {
+        // It's possible to use this trait somewhere where it has no meaning, but we don't
+        // want to document in those cases.
+        var index = OperationIndex.of(section.context().model());
+        return index.isInputStructure(section.shape().getId().withoutMember()) && super.isIntercepted(section);
+    }
+
+    @Override
     void write(DocWriter writer, String previousText, ProtocolSection section, HttpLabelTrait trait) {
-        writer.putContext("greedy", getOperation(section.context(), section.shape())
+        var index = OperationIndex.of(section.context().model());
+        writer.putContext("greedy", index.getInputBindings(section.shape()).stream().findFirst()
                 .map(operation -> operation.expectTrait(HttpTrait.class))
                 .flatMap(httpTrait -> httpTrait.getUri().getGreedyLabel())
                 .map(segment -> segment.getContent().equals(section.shape().getId().getName()))
@@ -49,15 +55,5 @@ public final class HttpLabelInterceptor extends ProtocolTraitInterceptor<HttpLab
                 ${/greedy}
 
                 $L""", segment, "/", previousText);
-    }
-
-    private Optional<OperationShape> getOperation(DocGenerationContext context, Shape shape) {
-        var member = shape.asMemberShape().get();
-        for (var operation : context.model().getOperationShapes()) {
-            if (operation.getInputShape().equals(member.getContainer())) {
-                return Optional.of(operation);
-            }
-        }
-        return Optional.empty();
     }
 }
