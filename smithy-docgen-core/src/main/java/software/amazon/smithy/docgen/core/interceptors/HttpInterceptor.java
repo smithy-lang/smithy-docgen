@@ -41,7 +41,7 @@ public final class HttpInterceptor extends ProtocolTraitInterceptor<HttpTrait> {
                 ${?hasLabels}
 
                 To resolve the path segment of the URI, replace any segments surrounded with
-                brackets with the URI-escaped value of the corresponding member.${?greedyLabel} \
+                braces with the URI-escaped value of the corresponding member.${?greedyLabel} \
                 When escaping the value of the ${greedyLabel:`} segment, do not escape any \
                 backslashes ($`).${/greedyLabel}
                 ${/hasLabels}
