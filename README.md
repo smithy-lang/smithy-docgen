@@ -122,7 +122,6 @@ which have default support.
   needed to make this feasible. Protocols will need to implement this also.
 * [mediaType](https://smithy.io/2.0/spec/protocol-traits.html#smithy-api-mediatype-trait)
 * [references](https://smithy.io/2.0/spec/resource-traits.html#smithy-api-references-trait)
-* [endpoint](https://smithy.io/2.0/spec/endpoint-traits.html)
 
 ## Security
 
