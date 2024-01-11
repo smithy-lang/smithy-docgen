@@ -13,8 +13,10 @@ import software.amazon.smithy.docgen.core.DocSettings;
 import software.amazon.smithy.docgen.core.interceptors.ApiKeyAuthInterceptor;
 import software.amazon.smithy.docgen.core.interceptors.DefaultValueInterceptor;
 import software.amazon.smithy.docgen.core.interceptors.DeprecatedInterceptor;
+import software.amazon.smithy.docgen.core.interceptors.EndpointInterceptor;
 import software.amazon.smithy.docgen.core.interceptors.ErrorFaultInterceptor;
 import software.amazon.smithy.docgen.core.interceptors.ExternalDocsInterceptor;
+import software.amazon.smithy.docgen.core.interceptors.HostLabelInterceptor;
 import software.amazon.smithy.docgen.core.interceptors.HttpChecksumRequiredInterceptor;
 import software.amazon.smithy.docgen.core.interceptors.HttpErrorInterceptor;
 import software.amazon.smithy.docgen.core.interceptors.HttpHeaderInterceptor;
@@ -106,6 +108,8 @@ public class BuiltinsIntegration implements DocIntegration {
                 new HttpPrefixHeadersInterceptor(),
                 new HttpQueryParamsInterceptor(),
                 new HttpQueryInterceptor(),
+                new HostLabelInterceptor(),
+                new EndpointInterceptor(),
                 new HttpLabelInterceptor(),
                 new HttpInterceptor(),
                 new PaginationInterceptor(),
