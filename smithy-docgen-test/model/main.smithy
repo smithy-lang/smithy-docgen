@@ -407,7 +407,7 @@ operation LimitedAuth {}
 operation LimitedOptionalAuth {}
 
 /// This operation showcases the various
-/// [serialization and protocol traits](https://smithy.io/2.0/spec/behavior-traits.html).
+/// [serialization and protocol traits](https://smithy.io/2.0/spec/protocol-traits.html).
 @http(method: "POST", uri: "/ProtocolTraits")
 operation ProtocolTraits with [AllAuth] {
     input := {
@@ -415,7 +415,7 @@ operation ProtocolTraits with [AllAuth] {
         @jsonName("spam")
         jsonName: String
 
-        /// This targets a shape with a media type. This trait is currently unuspported.
+        /// This targets a shape with a media type.
         mediaType: VideoData
 
         /// This is a timestamp with a custom format.

@@ -31,6 +31,7 @@ import software.amazon.smithy.docgen.core.interceptors.IdempotencyInterceptor;
 import software.amazon.smithy.docgen.core.interceptors.InternalInterceptor;
 import software.amazon.smithy.docgen.core.interceptors.JsonNameInterceptor;
 import software.amazon.smithy.docgen.core.interceptors.LengthInterceptor;
+import software.amazon.smithy.docgen.core.interceptors.MediaTypeInterceptor;
 import software.amazon.smithy.docgen.core.interceptors.NoReplaceBindingInterceptor;
 import software.amazon.smithy.docgen.core.interceptors.NoReplaceOperationInterceptor;
 import software.amazon.smithy.docgen.core.interceptors.NullabilityInterceptor;
@@ -92,6 +93,7 @@ public class BuiltinsIntegration implements DocIntegration {
         // the ones at the end will be at the top of the rendered pages. Therefore, interceptors
         // that provide more critical information should appear at the bottom of this list.
         return List.of(
+                new MediaTypeInterceptor(),
                 new OperationAuthInterceptor(),
                 new ApiKeyAuthInterceptor(),
                 new TimestampFormatInterceptor(),
