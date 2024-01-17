@@ -6,7 +6,36 @@ Smithy build plugin to generate API documentation from models authored in
 NOTE: this project is currently in a pre-release state. Interfaces and output
 formatting may change before full release.
 
-### Supported Formats
+### Configuration
+
+This generator supports the following top-level configuration options:
+
+* `service` - The shape ID of the service to generate documentation for.
+* `format` - The format that the documentation should be generated in.
+* `references` - A map of resource shape ID to URL for resources referenced by
+  the [references trait](https://smithy.io/2.0/spec/resource-traits.html#references-trait)
+  that aren't included in service.
+
+```json
+{
+    "version": "1.0",
+    "projections": {
+        "plain-markdown": {
+            "plugins": {
+                "docgen": {
+                    "service": "com.example#MyService",
+                    "format": "markdown",
+                    "references": {
+                        "com.example#ExternalReference": "https://example.com/"
+                    }
+                }
+            }
+        }
+    }
+}
+```
+
+#### Supported Formats
 
 The output format can be selected with the `format` configuration option. The
 example below demonstrtates selecting a plain markdown output format:
@@ -39,7 +68,7 @@ new
 via a
 [DocIntegration](https://github.com/smithy-lang/smithy-docgen/blob/main/smithy-docgen-core/src/main/java/software/amazon/smithy/docgen/core/DocIntegration.java).
 
-#### sphinx-markdown
+##### sphinx-markdown
 
 The `sphinx-markdown` format uses Sphinx's markdown support provided by
 [MySt](https://myst-parser.readthedocs.io/en/latest/), which builds on top of

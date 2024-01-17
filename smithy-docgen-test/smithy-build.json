@@ -5,7 +5,10 @@
             "plugins": {
                 "docgen": {
                     "service": "com.example#DocumentedService",
-                    "format": "markdown"
+                    "format": "markdown",
+                    "references": {
+                        "com.example#ExternalResource": "https://aws.amazon.com"
+                    }
                 }
             }
         },
@@ -13,7 +16,10 @@
             "plugins": {
                 "docgen": {
                     "service": "com.example#DocumentedService",
-                    "format": "sphinx-markdown"
+                    "format": "sphinx-markdown",
+                    "references": {
+                        "com.example#ExternalResource": "https://aws.amazon.com"
+                    }
                 }
             }
         }

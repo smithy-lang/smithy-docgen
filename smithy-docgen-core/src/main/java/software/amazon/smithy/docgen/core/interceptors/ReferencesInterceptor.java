@@ -5,16 +5,19 @@
 
 package software.amazon.smithy.docgen.core.interceptors;
 
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.logging.Logger;
+import software.amazon.smithy.docgen.core.DocGenerationContext;
 import software.amazon.smithy.docgen.core.sections.ShapeDetailsSection;
 import software.amazon.smithy.docgen.core.writers.DocWriter;
 import software.amazon.smithy.docgen.core.writers.DocWriter.NoticeType;
-import software.amazon.smithy.model.Model;
 import software.amazon.smithy.model.shapes.Shape;
 import software.amazon.smithy.model.traits.ReferencesTrait;
 import software.amazon.smithy.model.traits.ReferencesTrait.Reference;
 import software.amazon.smithy.utils.CodeInterceptor;
+import software.amazon.smithy.utils.Pair;
 import software.amazon.smithy.utils.SmithyInternalApi;
 
 /**
@@ -23,6 +26,8 @@ import software.amazon.smithy.utils.SmithyInternalApi;
  */
 @SmithyInternalApi
 public final class ReferencesInterceptor implements CodeInterceptor.Appender<ShapeDetailsSection, DocWriter> {
+    private static final Logger LOGGER = Logger.getLogger(ReferencesInterceptor.class.getName());
+
     @Override
     public Class<ShapeDetailsSection> sectionType() {
         return ShapeDetailsSection.class;
@@ -31,9 +36,8 @@ public final class ReferencesInterceptor implements CodeInterceptor.Appender<Sha
     @Override
     public boolean isIntercepted(ShapeDetailsSection section) {
         var model = section.context().model();
-        if (model.getResourceShapes().isEmpty()) {
-            // We can only link to local references for now, so if the model doesn't have any
-            // then we know we can't link.
+        if (model.getResourceShapes().isEmpty() && section.context().settings().references().isEmpty()) {
+            // If there's nothing referenceable, we can return quickly.
             return false;
         }
 
@@ -43,16 +47,23 @@ public final class ReferencesInterceptor implements CodeInterceptor.Appender<Sha
             return false;
         }
 
-        return !getLocalReferences(section.context().model(), section.shape()).isEmpty();
+        return !getLocalReferences(section.context(), section.shape()).isEmpty();
     }
 
     @Override
     public void append(DocWriter writer, ShapeDetailsSection section) {
         var model = section.context().model();
         var symbolProvider = section.context().symbolProvider();
-        var references = getLocalReferences(model, section.shape()).stream()
-                .map(reference -> symbolProvider.toSymbol(model.expectShape(reference.getResource())))
-                .toList();
+        var localRefs = getLocalReferences(section.context(), section.shape());
+        var externalRefs = section.context().settings().references();
+        var references = new ArrayList<>(localRefs.size());
+        for (var reference : localRefs) {
+            if (model.getShape(reference.getResource()).isPresent()) {
+                references.add(symbolProvider.toSymbol(model.expectShape(reference.getResource())));
+            } else if (externalRefs.containsKey(reference.getResource())) {
+                references.add(Pair.of(reference.getResource().getName(), externalRefs.get(reference.getResource())));
+            }
+        }
 
         writer.pushState();
         writer.putContext("refs", references);
@@ -71,23 +82,29 @@ public final class ReferencesInterceptor implements CodeInterceptor.Appender<Sha
         writer.popState();
     }
 
-    private Set<Reference> getLocalReferences(Model model, Shape shape) {
+    private Set<Reference> getLocalReferences(DocGenerationContext context, Shape shape) {
+        var model = context.model();
         var references = new LinkedHashSet<Reference>();
         if (shape.isOperationShape()) {
             var operation = shape.asOperationShape().get();
-            references.addAll(getLocalReferences(model, model.expectShape(operation.getInputShape())));
-            references.addAll(getLocalReferences(model, model.expectShape(operation.getInputShape())));
+            references.addAll(getLocalReferences(context, model.expectShape(operation.getInputShape())));
+            references.addAll(getLocalReferences(context, model.expectShape(operation.getInputShape())));
             return references;
         }
         for (var member : shape.members()) {
-            references.addAll(getLocalReferences(model, member));
+            references.addAll(getLocalReferences(context, member));
         }
         var shapeRefs = shape.getMemberTrait(model, ReferencesTrait.class);
+        var externalsRefs = context.settings().references();
         if (shapeRefs.isPresent()) {
             for (var reference : shapeRefs.get().getReferences()) {
-                // We can only link to local references for now.
-                if (model.getShape(reference.getResource()).isPresent()) {
+                if (model.getShape(reference.getResource()).isPresent()
+                        || externalsRefs.containsKey(reference.getResource())) {
                     references.add(reference);
+                } else {
+                    LOGGER.warning("""
+                            Unable to generate a reference link for `%s`, referenced by `%s`. Use the `references` \
+                            map in the generator settings to add a reference link.""");
                 }
             }
         }
