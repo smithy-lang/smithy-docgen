@@ -5,7 +5,7 @@
 
 package software.amazon.smithy.docgen.core.interceptors;
 
-import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -56,12 +56,17 @@ public final class ReferencesInterceptor implements CodeInterceptor.Appender<Sha
         var symbolProvider = section.context().symbolProvider();
         var localRefs = getLocalReferences(section.context(), section.shape());
         var externalRefs = section.context().settings().references();
-        var references = new ArrayList<>(localRefs.size());
+
+        // This is a mapping of reference link to optional rel type. If `rel` isn't set,
+        // it'll be an empty optional that won't get displayed.
+        var references = new LinkedHashMap<>(localRefs.size());
         for (var reference : localRefs) {
             if (model.getShape(reference.getResource()).isPresent()) {
-                references.add(symbolProvider.toSymbol(model.expectShape(reference.getResource())));
+                var symbol = symbolProvider.toSymbol(model.expectShape(reference.getResource()));
+                references.put(symbol, reference.getRel());
             } else if (externalRefs.containsKey(reference.getResource())) {
-                references.add(Pair.of(reference.getResource().getName(), externalRefs.get(reference.getResource())));
+                var ref = Pair.of(reference.getResource().getName(), externalRefs.get(reference.getResource()));
+                references.put(ref, reference.getRel());
             }
         }
 
@@ -74,7 +79,7 @@ public final class ReferencesInterceptor implements CodeInterceptor.Appender<Sha
                 ${?multipleRefs}the following resources: ${/multipleRefs}\
                 ${^multipleRefs}the resource ${/multipleRefs}\
                 ${#refs}
-                ${value:R}${^key.last}, ${/key.last}\
+                ${key:R}${?value} (rel type: ${value:`})${/value}${^key.last}, ${/key.last}\
                 ${/refs}
                 .
                 """);
@@ -102,9 +107,10 @@ public final class ReferencesInterceptor implements CodeInterceptor.Appender<Sha
                         || externalsRefs.containsKey(reference.getResource())) {
                     references.add(reference);
                 } else {
-                    LOGGER.warning("""
+                    LOGGER.warning(String.format("""
                             Unable to generate a reference link for `%s`, referenced by `%s`. Use the `references` \
-                            map in the generator settings to add a reference link.""");
+                            map in the generator settings to add a reference link.""",
+                            reference.getResource(), shape.getId()));
                 }
             }
         }
