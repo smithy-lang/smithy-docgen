@@ -616,7 +616,7 @@ operation ExternalReference {
 /// case to an external resource.
 @references(
     [
-        {resource: "com.example#ExternalResource"}
+        {resource: "com.example#ExternalResource", rel: "help"}
     ]
 )
 structure ExternalResourceReference {
