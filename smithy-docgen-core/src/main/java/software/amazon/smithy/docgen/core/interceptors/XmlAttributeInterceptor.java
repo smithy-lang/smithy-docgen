@@ -12,6 +12,8 @@ import software.amazon.smithy.model.shapes.ShapeId;
 import software.amazon.smithy.model.traits.XmlAttributeTrait;
 import software.amazon.smithy.utils.SmithyInternalApi;
 
+// TODO: this needs to get added to operation input / output shapes too.
+// It isn't right now because those shapes don't have their own doc pages.
 /**
  * Notes that a member is an
  * <a href="https://smithy.io/2.0/spec/protocol-traits.html#xmlattribute-trait">
