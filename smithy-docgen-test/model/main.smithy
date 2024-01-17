@@ -629,6 +629,11 @@ resource DocumentationResource {
 /// These properites and identifiers all have their own shapes to enable documentation
 /// sharing, not necessarily because they have meaningful collections of constraints
 /// or other wire-level traits.
+@references(
+    [
+        {resource: DocumentationResource}
+    ]
+)
 string DocumentationId
 
 /// The actual body of the documentation.
@@ -782,13 +787,24 @@ resource DocumentationArtifact {
 /// Sub-resources need distinct identifiers.
 string DocumentationArtifactId
 
+@mixin
+@references(
+    [
+        {resource: DocumentationArtifact}
+    ]
+)
+structure DocArtifactRef for DocumentationArtifact {
+    $id
+    $artifactId
+}
+
 /// This would be the bytes containing the artifact
 blob DocumentationArtifactData
 
 @idempotent
 @http(method: "PUT", uri: "/DocumentationResource/{id}/artifact/{artifactId}")
 operation PutDocArtifact with [AllAuth] {
-    input := for DocumentationArtifact {
+    input := for DocumentationArtifact with [DocArtifactRef] {
         @required
         @httpLabel
         $id
@@ -805,7 +821,7 @@ operation PutDocArtifact with [AllAuth] {
 @readonly
 @http(method: "GET", uri: "/DocumentationResource/{id}/artifact/{artifactId}")
 operation GetDocArtifact with [AllAuth] {
-    input := for DocumentationArtifact {
+    input := for DocumentationArtifact with [DocArtifactRef] {
         @required
         @httpLabel
         $id
@@ -815,7 +831,7 @@ operation GetDocArtifact with [AllAuth] {
         $artifactId
     }
 
-    output := for DocumentationArtifact {
+    output := for DocumentationArtifact with [DocArtifactRef] {
         @required
         $id
 
@@ -830,7 +846,7 @@ operation GetDocArtifact with [AllAuth] {
 @idempotent
 @http(method: "DELETE", uri: "/DocumentationResource/{id}/artifact/{artifactId}")
 operation DeleteDocArtifact with [AllAuth] {
-    input := for DocumentationArtifact {
+    input := for DocumentationArtifact with [DocArtifactRef] {
         @required
         @httpLabel
         $id
