@@ -58,6 +58,7 @@ service DocumentedService {
         HttpTraits
         EndpointTraits
         Misc
+        ExternalReference
     ]
     resources: [
         DocumentationResource
@@ -599,6 +600,29 @@ structure ClientError with [ErrorMixin] {}
 @error("server")
 @httpError(500)
 structure ServiceError with [ErrorMixin] {}
+
+/// This operation references a resource shape that isn't contained within this
+/// model, and so generating a reference link to it requires configuring the
+/// `references` setting of the generator.
+@http(method: "POST", uri: "/ExternalReference")
+operation ExternalReference {
+    input := {
+        /// A structure that contains the identifiers for the external resource.
+        externalReference: ExternalResourceReference
+    }
+}
+
+/// This is a non-input, non-output structure that contains references, in this
+/// case to an external resource.
+@references(
+    [
+        {resource: "com.example#ExternalResource"}
+    ]
+)
+structure ExternalResourceReference {
+    /// This is the actual identifier for the external resource.
+    externalResourceId: String
+}
 
 /// A resource shape. To have some sense of readability this will represent the concept
 /// of documentation itself as a resource, presenting the image of a service which
