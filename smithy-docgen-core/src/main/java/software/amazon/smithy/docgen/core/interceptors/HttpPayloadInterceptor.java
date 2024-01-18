@@ -9,6 +9,7 @@ import software.amazon.smithy.docgen.core.sections.ProtocolSection;
 import software.amazon.smithy.docgen.core.writers.DocWriter;
 import software.amazon.smithy.model.shapes.ShapeId;
 import software.amazon.smithy.model.traits.HttpPayloadTrait;
+import software.amazon.smithy.model.traits.RequiresLengthTrait;
 import software.amazon.smithy.utils.SmithyInternalApi;
 
 /**
@@ -30,9 +31,14 @@ public final class HttpPayloadInterceptor extends ProtocolTraitInterceptor<HttpP
 
     @Override
     void write(DocWriter writer, String previousText, ProtocolSection section, HttpPayloadTrait trait) {
+        var target = section.context().model().expectShape(section.shape().asMemberShape().get().getTarget());
+        writer.pushState();
+        writer.putContext("requiresLength", target.hasTrait(RequiresLengthTrait.class));
         writer.write("""
-                This is bound directly to the HTTP message body without wrapping.
+                This is bound directly to the HTTP message body without wrapping.${?requiresLength} \
+                Its size must be sent as the value of the $` header.${/requiresLength}
 
-                $L""", previousText);
+                $L""", "Content-Length", previousText);
+        writer.popState();
     }
 }

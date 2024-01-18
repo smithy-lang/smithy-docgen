@@ -487,8 +487,7 @@ operation StreamingTraits with [AllAuth] {
     }
 }
 
-/// This is a streaming blob. The streaming trait is not currently
-/// supported either for data streams or event streams.
+/// This is a streaming blob.
 @streaming
 @requiresLength
 blob StreamingBlob
