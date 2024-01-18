@@ -141,7 +141,6 @@ which have default support.
   dedicated section is created for them and documentation is added without
   needing to add explicit support. Each protocol also needs to be able to register
   an example generator.
-* [cors](https://smithy.io/2.0/spec/http-bindings.html#smithy-api-cors-trait)
 * [Event Streaming](https://smithy.io/2.0/spec/streaming.html#event-streams)
 * [examples](https://smithy.io/2.0/spec/documentation-traits.html#smithy-api-examples-trait) -
   The sections and wrapping for these are created, and currently there's a
