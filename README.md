@@ -6,6 +6,48 @@ Smithy build plugin to generate API documentation from models authored in
 NOTE: this project is currently in a pre-release state. Interfaces and output
 formatting may change before full release.
 
+### Current State
+
+A documentation site can be generated in one of two formats with wide support
+for built-in traits. Minor changes to layout may occur, but the final product
+will be very similar to the current output.
+
+The one critical missing component is full example support. This will drive both
+wire-level examples and client examples.
+
+#### Trait Support
+
+Currently, most prelude (`smithy.api`) traits are supported, or deliberately
+excluded where not relevant to customer documentation. Trait information is
+easily added using Smithy's
+[interceptor](https://github.com/smithy-lang/smithy/blob/main/smithy-utils/src/main/java/software/amazon/smithy/utils/CodeInterceptor.java)
+system. Most trait information is added using interceptors, the implementations
+of which can be found in the
+[interceptors](https://github.com/smithy-lang/smithy-docgen/tree/main/smithy-docgen-core/src/main/java/software/amazon/smithy/docgen/core/interceptors)
+package.
+
+Auth traits are automatically supported as part of the service's auth list,
+where the trait's docs are used by default. More context can be added using
+the same interceptors that are run on normal shapes.
+
+##### Traits Missing Support
+
+The following prelude traits and trait categories are currently unsupported. All
+traits outside of the prelude are unsupported, with the exception of auth traits
+which have default support.
+
+* Protocol Traits - These should get a similar treatment to auth traits, where a
+  dedicated section is created for them and documentation is added without
+  needing to add explicit support. Each protocol also needs to be able to register
+  an example generator.
+* [Event Streaming](https://smithy.io/2.0/spec/streaming.html#event-streams)
+* [examples](https://smithy.io/2.0/spec/documentation-traits.html#smithy-api-examples-trait) -
+  The sections and wrapping for these are created, and currently there's a
+  stub that simply places the values of example inputs and outputs inside the
+  example blocks. An interface needs to be created for code generators to
+  actually integrate into this. Updates to directed codegen will likely be
+  needed to make this feasible. Protocols will need to implement this also.
+
 ### Configuration
 
 This generator supports the following top-level configuration options:
@@ -115,39 +157,6 @@ The following example `smithy-build.json` demonstrates configuring the
     }
 }
 ```
-
-### Trait Support
-
-Currently, most prelude (`smithy.api`) traits are supported, or deliberately
-excluded where not relevant to customer documentation. Trait information is
-easily added using Smithy's
-[interceptor](https://github.com/smithy-lang/smithy/blob/main/smithy-utils/src/main/java/software/amazon/smithy/utils/CodeInterceptor.java)
-system. Most trait information is added using interceptors, the implementations
-of which can be found in the
-[interceptors](https://github.com/smithy-lang/smithy-docgen/tree/main/smithy-docgen-core/src/main/java/software/amazon/smithy/docgen/core/interceptors)
-package.
-
-Auth traits are automatically supported as part of the service's auth list,
-where the trait's docs are used by default. More context can be added using
-the same interceptors that are run on normal shapes.
-
-#### Traits Missing Support
-
-The following prelude traits and trait categories are currently unsupported. All
-traits outside of the prelude are unsupported, with the exception of auth traits
-which have default support.
-
-* Protocol Traits - These should get a similar treatment to auth traits, where a
-  dedicated section is created for them and documentation is added without
-  needing to add explicit support. Each protocol also needs to be able to register
-  an example generator.
-* [Event Streaming](https://smithy.io/2.0/spec/streaming.html#event-streams)
-* [examples](https://smithy.io/2.0/spec/documentation-traits.html#smithy-api-examples-trait) -
-  The sections and wrapping for these are created, and currently there's a
-  stub that simply places the values of example inputs and outputs inside the
-  example blocks. An interface needs to be created for code generators to
-  actually integrate into this. Updates to directed codegen will likely be
-  needed to make this feasible. Protocols will need to implement this also.
 
 ## Security
 
