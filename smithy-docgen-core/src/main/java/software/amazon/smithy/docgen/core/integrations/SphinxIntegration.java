@@ -33,6 +33,7 @@ import software.amazon.smithy.model.node.Node;
 import software.amazon.smithy.model.node.ObjectNode;
 import software.amazon.smithy.model.node.StringNode;
 import software.amazon.smithy.model.shapes.ServiceShape;
+import software.amazon.smithy.utils.IoUtils;
 import software.amazon.smithy.utils.SmithyInternalApi;
 import software.amazon.smithy.utils.SmithyUnstableApi;
 import software.amazon.smithy.utils.StringUtils;
@@ -93,18 +94,9 @@ public final class SphinxIntegration implements DocIntegration {
     private static final Logger LOGGER = Logger.getLogger(SphinxIntegration.class.getName());
 
     // The default requirements needed to build the docs.
-    private static final List<String> BASE_REQUIREMENTS = List.of(
-            "Sphinx==7.2.6",
-            "sphinx_inline_tabs==2023.4.21",
-            "sphinx-copybutton==0.5.2",
-            "Pygments==2.16.1",
-            "sphinx-design==0.5.0"
-    );
-    private static final List<String> FURO_REQUIREMENTS = List.of("furo==2023.9.10");
-    private static final List<String> MARKDOWN_REQUIREMENTS = List.of(
-            "myst-parser==2.0.0",
-            "linkify-it-py==2.0.2"
-    );
+    private static final List<String> BASE_REQUIREMENTS = parseRequirements("requirements-base.txt");
+    private static final List<String> FURO_REQUIREMENTS = parseRequirements("requirements-furo.txt");
+    private static final List<String> MARKDOWN_REQUIREMENTS = parseRequirements("requirements-markdown.txt");
 
     private static final List<String> BASE_EXTENSIONS = List.of(
             "sphinx_inline_tabs",
@@ -116,6 +108,13 @@ public final class SphinxIntegration implements DocIntegration {
     );
 
     private SphinxSettings settings = SphinxSettings.fromNode(Node.objectNode());
+
+    private static List<String> parseRequirements(String filename) {
+        String requirementsFile = IoUtils.readUtf8Resource(SphinxIntegration.class, "sphinx/" + filename);
+        return requirementsFile.lines()
+                .filter(line -> line.stripLeading().startsWith("#"))
+                .collect(Collectors.toList());
+    }
 
     @Override
     public String name() {
