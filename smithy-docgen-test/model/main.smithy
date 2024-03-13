@@ -1,8 +1,16 @@
 $version: "2.0"
 
 metadata suppressions = [
-    {id: "UnstableTrait", namespace: "com.example", reason: "These are used for examples."}
-    {id: "DeprecatedTrait", namespace: "com.example", reason: "These are used for examples."}
+    {
+        id: "UnstableTrait"
+        namespace: "com.example"
+        reason: "These are used for examples."
+    }
+    {
+        id: "DeprecatedTrait"
+        namespace: "com.example"
+        reason: "These are used for examples."
+    }
 ]
 
 namespace com.example
@@ -248,28 +256,26 @@ structure SimpleError with [ErrorMixin] {}
 /// shows the raw input / output structures.
 ///
 /// The `title` trait is applied to the service.
-@examples(
-    [
-        {
-            title: "Basic Example"
-            input: {
-                deprecated: {deprecatedSince: "foo"}
-            }
-            output: {}
+@examples([
+    {
+        title: "Basic Example"
+        input: {
+            deprecated: { deprecatedSince: "foo" }
         }
-        {
-            title: "Error example"
-            documentation: "This shows an error response example."
-            input: {
-                deprecated: {deprecatedMessage: "bar"}
-            }
-            error: {
-                shapeId: SimpleError
-                content: {message: "That's super deprecated, don't use it."}
-            }
+        output: {}
+    }
+    {
+        title: "Error example"
+        documentation: "This shows an error response example."
+        input: {
+            deprecated: { deprecatedMessage: "bar" }
         }
-    ]
-)
+        error: {
+            shapeId: SimpleError
+            content: { message: "That's super deprecated, don't use it." }
+        }
+    }
+])
 @http(method: "POST", uri: "/DocumentationTraits")
 operation DocumentationTraits with [AllAuth] {
     input := {
@@ -613,11 +619,12 @@ operation ExternalReference {
 
 /// This is a non-input, non-output structure that contains references, in this
 /// case to an external resource.
-@references(
-    [
-        {resource: "com.example#ExternalResource", rel: "help"}
-    ]
-)
+@references([
+    {
+        resource: "com.example#ExternalResource"
+        rel: "help"
+    }
+])
 structure ExternalResourceReference {
     /// This is the actual identifier for the external resource.
     externalResourceId: String
@@ -628,8 +635,8 @@ structure ExternalResourceReference {
 /// stores such things.
 @noReplace
 resource DocumentationResource {
-    identifiers: {id: DocumentationId}
-    properties: {contents: DocumentationContents, archived: DocumentationArchived}
+    identifiers: { id: DocumentationId }
+    properties: { contents: DocumentationContents, archived: DocumentationArchived }
     put: PutDocs
     create: CreateDocs
     read: GetDocs
@@ -652,11 +659,11 @@ resource DocumentationResource {
 /// These properites and identifiers all have their own shapes to enable documentation
 /// sharing, not necessarily because they have meaningful collections of constraints
 /// or other wire-level traits.
-@references(
-    [
-        {resource: DocumentationResource}
-    ]
-)
+@references([
+    {
+        resource: DocumentationResource
+    }
+])
 string DocumentationId
 
 /// The actual body of the documentation.
@@ -800,8 +807,8 @@ structure Documentation for DocumentationResource {
 
 /// This would be something like a built PDF.
 resource DocumentationArtifact {
-    identifiers: {id: DocumentationId, artifactId: DocumentationArtifactId}
-    properties: {data: DocumentationArtifactData}
+    identifiers: { id: DocumentationId, artifactId: DocumentationArtifactId }
+    properties: { data: DocumentationArtifactData }
     put: PutDocArtifact
     read: GetDocArtifact
     delete: DeleteDocArtifact
@@ -811,11 +818,11 @@ resource DocumentationArtifact {
 string DocumentationArtifactId
 
 @mixin
-@references(
-    [
-        {resource: DocumentationArtifact}
-    ]
-)
+@references([
+    {
+        resource: DocumentationArtifact
+    }
+])
 structure DocArtifactRef for DocumentationArtifact {
     $id
     $artifactId
