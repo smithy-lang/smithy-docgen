@@ -1,2 +1,2 @@
 # These are requirements only needed for the base furo theme
-furo==2023.9.10
+furo==2024.1.29
