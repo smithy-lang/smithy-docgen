@@ -112,7 +112,7 @@ public final class SphinxIntegration implements DocIntegration {
     private static List<String> parseRequirements(String filename) {
         String requirementsFile = IoUtils.readUtf8Resource(SphinxIntegration.class, "sphinx/" + filename);
         return requirementsFile.lines()
-                .filter(line -> line.stripLeading().startsWith("#"))
+                .filter(line -> !line.stripLeading().startsWith("#"))
                 .collect(Collectors.toList());
     }
 
