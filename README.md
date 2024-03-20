@@ -10,9 +10,9 @@ formatting may change before full release.
 
 A documentation site can be generated in one of two formats with wide support
 for built-in traits. Minor changes to layout may occur, but the final product
-will be very similar to the current output.
+will be similar to the current output.
 
-The one critical missing component is full example support. This will drive both
+The one critical, missing component is full example support. This will drive both
 wire-level examples and client examples.
 
 #### Trait Support
