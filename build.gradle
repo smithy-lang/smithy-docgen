@@ -21,7 +21,7 @@ plugins {
     id "signing"
     id "checkstyle"
     id "jacoco"
-    id "com.github.spotbugs" version "6.0.12"
+    id "com.github.spotbugs" version "6.0.18"
 }
 
 ext {
@@ -51,9 +51,9 @@ subprojects {
     }
 
     dependencies {
-        testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.2")
-        testImplementation("org.junit.jupiter:junit-jupiter-engine:5.10.2")
-        testImplementation("org.junit.jupiter:junit-jupiter-params:5.10.2")
+        testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.3")
+        testImplementation("org.junit.jupiter:junit-jupiter-engine:5.10.3")
+        testImplementation("org.junit.jupiter:junit-jupiter-params:5.10.3")
         testImplementation("org.hamcrest:hamcrest:2.2")
     }
 
