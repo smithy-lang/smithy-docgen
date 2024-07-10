@@ -58,13 +58,13 @@ jobs:
         run: ./gradlew clean build -Plog-tests
 
       - name: Upload built plain markdown test docs
-        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
+        uses: actions/upload-artifact@0b2256b8c012f0828dc542b3febcab082c67f72b # v4.3.4
         with:
           name: plain-markdown-docs
           path: smithy-docgen-test/build/smithyprojections/smithy-docgen-test/plain-markdown/docgen
 
       - name: Upload built sphinx markdown test docs
-        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
+        uses: actions/upload-artifact@0b2256b8c012f0828dc542b3febcab082c67f72b # v4.3.4
         with:
           name: sphinx-markdown-docs
           path: |
