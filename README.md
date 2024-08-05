@@ -6,6 +6,31 @@ Smithy build plugin to generate API documentation from models authored in
 NOTE: this project is currently in a pre-release state. Interfaces and output
 formatting may change before full release.
 
+### Setup
+
+1. Locally publish with `./gradlew :smithy-docgen-core:publishToMavenLocal`
+
+### Usage
+
+Given a Gradle Smithy workspace (ie created with
+`smithy init -o /tmp/smithy-docgen -t quickstart-gradle`).
+
+Add `implementation("software.amazon.smithy.docgen:smithy-docgen-core:0.1.0")`
+to `build.gradle.kts` under `implementation`.
+
+Add `docgen` plugin to `smithy-build.json`:
+```
+    "plugins": {
+        "docgen": {
+            "service": "example.weather#Weather"
+        }
+    }
+```
+
+Now build the model: `./gradlew build`
+
+Build logs will provide the destination folder for the generated docs.
+
 ### Current State
 
 A documentation site can be generated in one of two formats with wide support
