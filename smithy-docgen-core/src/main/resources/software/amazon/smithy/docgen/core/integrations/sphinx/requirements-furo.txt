@@ -1,2 +1,2 @@
 # These are requirements only needed for the base furo theme
-furo==2024.8.6
+furo==2025.9.25
