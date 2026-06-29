@@ -1,3 +1,10 @@
+> [!WARNING]
+> This project has been incorporated into the
+> [main smithy repo](https://github.com/smithy-lang/smithy/tree/main/smithy-docgen).
+> If you have any feature requests or issues, please report them there. This
+> repository is archived, and is not accepting any new changes.
+
+
 ## Smithy DocGen
 
 Smithy build plugin to generate API documentation from models authored in
