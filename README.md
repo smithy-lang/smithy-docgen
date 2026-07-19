@@ -139,7 +139,7 @@ By default, two formats are currently supported: `markdown` and
 `sphinx-markdown`. The `markdown` format renders docs as plain
 [CommonMark](https://commonmark.org), while `sphinx-commonmark` creates a
 [Sphinx](https://www.sphinx-doc.org/) markdown project that gets rendered to
-HTTP. `sphinx-markdown` is used by default.
+HTML. `sphinx-markdown` is used by default.
 
 The generator is designed to allow for different output formats by supplying a
 new
